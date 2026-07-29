@@ -93,4 +93,5 @@ export const settingsQuery = queryOptions({
   },
 });
 
-export type ProductRow = Awaited<ReturnType<typeof productsQuery.queryFn>>[number];
+type Unwrap<T> = T extends Promise<infer U> ? U : T;
+export type ProductRow = Unwrap<ReturnType<NonNullable<typeof productsQuery.queryFn>>>[number];
