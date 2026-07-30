@@ -10,9 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as WholesaleRouteImport } from './routes/wholesale'
+import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ExportRouteImport } from './routes/export'
+import { Route as CustomPackagingRouteImport } from './routes/custom-packaging'
+import { Route as CorporateSupplyRouteImport } from './routes/corporate-supply'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
@@ -29,6 +34,16 @@ const WishlistRoute = WishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WholesaleRoute = WholesaleRouteImport.update({
+  id: '/wholesale',
+  path: '/wholesale',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhiteLabellingRoute = WhiteLabellingRouteImport.update({
+  id: '/white-labelling',
+  path: '/white-labelling',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackOrderRoute = TrackOrderRouteImport.update({
   id: '/track-order',
   path: '/track-order',
@@ -42,6 +57,21 @@ const OrderConfirmedRoute = OrderConfirmedRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExportRoute = ExportRouteImport.update({
+  id: '/export',
+  path: '/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomPackagingRoute = CustomPackagingRouteImport.update({
+  id: '/custom-packaging',
+  path: '/custom-packaging',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CorporateSupplyRoute = CorporateSupplyRouteImport.update({
+  id: '/corporate-supply',
+  path: '/corporate-supply',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -101,9 +131,14 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/corporate-supply': typeof CorporateSupplyRoute
+  '/custom-packaging': typeof CustomPackagingRoute
+  '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/track-order': typeof TrackOrderRoute
+  '/white-labelling': typeof WhiteLabellingRoute
+  '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -117,9 +152,14 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/corporate-supply': typeof CorporateSupplyRoute
+  '/custom-packaging': typeof CustomPackagingRoute
+  '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/track-order': typeof TrackOrderRoute
+  '/white-labelling': typeof WhiteLabellingRoute
+  '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -134,9 +174,14 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/corporate-supply': typeof CorporateSupplyRoute
+  '/custom-packaging': typeof CustomPackagingRoute
+  '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/track-order': typeof TrackOrderRoute
+  '/white-labelling': typeof WhiteLabellingRoute
+  '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -152,9 +197,14 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/corporate-supply'
+    | '/custom-packaging'
+    | '/export'
     | '/faq'
     | '/order-confirmed'
     | '/track-order'
+    | '/white-labelling'
+    | '/wholesale'
     | '/wishlist'
     | '/category/$slug'
     | '/products/$slug'
@@ -168,9 +218,14 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/corporate-supply'
+    | '/custom-packaging'
+    | '/export'
     | '/faq'
     | '/order-confirmed'
     | '/track-order'
+    | '/white-labelling'
+    | '/wholesale'
     | '/wishlist'
     | '/category/$slug'
     | '/products/$slug'
@@ -184,9 +239,14 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/corporate-supply'
+    | '/custom-packaging'
+    | '/export'
     | '/faq'
     | '/order-confirmed'
     | '/track-order'
+    | '/white-labelling'
+    | '/wholesale'
     | '/wishlist'
     | '/category/$slug'
     | '/products/$slug'
@@ -201,9 +261,14 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  CorporateSupplyRoute: typeof CorporateSupplyRoute
+  CustomPackagingRoute: typeof CustomPackagingRoute
+  ExportRoute: typeof ExportRoute
   FaqRoute: typeof FaqRoute
   OrderConfirmedRoute: typeof OrderConfirmedRoute
   TrackOrderRoute: typeof TrackOrderRoute
+  WhiteLabellingRoute: typeof WhiteLabellingRoute
+  WholesaleRoute: typeof WholesaleRoute
   WishlistRoute: typeof WishlistRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
@@ -219,6 +284,20 @@ declare module '@tanstack/react-router' {
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wholesale': {
+      id: '/wholesale'
+      path: '/wholesale'
+      fullPath: '/wholesale'
+      preLoaderRoute: typeof WholesaleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/white-labelling': {
+      id: '/white-labelling'
+      path: '/white-labelling'
+      fullPath: '/white-labelling'
+      preLoaderRoute: typeof WhiteLabellingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/track-order': {
@@ -240,6 +319,27 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/export': {
+      id: '/export'
+      path: '/export'
+      fullPath: '/export'
+      preLoaderRoute: typeof ExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/custom-packaging': {
+      id: '/custom-packaging'
+      path: '/custom-packaging'
+      fullPath: '/custom-packaging'
+      preLoaderRoute: typeof CustomPackagingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-supply': {
+      id: '/corporate-supply'
+      path: '/corporate-supply'
+      fullPath: '/corporate-supply'
+      preLoaderRoute: typeof CorporateSupplyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -321,9 +421,14 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  CorporateSupplyRoute: CorporateSupplyRoute,
+  CustomPackagingRoute: CustomPackagingRoute,
+  ExportRoute: ExportRoute,
   FaqRoute: FaqRoute,
   OrderConfirmedRoute: OrderConfirmedRoute,
   TrackOrderRoute: TrackOrderRoute,
+  WhiteLabellingRoute: WhiteLabellingRoute,
+  WholesaleRoute: WholesaleRoute,
   WishlistRoute: WishlistRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductsSlugRoute: ProductsSlugRoute,
