@@ -5,7 +5,7 @@ import { ProductGrid } from "@/components/product-grid";
 import { RecentlyViewed } from "@/components/recently-viewed";
 import { categoriesQuery, productsQuery } from "@/lib/queries";
 
-export const Route = createFileRoute("/products")({
+export const Route = createFileRoute("/products/")({
   validateSearch: z.object({ q: z.string().optional() }),
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(productsQuery);
