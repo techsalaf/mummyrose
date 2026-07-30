@@ -9,38 +9,427 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as WholesaleRouteImport } from './routes/wholesale'
+import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
+import { Route as TrackOrderRouteImport } from './routes/track-order'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ExportRouteImport } from './routes/export'
+import { Route as CustomPackagingRouteImport } from './routes/custom-packaging'
+import { Route as CorporateSupplyRouteImport } from './routes/corporate-supply'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RecipesIndexRouteImport } from './routes/recipes.index'
+import { Route as ProductsIndexRouteImport } from './routes/products.index'
+import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
+import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WholesaleRoute = WholesaleRouteImport.update({
+  id: '/wholesale',
+  path: '/wholesale',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhiteLabellingRoute = WhiteLabellingRouteImport.update({
+  id: '/white-labelling',
+  path: '/white-labelling',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackOrderRoute = TrackOrderRouteImport.update({
+  id: '/track-order',
+  path: '/track-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderConfirmedRoute = OrderConfirmedRouteImport.update({
+  id: '/order-confirmed',
+  path: '/order-confirmed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExportRoute = ExportRouteImport.update({
+  id: '/export',
+  path: '/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomPackagingRoute = CustomPackagingRouteImport.update({
+  id: '/custom-packaging',
+  path: '/custom-packaging',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CorporateSupplyRoute = CorporateSupplyRouteImport.update({
+  id: '/corporate-supply',
+  path: '/corporate-supply',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecipesIndexRoute = RecipesIndexRouteImport.update({
+  id: '/recipes/',
+  path: '/recipes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsIndexRoute = ProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipesSlugRoute = RecipesSlugRouteImport.update({
+  id: '/recipes/$slug',
+  path: '/recipes/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsSlugRoute = ProductsSlugRouteImport.update({
+  id: '/products/$slug',
+  path: '/products/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
+  '/corporate-supply': typeof CorporateSupplyRoute
+  '/custom-packaging': typeof CustomPackagingRoute
+  '/export': typeof ExportRoute
+  '/faq': typeof FaqRoute
+  '/order-confirmed': typeof OrderConfirmedRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/track-order': typeof TrackOrderRoute
+  '/white-labelling': typeof WhiteLabellingRoute
+  '/wholesale': typeof WholesaleRoute
+  '/wishlist': typeof WishlistRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/recipes/$slug': typeof RecipesSlugRoute
+  '/products/': typeof ProductsIndexRoute
+  '/recipes/': typeof RecipesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
+  '/corporate-supply': typeof CorporateSupplyRoute
+  '/custom-packaging': typeof CustomPackagingRoute
+  '/export': typeof ExportRoute
+  '/faq': typeof FaqRoute
+  '/order-confirmed': typeof OrderConfirmedRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/track-order': typeof TrackOrderRoute
+  '/white-labelling': typeof WhiteLabellingRoute
+  '/wholesale': typeof WholesaleRoute
+  '/wishlist': typeof WishlistRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/recipes/$slug': typeof RecipesSlugRoute
+  '/products': typeof ProductsIndexRoute
+  '/recipes': typeof RecipesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
+  '/corporate-supply': typeof CorporateSupplyRoute
+  '/custom-packaging': typeof CustomPackagingRoute
+  '/export': typeof ExportRoute
+  '/faq': typeof FaqRoute
+  '/order-confirmed': typeof OrderConfirmedRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/track-order': typeof TrackOrderRoute
+  '/white-labelling': typeof WhiteLabellingRoute
+  '/wholesale': typeof WholesaleRoute
+  '/wishlist': typeof WishlistRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/recipes/$slug': typeof RecipesSlugRoute
+  '/products/': typeof ProductsIndexRoute
+  '/recipes/': typeof RecipesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/account'
+    | '/cart'
+    | '/checkout'
+    | '/contact'
+    | '/corporate-supply'
+    | '/custom-packaging'
+    | '/export'
+    | '/faq'
+    | '/order-confirmed'
+    | '/privacy'
+    | '/terms'
+    | '/track-order'
+    | '/white-labelling'
+    | '/wholesale'
+    | '/wishlist'
+    | '/category/$slug'
+    | '/products/$slug'
+    | '/recipes/$slug'
+    | '/products/'
+    | '/recipes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/account'
+    | '/cart'
+    | '/checkout'
+    | '/contact'
+    | '/corporate-supply'
+    | '/custom-packaging'
+    | '/export'
+    | '/faq'
+    | '/order-confirmed'
+    | '/privacy'
+    | '/terms'
+    | '/track-order'
+    | '/white-labelling'
+    | '/wholesale'
+    | '/wishlist'
+    | '/category/$slug'
+    | '/products/$slug'
+    | '/recipes/$slug'
+    | '/products'
+    | '/recipes'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/account'
+    | '/cart'
+    | '/checkout'
+    | '/contact'
+    | '/corporate-supply'
+    | '/custom-packaging'
+    | '/export'
+    | '/faq'
+    | '/order-confirmed'
+    | '/privacy'
+    | '/terms'
+    | '/track-order'
+    | '/white-labelling'
+    | '/wholesale'
+    | '/wishlist'
+    | '/category/$slug'
+    | '/products/$slug'
+    | '/recipes/$slug'
+    | '/products/'
+    | '/recipes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AccountRoute: typeof AccountRoute
+  CartRoute: typeof CartRoute
+  CheckoutRoute: typeof CheckoutRoute
+  ContactRoute: typeof ContactRoute
+  CorporateSupplyRoute: typeof CorporateSupplyRoute
+  CustomPackagingRoute: typeof CustomPackagingRoute
+  ExportRoute: typeof ExportRoute
+  FaqRoute: typeof FaqRoute
+  OrderConfirmedRoute: typeof OrderConfirmedRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
+  TrackOrderRoute: typeof TrackOrderRoute
+  WhiteLabellingRoute: typeof WhiteLabellingRoute
+  WholesaleRoute: typeof WholesaleRoute
+  WishlistRoute: typeof WishlistRoute
+  CategorySlugRoute: typeof CategorySlugRoute
+  ProductsSlugRoute: typeof ProductsSlugRoute
+  RecipesSlugRoute: typeof RecipesSlugRoute
+  ProductsIndexRoute: typeof ProductsIndexRoute
+  RecipesIndexRoute: typeof RecipesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wholesale': {
+      id: '/wholesale'
+      path: '/wholesale'
+      fullPath: '/wholesale'
+      preLoaderRoute: typeof WholesaleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/white-labelling': {
+      id: '/white-labelling'
+      path: '/white-labelling'
+      fullPath: '/white-labelling'
+      preLoaderRoute: typeof WhiteLabellingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track-order': {
+      id: '/track-order'
+      path: '/track-order'
+      fullPath: '/track-order'
+      preLoaderRoute: typeof TrackOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order-confirmed': {
+      id: '/order-confirmed'
+      path: '/order-confirmed'
+      fullPath: '/order-confirmed'
+      preLoaderRoute: typeof OrderConfirmedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/export': {
+      id: '/export'
+      path: '/export'
+      fullPath: '/export'
+      preLoaderRoute: typeof ExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/custom-packaging': {
+      id: '/custom-packaging'
+      path: '/custom-packaging'
+      fullPath: '/custom-packaging'
+      preLoaderRoute: typeof CustomPackagingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-supply': {
+      id: '/corporate-supply'
+      path: '/corporate-supply'
+      fullPath: '/corporate-supply'
+      preLoaderRoute: typeof CorporateSupplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +437,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recipes/': {
+      id: '/recipes/'
+      path: '/recipes'
+      fullPath: '/recipes/'
+      preLoaderRoute: typeof RecipesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products/': {
+      id: '/products/'
+      path: '/products'
+      fullPath: '/products/'
+      preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipes/$slug': {
+      id: '/recipes/$slug'
+      path: '/recipes/$slug'
+      fullPath: '/recipes/$slug'
+      preLoaderRoute: typeof RecipesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products/$slug': {
+      id: '/products/$slug'
+      path: '/products/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof ProductsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AccountRoute: AccountRoute,
+  CartRoute: CartRoute,
+  CheckoutRoute: CheckoutRoute,
+  ContactRoute: ContactRoute,
+  CorporateSupplyRoute: CorporateSupplyRoute,
+  CustomPackagingRoute: CustomPackagingRoute,
+  ExportRoute: ExportRoute,
+  FaqRoute: FaqRoute,
+  OrderConfirmedRoute: OrderConfirmedRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
+  TrackOrderRoute: TrackOrderRoute,
+  WhiteLabellingRoute: WhiteLabellingRoute,
+  WholesaleRoute: WholesaleRoute,
+  WishlistRoute: WishlistRoute,
+  CategorySlugRoute: CategorySlugRoute,
+  ProductsSlugRoute: ProductsSlugRoute,
+  RecipesSlugRoute: RecipesSlugRoute,
+  ProductsIndexRoute: ProductsIndexRoute,
+  RecipesIndexRoute: RecipesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
