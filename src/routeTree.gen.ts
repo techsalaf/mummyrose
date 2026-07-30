@@ -133,9 +133,9 @@ const RecipesSlugRoute = RecipesSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsSlugRoute = ProductsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => ProductsRoute,
+  id: '/products/$slug',
+  path: '/products/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
@@ -310,6 +310,7 @@ export interface RootRouteChildren {
   WholesaleRoute: typeof WholesaleRoute
   WishlistRoute: typeof WishlistRoute
   CategorySlugRoute: typeof CategorySlugRoute
+  ProductsSlugRoute: typeof ProductsSlugRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
@@ -459,10 +460,10 @@ declare module '@tanstack/react-router' {
     }
     '/products/$slug': {
       id: '/products/$slug'
-      path: '/$slug'
+      path: '/products/$slug'
       fullPath: '/products/$slug'
       preLoaderRoute: typeof ProductsSlugRouteImport
-      parentRoute: typeof ProductsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
       id: '/category/$slug'
@@ -493,6 +494,7 @@ const rootRouteChildren: RootRouteChildren = {
   WholesaleRoute: WholesaleRoute,
   WishlistRoute: WishlistRoute,
   CategorySlugRoute: CategorySlugRoute,
+  ProductsSlugRoute: ProductsSlugRoute,
   RecipesSlugRoute: RecipesSlugRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
@@ -500,13 +502,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
