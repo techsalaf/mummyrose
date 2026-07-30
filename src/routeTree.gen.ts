@@ -13,6 +13,8 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as WholesaleRouteImport } from './routes/wholesale'
 import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExportRouteImport } from './routes/export'
@@ -48,6 +50,16 @@ const WhiteLabellingRoute = WhiteLabellingRouteImport.update({
 const TrackOrderRoute = TrackOrderRouteImport.update({
   id: '/track-order',
   path: '/track-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderConfirmedRoute = OrderConfirmedRouteImport.update({
@@ -121,9 +133,9 @@ const RecipesSlugRoute = RecipesSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsSlugRoute = ProductsSlugRouteImport.update({
-  id: '/products/$slug',
-  path: '/products/$slug',
-  getParentRoute: () => rootRouteImport,
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ProductsRoute,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
@@ -143,6 +155,8 @@ export interface FileRoutesByFullPath {
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
@@ -165,6 +179,8 @@ export interface FileRoutesByTo {
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
@@ -188,6 +204,8 @@ export interface FileRoutesById {
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
@@ -212,6 +230,8 @@ export interface FileRouteTypes {
     | '/export'
     | '/faq'
     | '/order-confirmed'
+    | '/privacy'
+    | '/terms'
     | '/track-order'
     | '/white-labelling'
     | '/wholesale'
@@ -234,6 +254,8 @@ export interface FileRouteTypes {
     | '/export'
     | '/faq'
     | '/order-confirmed'
+    | '/privacy'
+    | '/terms'
     | '/track-order'
     | '/white-labelling'
     | '/wholesale'
@@ -256,6 +278,8 @@ export interface FileRouteTypes {
     | '/export'
     | '/faq'
     | '/order-confirmed'
+    | '/privacy'
+    | '/terms'
     | '/track-order'
     | '/white-labelling'
     | '/wholesale'
@@ -279,12 +303,13 @@ export interface RootRouteChildren {
   ExportRoute: typeof ExportRoute
   FaqRoute: typeof FaqRoute
   OrderConfirmedRoute: typeof OrderConfirmedRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   TrackOrderRoute: typeof TrackOrderRoute
   WhiteLabellingRoute: typeof WhiteLabellingRoute
   WholesaleRoute: typeof WholesaleRoute
   WishlistRoute: typeof WishlistRoute
   CategorySlugRoute: typeof CategorySlugRoute
-  ProductsSlugRoute: typeof ProductsSlugRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
@@ -318,6 +343,20 @@ declare module '@tanstack/react-router' {
       path: '/track-order'
       fullPath: '/track-order'
       preLoaderRoute: typeof TrackOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/order-confirmed': {
@@ -420,10 +459,10 @@ declare module '@tanstack/react-router' {
     }
     '/products/$slug': {
       id: '/products/$slug'
-      path: '/products/$slug'
+      path: '/$slug'
       fullPath: '/products/$slug'
       preLoaderRoute: typeof ProductsSlugRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ProductsRoute
     }
     '/category/$slug': {
       id: '/category/$slug'
@@ -447,12 +486,13 @@ const rootRouteChildren: RootRouteChildren = {
   ExportRoute: ExportRoute,
   FaqRoute: FaqRoute,
   OrderConfirmedRoute: OrderConfirmedRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   TrackOrderRoute: TrackOrderRoute,
   WhiteLabellingRoute: WhiteLabellingRoute,
   WholesaleRoute: WholesaleRoute,
   WishlistRoute: WishlistRoute,
   CategorySlugRoute: CategorySlugRoute,
-  ProductsSlugRoute: ProductsSlugRoute,
   RecipesSlugRoute: RecipesSlugRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
@@ -460,3 +500,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
