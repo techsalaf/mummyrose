@@ -40,7 +40,7 @@ export function track(
     session_id: sessionId(),
     product_id: options.productId ?? null,
     value: options.value ?? null,
-    meta: options.meta ?? {},
+    meta: (options.meta ?? {}) as Record<string, never>,
   };
   void supabase
     .from("analytics_events")
