@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          id: string
+          meta: Json
+          name: string
+          path: string | null
+          product_id: string | null
+          referrer: string | null
+          session_id: string | null
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          name: string
+          path?: string | null
+          product_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          name?: string
+          path?: string | null
+          product_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -283,6 +319,53 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          order_id: string | null
+          payload: Json
+          provider: string
+          reference: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string | null
+          payload?: Json
+          provider: string
+          reference: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string | null
+          payload?: Json
+          provider?: string
+          reference?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author: string | null
@@ -525,6 +608,57 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      wholesale_accounts: {
+        Row: {
+          company: string
+          contact_name: string
+          country: string | null
+          created_at: string
+          discount_percent: number
+          email: string
+          id: string
+          monthly_volume: string | null
+          notes: string | null
+          phone: string | null
+          status: string
+          tier: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          company: string
+          contact_name: string
+          country?: string | null
+          created_at?: string
+          discount_percent?: number
+          email: string
+          id?: string
+          monthly_volume?: string | null
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          company?: string
+          contact_name?: string
+          country?: string | null
+          created_at?: string
+          discount_percent?: number
+          email?: string
+          id?: string
+          monthly_volume?: string | null
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

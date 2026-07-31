@@ -15,6 +15,7 @@ import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PaymentCallbackRouteImport } from './routes/payment-callback'
 import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExportRouteImport } from './routes/export'
@@ -31,6 +32,8 @@ import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
+import { Route as ApiPublicWebhooksFlutterwaveRouteImport } from './routes/api/public/webhooks/flutterwave'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -60,6 +63,11 @@ const TermsRoute = TermsRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentCallbackRoute = PaymentCallbackRouteImport.update({
+  id: '/payment-callback',
+  path: '/payment-callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderConfirmedRoute = OrderConfirmedRouteImport.update({
@@ -142,6 +150,18 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWebhooksPaystackRoute =
+  ApiPublicWebhooksPaystackRouteImport.update({
+    id: '/api/public/webhooks/paystack',
+    path: '/api/public/webhooks/paystack',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicWebhooksFlutterwaveRoute =
+  ApiPublicWebhooksFlutterwaveRouteImport.update({
+    id: '/api/public/webhooks/flutterwave',
+    path: '/api/public/webhooks/flutterwave',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -155,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
+  '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -166,6 +187,8 @@ export interface FileRoutesByFullPath {
   '/recipes/$slug': typeof RecipesSlugRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
+  '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
+  '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -179,6 +202,7 @@ export interface FileRoutesByTo {
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
+  '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -190,6 +214,8 @@ export interface FileRoutesByTo {
   '/recipes/$slug': typeof RecipesSlugRoute
   '/products': typeof ProductsIndexRoute
   '/recipes': typeof RecipesIndexRoute
+  '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
+  '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -204,6 +230,7 @@ export interface FileRoutesById {
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
   '/order-confirmed': typeof OrderConfirmedRoute
+  '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -215,6 +242,8 @@ export interface FileRoutesById {
   '/recipes/$slug': typeof RecipesSlugRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
+  '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
+  '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,6 +259,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/faq'
     | '/order-confirmed'
+    | '/payment-callback'
     | '/privacy'
     | '/terms'
     | '/track-order'
@@ -241,6 +271,8 @@ export interface FileRouteTypes {
     | '/recipes/$slug'
     | '/products/'
     | '/recipes/'
+    | '/api/public/webhooks/flutterwave'
+    | '/api/public/webhooks/paystack'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -254,6 +286,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/faq'
     | '/order-confirmed'
+    | '/payment-callback'
     | '/privacy'
     | '/terms'
     | '/track-order'
@@ -265,6 +298,8 @@ export interface FileRouteTypes {
     | '/recipes/$slug'
     | '/products'
     | '/recipes'
+    | '/api/public/webhooks/flutterwave'
+    | '/api/public/webhooks/paystack'
   id:
     | '__root__'
     | '/'
@@ -278,6 +313,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/faq'
     | '/order-confirmed'
+    | '/payment-callback'
     | '/privacy'
     | '/terms'
     | '/track-order'
@@ -289,6 +325,8 @@ export interface FileRouteTypes {
     | '/recipes/$slug'
     | '/products/'
     | '/recipes/'
+    | '/api/public/webhooks/flutterwave'
+    | '/api/public/webhooks/paystack'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -303,6 +341,7 @@ export interface RootRouteChildren {
   ExportRoute: typeof ExportRoute
   FaqRoute: typeof FaqRoute
   OrderConfirmedRoute: typeof OrderConfirmedRoute
+  PaymentCallbackRoute: typeof PaymentCallbackRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   TrackOrderRoute: typeof TrackOrderRoute
@@ -314,6 +353,8 @@ export interface RootRouteChildren {
   RecipesSlugRoute: typeof RecipesSlugRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
+  ApiPublicWebhooksFlutterwaveRoute: typeof ApiPublicWebhooksFlutterwaveRoute
+  ApiPublicWebhooksPaystackRoute: typeof ApiPublicWebhooksPaystackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -358,6 +399,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-callback': {
+      id: '/payment-callback'
+      path: '/payment-callback'
+      fullPath: '/payment-callback'
+      preLoaderRoute: typeof PaymentCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/order-confirmed': {
@@ -472,6 +520,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/webhooks/paystack': {
+      id: '/api/public/webhooks/paystack'
+      path: '/api/public/webhooks/paystack'
+      fullPath: '/api/public/webhooks/paystack'
+      preLoaderRoute: typeof ApiPublicWebhooksPaystackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/webhooks/flutterwave': {
+      id: '/api/public/webhooks/flutterwave'
+      path: '/api/public/webhooks/flutterwave'
+      fullPath: '/api/public/webhooks/flutterwave'
+      preLoaderRoute: typeof ApiPublicWebhooksFlutterwaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -487,6 +549,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExportRoute: ExportRoute,
   FaqRoute: FaqRoute,
   OrderConfirmedRoute: OrderConfirmedRoute,
+  PaymentCallbackRoute: PaymentCallbackRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   TrackOrderRoute: TrackOrderRoute,
@@ -498,6 +561,8 @@ const rootRouteChildren: RootRouteChildren = {
   RecipesSlugRoute: RecipesSlugRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
+  ApiPublicWebhooksFlutterwaveRoute: ApiPublicWebhooksFlutterwaveRoute,
+  ApiPublicWebhooksPaystackRoute: ApiPublicWebhooksPaystackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
