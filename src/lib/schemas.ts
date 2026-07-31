@@ -25,6 +25,15 @@ export const newsletterSchema = z.object({
   email: z.string().trim().email("Enter a valid email").max(255),
 });
 
+export const paymentProviders = [
+  "paystack",
+  "flutterwave",
+  "bank_transfer",
+  "pay_on_delivery",
+  "whatsapp",
+] as const;
+export type PaymentProvider = (typeof paymentProviders)[number];
+
 export const checkoutSchema = z.object({
   customer_name: z.string().trim().min(2, "Full name is required").max(120),
   customer_email: z.string().trim().email("Enter a valid email").max(255),
@@ -35,7 +44,8 @@ export const checkoutSchema = z.object({
   country: z.string().trim().min(2).max(120).default("Nigeria"),
   postal_code: z.string().trim().max(20).optional().nullable(),
   notes: z.string().trim().max(1000).optional().nullable(),
-  payment_provider: z.enum(["paystack", "flutterwave", "bank_transfer", "pay_on_delivery"]),
+  payment_provider: z.enum(paymentProviders),
+  origin: z.string().trim().url().max(300).optional().nullable(),
   items: z
     .array(
       z.object({
@@ -48,3 +58,14 @@ export const checkoutSchema = z.object({
     .max(60),
 });
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
+
+export const wholesaleApplicationSchema = z.object({
+  company: z.string().trim().min(2, "Company name is required").max(160),
+  contact_name: z.string().trim().min(2, "Contact name is required").max(120),
+  email: z.string().trim().email("Enter a valid email").max(255),
+  phone: z.string().trim().min(7, "Phone number is required").max(40),
+  country: z.string().trim().max(80).optional().nullable(),
+  monthly_volume: z.string().trim().max(120).optional().nullable(),
+  notes: z.string().trim().max(2000).optional().nullable(),
+});
+export type WholesaleApplicationInput = z.infer<typeof wholesaleApplicationSchema>;
