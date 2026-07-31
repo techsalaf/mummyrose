@@ -32,6 +32,7 @@ import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
+import { Route as ApiPublicWebhooksFlutterwaveRouteImport } from './routes/api/public/webhooks/flutterwave'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -149,6 +150,12 @@ const ApiPublicWebhooksPaystackRoute =
     path: '/api/public/webhooks/paystack',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicWebhooksFlutterwaveRoute =
+  ApiPublicWebhooksFlutterwaveRouteImport.update({
+    id: '/api/public/webhooks/flutterwave',
+    path: '/api/public/webhooks/flutterwave',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/recipes/$slug': typeof RecipesSlugRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
+  '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRoutesByTo {
@@ -198,6 +206,7 @@ export interface FileRoutesByTo {
   '/recipes/$slug': typeof RecipesSlugRoute
   '/products': typeof ProductsIndexRoute
   '/recipes': typeof RecipesIndexRoute
+  '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRoutesById {
@@ -224,6 +233,7 @@ export interface FileRoutesById {
   '/recipes/$slug': typeof RecipesSlugRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
+  '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRouteTypes {
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/recipes/$slug'
     | '/products/'
     | '/recipes/'
+    | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/recipes/$slug'
     | '/products'
     | '/recipes'
+    | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   id:
     | '__root__'
@@ -301,6 +313,7 @@ export interface FileRouteTypes {
     | '/recipes/$slug'
     | '/products/'
     | '/recipes/'
+    | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   fileRoutesById: FileRoutesById
 }
@@ -327,6 +340,7 @@ export interface RootRouteChildren {
   RecipesSlugRoute: typeof RecipesSlugRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
+  ApiPublicWebhooksFlutterwaveRoute: typeof ApiPublicWebhooksFlutterwaveRoute
   ApiPublicWebhooksPaystackRoute: typeof ApiPublicWebhooksPaystackRoute
 }
 
@@ -493,6 +507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksPaystackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/webhooks/flutterwave': {
+      id: '/api/public/webhooks/flutterwave'
+      path: '/api/public/webhooks/flutterwave'
+      fullPath: '/api/public/webhooks/flutterwave'
+      preLoaderRoute: typeof ApiPublicWebhooksFlutterwaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -519,6 +540,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecipesSlugRoute: RecipesSlugRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
+  ApiPublicWebhooksFlutterwaveRoute: ApiPublicWebhooksFlutterwaveRoute,
   ApiPublicWebhooksPaystackRoute: ApiPublicWebhooksPaystackRoute,
 }
 export const routeTree = rootRouteImport
