@@ -1,4 +1,7 @@
+import { getRequestHeader } from "@tanstack/react-start/server";
+import { createClient } from "@supabase/supabase-js";
 import type { CheckoutInput } from "./schemas";
+import { quoteShipping, type ShippingConfig } from "./shipping";
 
 type Item = CheckoutInput["items"][number];
 
@@ -9,14 +12,42 @@ export function generateOrderNumber() {
   return `MR-${stamp}-${rand}`;
 }
 
-export function shippingFeeFor(subtotal: number, config: { flat_fee?: number; free_over?: number }) {
-  const flat = Number(config.flat_fee ?? 2500);
-  const freeOver = Number(config.free_over ?? 50000);
-  return subtotal >= freeOver ? 0 : flat;
+/** Resolves the signed-in user from the bearer token, if the checkout was authenticated. */
+export async function resolveUserId(): Promise<string | null> {
+  try {
+    const header = getRequestHeader("authorization");
+    const token = header?.startsWith("Bearer ") ? header.slice(7) : null;
+    if (!token) return null;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const client = createClient(process.env.SUPABASE_URL!, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data } = await client.auth.getUser(token);
+    return data.user?.id ?? null;
+  } catch {
+    return null;
+  }
 }
 
+export async function getShippingConfig(): Promise<ShippingConfig> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin.from("site_settings").select("value").eq("key", "shipping").maybeSingle();
+  return (data?.value ?? {}) as ShippingConfig;
+}
+
+export type CreatedOrder = {
+  id: string;
+  order_number: string;
+  subtotal: number;
+  shipping_fee: number;
+  shipping_zone: string;
+  total: number;
+  payment_provider: string;
+  items: { product_name: string; variant: string | null; quantity: number; unit_price: number }[];
+};
+
 /** Creates the order server-side, pricing every line from the database. */
-export async function createOrder(input: CheckoutInput, userId: string | null) {
+export async function createOrder(input: CheckoutInput, userId: string | null): Promise<CreatedOrder> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const ids = [...new Set(input.items.map((i) => i.product_id))];
@@ -48,12 +79,12 @@ export async function createOrder(input: CheckoutInput, userId: string | null) {
   });
 
   const subtotal = lines.reduce((sum, l) => sum + l.line_total, 0);
-  const { data: shippingSetting } = await supabaseAdmin
-    .from("site_settings")
-    .select("value")
-    .eq("key", "shipping")
-    .maybeSingle();
-  const shipping = shippingFeeFor(subtotal, (shippingSetting?.value ?? {}) as Record<string, number>);
+  const shippingConfig = await getShippingConfig();
+  const quote = quoteShipping(shippingConfig, {
+    subtotal,
+    state: input.state,
+    country: input.country,
+  });
 
   const { data: order, error: orderError } = await supabaseAdmin
     .from("orders")
@@ -70,8 +101,8 @@ export async function createOrder(input: CheckoutInput, userId: string | null) {
       postal_code: input.postal_code ?? null,
       notes: input.notes ?? null,
       subtotal,
-      shipping_fee: shipping,
-      total: subtotal + shipping,
+      shipping_fee: quote.fee,
+      total: subtotal + quote.fee,
       payment_provider: input.payment_provider,
       payment_status: "unpaid",
       status: "pending",
@@ -103,10 +134,19 @@ export async function createOrder(input: CheckoutInput, userId: string | null) {
   }
 
   return {
+    id: order.id,
     order_number: order.order_number,
     subtotal: Number(order.subtotal),
     shipping_fee: Number(order.shipping_fee),
+    shipping_zone: quote.zone,
     total: Number(order.total),
+    payment_provider: input.payment_provider,
+    items: lines.map((l) => ({
+      product_name: l.product_name,
+      variant: l.variant,
+      quantity: l.quantity,
+      unit_price: l.unit_price,
+    })),
   };
 }
 
