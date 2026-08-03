@@ -97,17 +97,29 @@ export function SiteChrome() {
       document.title = document.title.split(DEFAULT_BRANDING.name).join(name);
     }
     setMeta("property", "og:site_name", name);
-    if (seo.description) {
-      setMeta("name", "description", seo.description);
-      setMeta("property", "og:description", seo.description);
+
+    const title = page.title?.trim();
+    if (title) {
+      document.title = title;
+      setMeta("property", "og:title", title);
+      setMeta("name", "twitter:title", title);
     }
-    if (seo.keywords) setMeta("name", "keywords", seo.keywords);
-    if (seo.og_image) {
-      setMeta("property", "og:image", seo.og_image);
-      setMeta("name", "twitter:image", seo.og_image);
+    const description = page.description?.trim() || seo.description;
+    if (description) {
+      setMeta("name", "description", description);
+      setMeta("property", "og:description", description);
+      setMeta("name", "twitter:description", description);
+    }
+    const keywords = page.keywords?.trim() || seo.keywords;
+    if (keywords) setMeta("name", "keywords", keywords);
+    const ogImage = page.og_image?.trim() || seo.og_image;
+    if (ogImage) {
+      setMeta("property", "og:image", ogImage);
+      setMeta("name", "twitter:image", ogImage);
     }
     if (seo.twitter_handle) setMeta("name", "twitter:site", seo.twitter_handle);
-  }, [branding.name, seo, pathname]);
+  }, [branding.name, seo, page, pathname]);
+
 
   return null;
 }
