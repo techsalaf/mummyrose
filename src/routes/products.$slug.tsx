@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ProductCard } from "@/components/product-card";
 import { RecentlyViewed } from "@/components/recently-viewed";
 import { JsonLd } from "@/components/json-ld";
+import { OrderPathsNote, WhatsAppOrderButton } from "@/components/whatsapp-order-button";
 import { productQuery, productsQuery } from "@/lib/queries";
 import { effectivePrice, formatNaira } from "@/lib/format";
 import { productImage } from "@/lib/catalog-images";
