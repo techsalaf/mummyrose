@@ -183,11 +183,34 @@ function WholesalePortal() {
       </div>
 
       {!approved ? (
-        <p className="mt-6 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-          Your application is {account.data.status}. You can browse the order pad now — trade pricing activates as soon
-          as we approve the account.
-        </p>
-      ) : null}
+        <div className="mt-6 flex items-start gap-3 rounded-md border border-accent/40 bg-accent/5 p-4 text-sm">
+          <BellRing className="mt-0.5 size-4 shrink-0 text-accent" />
+          <div>
+            <p className="font-medium">
+              {account.data.status === "pending"
+                ? "Application under review"
+                : `Application ${account.data.status}`}
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              {account.data.status === "pending"
+                ? "Our trade team reviews new accounts within one working day. You can browse the order pad now — trade pricing and trade ordering unlock the moment your account is approved."
+                : "Trade ordering is disabled for this account. Reply to our last email or contact the trade desk and we'll take another look."}
+            </p>
+            <p className="mt-2 text-muted-foreground">
+              Need stock today? You can still buy at retail prices in the shop.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-6 flex items-start gap-3 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
+          <BellRing className="mt-0.5 size-4 shrink-0 text-primary" />
+          <p>
+            Account approved on the <strong>{TIER_LABELS[account.data.tier] ?? account.data.tier}</strong> tier —{" "}
+            <strong>{discount}% off</strong> every retail price, applied automatically on the order pad.
+          </p>
+        </div>
+      )}
+
 
       <Tabs defaultValue="order" className="mt-10">
         <TabsList>
