@@ -223,6 +223,63 @@ export const adminRedirectsQuery = queryOptions({
 
 
 
+export type AdminNotification = {
+  id: string;
+  title: string;
+  body: string | null;
+  href: string | null;
+  kind: string;
+  is_read: boolean;
+  created_at: string;
+};
+
+export const adminNotificationsQuery = queryOptions({
+  queryKey: ["admin", "notifications"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("admin_notifications")
+      .select("id,title,body,href,kind,is_read,created_at")
+      .order("created_at", { ascending: false })
+      .limit(30);
+    if (error) throw error;
+    return (data ?? []) as unknown as AdminNotification[];
+  },
+});
+
+export const adminReviewsQuery = queryOptions({
+  queryKey: ["admin", "product_reviews"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("product_reviews")
+      .select("*, products(name,slug)")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
+export const adminBannersQuery = queryOptions({
+  queryKey: ["admin", "banners"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("banners").select("*").order("sort_order");
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
+export const adminRolesQuery = queryOptions({
+  queryKey: ["admin", "user_roles"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("id,user_id,role,created_at")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
+
 /** Subscribes to Postgres changes and invalidates the matching admin query keys. */
 export function useAdminRealtime(tables: string[], keys: string[][]) {
   const queryClient = useQueryClient();
