@@ -1,6 +1,13 @@
 import { useEffect } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { useSiteConfig, googleFontHref, DEFAULT_BRANDING } from "@/lib/site-config";
+import {
+  useSiteConfig,
+  usePageSeoMap,
+  resolvePageSeo,
+  googleFontHref,
+  DEFAULT_BRANDING,
+} from "@/lib/site-config";
+
 
 function setMeta(attr: "name" | "property", key: string, content: string) {
   if (!content) return;
