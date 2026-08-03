@@ -147,11 +147,14 @@ export const DEFAULT_HOME: HomeConfig = {
   hero_body:
     "Spices, stone-milled flours, cereals and herbal infusions sourced directly from Nigerian farms — for home kitchens, restaurants and global distributors.",
   hero_image: "",
+  hero_image_alt: "",
   hero_overlay: 35,
   primary_cta_label: "Shop the pantry",
   primary_cta_href: "/products",
   secondary_cta_label: "Wholesale & export",
   secondary_cta_href: "/wholesale",
+  section_order: ["banners", "promises", "categories", "featured", "story", "testimonials"],
+
   promises: [
     { icon: "leaf", title: "100% natural", body: "No preservatives, fillers or artificial colouring — ever." },
     { icon: "package", title: "Small batch", body: "Milled and blended weekly so nothing sits on a shelf." },
