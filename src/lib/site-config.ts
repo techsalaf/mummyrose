@@ -234,6 +234,64 @@ export function useSiteConfig(): SiteConfig {
   return buildSiteConfig(data);
 }
 
+/* ---------------------------------------------------------------- per-page SEO */
+
+export type PageSeo = {
+  title: string;
+  description: string;
+  keywords: string;
+  og_image: string;
+};
+
+/** Every storefront route whose meta tags can be centrally overridden. */
+export const SEO_PAGES: { path: string; label: string }[] = [
+  { path: "/", label: "Home" },
+  { path: "/products", label: "Products" },
+  { path: "/recipes", label: "Recipes & journal" },
+  { path: "/about", label: "About" },
+  { path: "/contact", label: "Contact" },
+  { path: "/faq", label: "FAQ" },
+  { path: "/wholesale", label: "Wholesale" },
+  { path: "/export", label: "Export" },
+  { path: "/white-labelling", label: "White labelling" },
+  { path: "/corporate-supply", label: "Corporate supply" },
+  { path: "/custom-packaging", label: "Custom packaging" },
+  { path: "/track-order", label: "Track order" },
+  { path: "/cart", label: "Cart" },
+  { path: "/checkout", label: "Checkout" },
+];
+
+export const EMPTY_PAGE_SEO: PageSeo = { title: "", description: "", keywords: "", og_image: "" };
+
+/** Longest-prefix match so /products/ogiri inherits the /products overrides. */
+export function resolvePageSeo(
+  pages: Record<string, Partial<PageSeo>> | undefined,
+  pathname: string,
+): Partial<PageSeo> {
+  if (!pages) return {};
+  if (pages[pathname]) return pages[pathname];
+  const match = Object.keys(pages)
+    .filter((p) => p !== "/" && pathname.startsWith(p))
+    .sort((a, b) => b.length - a.length)[0];
+  return match ? pages[match] : {};
+}
+
+/** Meta overrides keyed by route path, edited in /admin/settings → SEO. */
+export function usePageSeoMap(): Record<string, Partial<PageSeo>> {
+  const { data } = useQuery({ ...settingsQuery, staleTime: 30_000 });
+  return (data?.pages_seo ?? {}) as Record<string, Partial<PageSeo>>;
+}
+
+/* ------------------------------------------------------------- media metadata */
+
+export type MediaMeta = { alt: string; seo_title: string };
+
+export function useMediaMeta(): Record<string, MediaMeta> {
+  const { data } = useQuery({ ...settingsQuery, staleTime: 30_000 });
+  return (data?.media_meta ?? {}) as Record<string, MediaMeta>;
+}
+
+
 export const GOOGLE_FONTS = [
   "Fraunces",
   "Karla",
