@@ -46,6 +46,7 @@ import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
 import { Route as ApiPublicWebhooksFlutterwaveRouteImport } from './routes/api/public/webhooks/flutterwave'
 
@@ -234,6 +235,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiPublicWebhooksPaystackRoute =
   ApiPublicWebhooksPaystackRouteImport.update({
     id: '/api/public/webhooks/paystack',
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faqs': typeof AdminFaqsRoute
@@ -307,6 +314,7 @@ export interface FileRoutesByTo {
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faqs': typeof AdminFaqsRoute
@@ -349,6 +357,7 @@ export interface FileRoutesById {
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faqs': typeof AdminFaqsRoute
@@ -392,6 +401,7 @@ export interface FileRouteTypes {
     | '/white-labelling'
     | '/wholesale'
     | '/wishlist'
+    | '/admin/analytics'
     | '/admin/categories'
     | '/admin/customers'
     | '/admin/faqs'
@@ -432,6 +442,7 @@ export interface FileRouteTypes {
     | '/white-labelling'
     | '/wholesale'
     | '/wishlist'
+    | '/admin/analytics'
     | '/admin/categories'
     | '/admin/customers'
     | '/admin/faqs'
@@ -473,6 +484,7 @@ export interface FileRouteTypes {
     | '/white-labelling'
     | '/wholesale'
     | '/wishlist'
+    | '/admin/analytics'
     | '/admin/categories'
     | '/admin/customers'
     | '/admin/faqs'
@@ -785,6 +797,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/public/webhooks/paystack': {
       id: '/api/public/webhooks/paystack'
       path: '/api/public/webhooks/paystack'
@@ -803,6 +822,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminCustomersRoute: typeof AdminCustomersRoute
   AdminFaqsRoute: typeof AdminFaqsRoute
@@ -819,6 +839,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminCustomersRoute: AdminCustomersRoute,
   AdminFaqsRoute: AdminFaqsRoute,
