@@ -299,9 +299,13 @@ function CheckoutPage() {
               >
                 Send order on WhatsApp
               </Button>
-              <p className="mt-2 text-center text-xs text-muted-foreground">
-                We'll open WhatsApp with your full order details for the seller to confirm.
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                Your order is created and reserved either way. <strong>Place order</strong> is fastest — you pay or
+                confirm now and get a tracking number instantly. <strong>Send order on WhatsApp</strong> opens a chat
+                with the full order details so a real person can confirm delivery and payment with you — great if you
+                prefer not to pay online, but replies come during business hours.
               </p>
+
             </>
           )}
         </aside>
