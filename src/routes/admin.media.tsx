@@ -72,10 +72,11 @@ function AdminMedia() {
   });
 
   const patch = (path: string, value: Partial<MediaMeta>) =>
-    setMeta((prev) => ({
-      ...prev,
-      [path]: { alt: "", seo_title: "", ...(prev[path] ?? {}), ...value },
-    }));
+    setMeta((prev) => {
+      const base: MediaMeta = prev[path] ?? { alt: "", seo_title: "" };
+      return { ...prev, [path]: { ...base, ...value } };
+    });
+
 
 
   return (
