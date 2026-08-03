@@ -117,6 +117,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-0.5">
+          <ThemeToggle />
           <Button variant="ghost" size="icon" asChild aria-label="Search products">
             <Link to="/products" search={{ q: "" }}>
               <Search />
