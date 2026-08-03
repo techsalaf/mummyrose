@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Menu, Search, ShoppingBag, Heart, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useCart } from "@/lib/cart";
 
 const shop = [
