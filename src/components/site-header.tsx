@@ -29,14 +29,18 @@ const business = [
 export function SiteHeader() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
+  const { branding } = useSiteConfig();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-md">
-      <div className="bg-ink text-ink-foreground">
-        <div className="container-page flex h-9 items-center justify-center gap-3 text-[11px] tracking-[0.18em] uppercase">
-          <span>Free delivery on orders over ₦50,000</span>
+      {branding.announcement_enabled && branding.announcement ? (
+        <div className="bg-ink text-ink-foreground">
+          <div className="container-page flex h-9 items-center justify-center gap-3 text-[11px] tracking-[0.18em] uppercase">
+            <span>{branding.announcement}</span>
+          </div>
         </div>
-      </div>
+      ) : null}
+
 
       <div className="container-page flex h-18 items-center justify-between gap-4 py-3">
         <div className="flex items-center gap-2">
