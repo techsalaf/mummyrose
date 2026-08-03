@@ -27,6 +27,11 @@ function AdminLayout() {
   const { user, isStaff, loading } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [claiming, setClaiming] = useState(false);
+  const pageTitle =
+    adminNavGroups
+      .flatMap((g) => g.items)
+      .filter((i) => (i.exact ? pathname === i.to : pathname.startsWith(i.to)))
+      .sort((a, b) => b.to.length - a.to.length)[0]?.label ?? "Dashboard";
 
   if (loading) {
     return (
