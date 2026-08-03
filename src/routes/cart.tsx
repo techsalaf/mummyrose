@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { OrderPathsNote, WhatsAppOrderButton } from "@/components/whatsapp-order-button";
 import { useCart } from "@/lib/cart";
 import { formatNaira } from "@/lib/format";
 
@@ -106,6 +107,17 @@ function CartPage() {
             <Button asChild variant="clay" size="lg" className="mt-6 w-full">
               <Link to="/checkout">Proceed to checkout</Link>
             </Button>
+            <WhatsAppOrderButton
+              className="mt-3 w-full"
+              lines={items.map((item) => ({
+                name: item.name,
+                variant: item.variant,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+              }))}
+            />
+            <OrderPathsNote className="mt-3 text-xs leading-relaxed text-muted-foreground" />
+
             <Link
               to="/products"
               className="mt-3 block text-center text-sm text-muted-foreground underline-offset-4 hover:underline"

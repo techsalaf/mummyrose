@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2 } from "lucide-react";
+import { BellRing, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -84,6 +84,8 @@ function WholesalePortal() {
 
   const place = useMutation({
     mutationFn: async () => {
+      if (!approved) throw new Error("Your trade account must be approved before placing wholesale orders.");
+
       if (selected.length === 0) throw new Error("Add at least one product to your order.");
       const result = await submit({
         data: {
@@ -183,11 +185,34 @@ function WholesalePortal() {
       </div>
 
       {!approved ? (
-        <p className="mt-6 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-          Your application is {account.data.status}. You can browse the order pad now — trade pricing activates as soon
-          as we approve the account.
-        </p>
-      ) : null}
+        <div className="mt-6 flex items-start gap-3 rounded-md border border-accent/40 bg-accent/5 p-4 text-sm">
+          <BellRing className="mt-0.5 size-4 shrink-0 text-accent" />
+          <div>
+            <p className="font-medium">
+              {account.data.status === "pending"
+                ? "Application under review"
+                : `Application ${account.data.status}`}
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              {account.data.status === "pending"
+                ? "Our trade team reviews new accounts within one working day. You can browse the order pad now — trade pricing and trade ordering unlock the moment your account is approved."
+                : "Trade ordering is disabled for this account. Reply to our last email or contact the trade desk and we'll take another look."}
+            </p>
+            <p className="mt-2 text-muted-foreground">
+              Need stock today? You can still buy at retail prices in the shop.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-6 flex items-start gap-3 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
+          <BellRing className="mt-0.5 size-4 shrink-0 text-primary" />
+          <p>
+            Account approved on the <strong>{TIER_LABELS[account.data.tier] ?? account.data.tier}</strong> tier —{" "}
+            <strong>{discount}% off</strong> every retail price, applied automatically on the order pad.
+          </p>
+        </div>
+      )}
+
 
       <Tabs defaultValue="order" className="mt-10">
         <TabsList>
@@ -290,9 +315,20 @@ function WholesalePortal() {
                   <span className="text-muted-foreground">Subtotal ({selected.length} lines)</span>
                   <span className="font-medium">{formatNaira(subtotal)}</span>
                 </div>
-                <Button className="w-full" size="lg" disabled={place.isPending} onClick={() => place.mutate()}>
+                <Button
+                  className="w-full"
+                  size="lg"
+                  disabled={place.isPending || !approved}
+                  onClick={() => place.mutate()}
+                >
                   {place.isPending ? <Loader2 className="size-4 animate-spin" /> : null} Submit trade order
                 </Button>
+                {!approved ? (
+                  <p className="text-center text-xs text-muted-foreground">
+                    Trade ordering unlocks once your account is approved.
+                  </p>
+                ) : null}
+
               </CardContent>
             </Card>
           </div>
