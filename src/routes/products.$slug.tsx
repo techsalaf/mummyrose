@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ProductCard } from "@/components/product-card";
+import { ProductReviews } from "@/components/product-reviews";
 import { RecentlyViewed } from "@/components/recently-viewed";
 import { JsonLd } from "@/components/json-ld";
 import { OrderPathsNote, WhatsAppOrderButton } from "@/components/whatsapp-order-button";
@@ -280,6 +281,8 @@ function ProductDetail() {
           </div>
         </section>
       )}
+
+      <ProductReviews productId={product.id} productName={product.name} />
 
       <RecentlyViewed products={products} excludeSlug={product.slug} />
     </div>

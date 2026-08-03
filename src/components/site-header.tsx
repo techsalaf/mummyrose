@@ -4,6 +4,7 @@ import { Menu, Search, ShoppingBag, Heart, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SearchCommand } from "@/components/search-command";
 import { useCart } from "@/lib/cart";
 
 const shop = [
@@ -119,11 +120,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-0.5">
           <ThemeToggle />
-          <Button variant="ghost" size="icon" asChild aria-label="Search products">
-            <Link to="/products" search={{ q: "" }}>
-              <Search />
-            </Link>
-          </Button>
+          <SearchCommand />
           <Button variant="ghost" size="icon" asChild aria-label="Wishlist">
             <Link to="/wishlist">
               <Heart />
