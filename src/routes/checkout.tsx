@@ -41,6 +41,20 @@ function CheckoutPage() {
   const [provider, setProvider] = useState<PaymentProvider>("paystack");
   const [state, setState] = useState("");
   const [country, setCountry] = useState("Nigeria");
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<{ code: string; discount: number; label: string } | null>(null);
+  const verifyCoupon = useServerFn(checkCoupon);
+  const couponCheck = useMutation({
+    mutationFn: (code: string) => verifyCoupon({ data: { code, subtotal } }),
+    onSuccess: (result) => {
+      setCoupon(result);
+      setCouponInput(result.code);
+      toast.success(`${result.code} applied — ${result.label}`);
+    },
+    onError: (error: Error) => toast.error(error.message || "That code isn't valid."),
+  });
+  const discount = coupon ? Math.min(coupon.discount, subtotal) : 0;
+
 
   const payments = pickPayments(settings);
   const whatsapp = pickWhatsApp(settings);
