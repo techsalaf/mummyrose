@@ -13,7 +13,8 @@ import { checkoutSchema, type CheckoutInput, type PaymentProvider } from "@/lib/
 import { placeOrder } from "@/lib/orders.functions";
 import { checkCoupon } from "@/lib/coupons.functions";
 import { settingsQuery } from "@/lib/queries";
-import { pickPayments, pickShipping, pickWhatsApp } from "@/lib/settings";
+import { pickShipping, pickWhatsApp } from "@/lib/settings";
+import { getPaymentMethods } from "@/lib/payment-methods.functions";
 import { quoteShipping } from "@/lib/shipping";
 import { buildWhatsAppMessage, whatsAppLink } from "@/lib/whatsapp";
 import { track } from "@/lib/analytics";
