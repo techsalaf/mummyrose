@@ -148,7 +148,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
+        <SiteChrome />
         {isAdmin ? (
+
           <Outlet />
         ) : (
           <div className="flex min-h-screen flex-col">
