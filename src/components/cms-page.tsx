@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
 import { pageQuery, type PageSection } from "@/lib/cms-queries";
+import { RichText } from "@/components/rich-text";
 
 /**
  * Renders a CMS-managed page (title, subtitle, hero, body sections) from the
@@ -63,15 +64,7 @@ export function CmsPage({
                   loading="lazy"
                 />
               ) : null}
-              {section.body
-                ? section.body
-                    .split(/\n{2,}/)
-                    .map((paragraph, i) => (
-                      <p key={i} className="mt-2 leading-relaxed text-muted-foreground">
-                        {paragraph}
-                      </p>
-                    ))
-                : null}
+              <RichText content={section.body} className="mt-2 space-y-2 leading-relaxed text-muted-foreground" />
             </section>
           ))
         )}
