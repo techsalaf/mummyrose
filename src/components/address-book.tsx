@@ -214,3 +214,28 @@ export function AddressBook({
     </div>
   );
 }
+
+/** Compact saved-address chooser used at checkout to prefill the delivery form. */
+export function SavedAddressPicker({
+  userId,
+  onSelect,
+}: {
+  userId: string;
+  onSelect: (address: AddressRow) => void;
+}) {
+  const { data: addresses = [] } = useQuery(addressesQuery(userId));
+  if (addresses.length === 0) return null;
+  return (
+    <div className="surface-card rounded-lg p-4">
+      <p className="text-sm font-medium">Use a saved address</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {(addresses as AddressRow[]).map((address) => (
+          <Button key={address.id} type="button" variant="outline" size="sm" onClick={() => onSelect(address)}>
+            <MapPin className="size-4 text-accent" />
+            {address.label} — {address.city}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}

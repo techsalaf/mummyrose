@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AddressBook } from "@/components/address-book";
 
 export const Route = createFileRoute("/account")({
   ssr: false,
@@ -62,7 +63,7 @@ function AccountPage() {
 
   if (user) {
     return (
-      <div className="container-page max-w-xl py-16">
+      <div className="container-page max-w-3xl py-16">
         <p className="eyebrow text-accent">Account</p>
         <h1 className="mt-3 font-display text-4xl">Hello{user.email ? `, ${user.email}` : ""}</h1>
         <p className="mt-4 text-muted-foreground">
@@ -84,6 +85,10 @@ function AccountPage() {
           >
             Sign out
           </Button>
+        </div>
+
+        <div className="mt-14">
+          <AddressBook userId={user.id} />
         </div>
       </div>
     );
