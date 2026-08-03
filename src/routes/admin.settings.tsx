@@ -185,6 +185,16 @@ function AdminSettings() {
             <Area label="Hero paragraph" value={home.hero_body} onChange={(v) => setHome({ ...home, hero_body: v })} />
             <ImageField label="Hero image" value={home.hero_image} onChange={(v) => setHome({ ...home, hero_image: v })} />
             <Text
+              label="Hero image alt text (SEO)"
+              value={home.hero_image_alt}
+              onChange={(v) => setHome({ ...home, hero_image_alt: v })}
+            />
+            <SectionOrderEditor
+              value={home.section_order}
+              onChange={(next: HomeSectionId[]) => setHome({ ...home, section_order: next })}
+            />
+
+            <Text
               label="Primary button label"
               value={home.primary_cta_label}
               onChange={(v) => setHome({ ...home, primary_cta_label: v })}
