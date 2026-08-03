@@ -22,6 +22,13 @@ export const Route = createFileRoute("/order-confirmed")({
 
 function OrderConfirmed() {
   const { order } = Route.useSearch();
+  const fetchBank = useServerFn(getBankDetails);
+  const { data: bank } = useQuery({
+    queryKey: ["bank-details", order],
+    queryFn: () => fetchBank({ data: { order_number: order! } }),
+    enabled: Boolean(order),
+    staleTime: 60_000,
+  });
   return (
     <div className="container-page py-24 text-center">
       <CheckCircle2 className="mx-auto size-12 text-accent" />
@@ -36,6 +43,17 @@ function OrderConfirmed() {
           "We've emailed your payment and delivery details."
         )}
       </p>
+      {bank && (
+        <div className="mx-auto mt-6 max-w-md rounded-lg border border-border bg-muted/40 p-4 text-sm">
+          <p className="font-medium">Bank transfer details</p>
+          <p className="mt-1">
+            {bank.bank_name} · {bank.account_name} · {bank.account_number}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Use <span className="text-foreground">{order}</span> as your transfer reference.
+          </p>
+        </div>
+      )}
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Button asChild variant="clay">
           <Link to="/track-order">Track your order</Link>
