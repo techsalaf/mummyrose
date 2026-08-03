@@ -467,9 +467,29 @@ function AdminSettings() {
               onChange={(v) => setSeo({ ...seo, og_image: v })}
               help="1200×630 works best. Link previews may cache the old image for a while."
             />
+            <SeoPreview
+              url="/"
+              title={String(seo.title ?? "")}
+              description={String(seo.description ?? "")}
+              image={seo.og_image ? String(seo.og_image) : undefined}
+              siteName={String(branding.name ?? "Mummy Rose")}
+            />
+          </Panel>
 
+          <Panel
+            title="Per-page meta"
+            description="Override the title, description, keywords and social image for any storefront page, with a live search and social preview."
+            onSave={() => save.mutate({ key: "pages_seo", value: pagesSeo })}
+            pending={save.isPending}
+          >
+            <PageSeoEditor
+              value={pagesSeo}
+              onChange={setPagesSeo}
+              siteName={String(branding.name ?? "Mummy Rose")}
+            />
           </Panel>
         </TabsContent>
+
       </Tabs>
     </div>
   );
