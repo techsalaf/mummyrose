@@ -19,6 +19,9 @@ import {
   Tag,
   Ticket,
   Users,
+  GalleryHorizontal,
+  ShieldCheck,
+  Star,
 } from "lucide-react";
 
 import {
@@ -58,6 +61,7 @@ export const adminNavGroups: { group: string; items: Item[] }[] = [
       { to: "/admin/customers", label: "Customers", icon: Users },
       { to: "/admin/wholesale", label: "Wholesale", icon: Layers },
       { to: "/admin/inquiries", label: "Inquiries", icon: Inbox },
+      { to: "/admin/roles", label: "Team & roles", icon: ShieldCheck },
     ],
   },
   {
@@ -68,6 +72,8 @@ export const adminNavGroups: { group: string; items: Item[] }[] = [
       { to: "/admin/testimonials", label: "Testimonials", icon: Quote },
       { to: "/admin/faqs", label: "FAQs", icon: MessageSquareQuote },
       { to: "/admin/navigation", label: "Navigation", icon: Navigation },
+      { to: "/admin/banners", label: "Banners", icon: GalleryHorizontal },
+      { to: "/admin/reviews", label: "Reviews", icon: Star },
       { to: "/admin/media", label: "Media library", icon: ImageIcon },
     ],
   },

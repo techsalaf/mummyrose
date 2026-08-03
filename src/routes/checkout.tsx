@@ -18,6 +18,7 @@ import { quoteShipping } from "@/lib/shipping";
 import { buildWhatsAppMessage, whatsAppLink } from "@/lib/whatsapp";
 import { track } from "@/lib/analytics";
 import { useAuth } from "@/hooks/useAuth";
+import { SavedAddressPicker, type AddressRow } from "@/components/address-book";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -42,6 +43,7 @@ function CheckoutPage() {
   const [provider, setProvider] = useState<PaymentProvider>("paystack");
   const [state, setState] = useState("");
   const [country, setCountry] = useState("Nigeria");
+  const [prefill, setPrefill] = useState<AddressRow | null>(null);
   const [couponInput, setCouponInput] = useState("");
   const [coupon, setCoupon] = useState<{ code: string; discount: number; label: string } | null>(null);
   const verifyCoupon = useServerFn(checkCoupon);
@@ -178,7 +180,21 @@ function CheckoutPage() {
         </p>
       )}
 
+      {user ? (
+        <div className="mt-8">
+          <SavedAddressPicker
+            userId={user.id}
+            onSelect={(address) => {
+              setPrefill(address);
+              setState(address.state);
+              setCountry(address.country);
+            }}
+          />
+        </div>
+      ) : null}
+
       <form
+        key={prefill?.id ?? "blank"}
         onSubmit={(event) => {
           event.preventDefault();
           runSubmit(event.currentTarget, provider);
@@ -188,7 +204,12 @@ function CheckoutPage() {
         <div className="space-y-8">
           <fieldset className="space-y-4">
             <legend className="font-display text-xl">Contact</legend>
-            <Field name="customer_name" label="Full name" error={errors.customer_name} />
+            <Field
+              name="customer_name"
+              label="Full name"
+              defaultValue={prefill?.full_name ?? ""}
+              error={errors.customer_name}
+            />
             <div className="grid gap-4 sm:grid-cols-2">
               <Field
                 name="customer_email"
@@ -197,18 +218,29 @@ function CheckoutPage() {
                 defaultValue={user?.email ?? ""}
                 error={errors.customer_email}
               />
-              <Field name="customer_phone" label="Phone" error={errors.customer_phone} />
+              <Field
+                name="customer_phone"
+                label="Phone"
+                defaultValue={prefill?.phone ?? ""}
+                error={errors.customer_phone}
+              />
             </div>
           </fieldset>
 
           <fieldset className="space-y-4">
             <legend className="font-display text-xl">Delivery</legend>
-            <Field name="address_line" label="Street address" error={errors.address_line} />
+            <Field
+              name="address_line"
+              label="Street address"
+              defaultValue={prefill?.address_line ?? ""}
+              error={errors.address_line}
+            />
             <div className="grid gap-4 sm:grid-cols-3">
-              <Field name="city" label="City" error={errors.city} />
+              <Field name="city" label="City" defaultValue={prefill?.city ?? ""} error={errors.city} />
               <Field
                 name="state"
                 label="State"
+                defaultValue={prefill?.state ?? ""}
                 error={errors.state}
                 onChange={(value) => setState(value)}
               />

@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminGate, AdminLogin } from "@/components/admin/admin-shell";
 import { AdminSidebar, adminNavGroups } from "@/components/admin/admin-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/admin/notification-bell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -88,6 +89,7 @@ function AdminLayout() {
               <p className="hidden truncate text-xs text-muted-foreground sm:block">{user.email}</p>
             </div>
             <div className="flex shrink-0 items-center gap-1">
+              <NotificationBell />
               <ThemeToggle />
               <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
                 <Link to="/">Storefront</Link>

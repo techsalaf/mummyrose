@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { uploadMedia } from "@/lib/media";
+import { RichTextEditor } from "@/components/rich-text";
 
 export type FieldType =
   | "text"
@@ -167,7 +168,7 @@ export function FieldRenderer({
         ) : field.type === "textarea" || field.type === "json" ? (
           <Textarea id={id} value={text} rows={4} placeholder={field.placeholder} onChange={(e) => onChange(e.target.value)} />
         ) : field.type === "richtext" ? (
-          <Textarea id={id} value={text} rows={12} placeholder={field.placeholder} onChange={(e) => onChange(e.target.value)} />
+          <RichTextEditor id={id} value={text} rows={12} placeholder={field.placeholder} onChange={onChange} />
         ) : (
           <Input
             id={id}
