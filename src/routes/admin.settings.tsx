@@ -40,6 +40,10 @@ function AdminSettings() {
   const [payments, setPayments] = useState<Group>({});
   const [whatsapp, setWhatsapp] = useState<Group>({});
   const [seo, setSeo] = useState<Group>({});
+  const [branding, setBranding] = useState<Group>({});
+  const [theme, setTheme] = useState<Group>({});
+  const [home, setHome] = useState<Group>({});
+  const [footer, setFooter] = useState<Group>({});
   const [zonesText, setZonesText] = useState("");
 
   useEffect(() => {
@@ -48,9 +52,14 @@ function AdminSettings() {
     setShipping(data.shipping ?? {});
     setPayments(data.payments ?? {});
     setWhatsapp(data.whatsapp ?? {});
-    setSeo(data.seo ?? {});
+    setSeo({ ...DEFAULT_SEO_META, ...(data.seo ?? {}) });
+    setBranding({ ...DEFAULT_BRANDING, ...(data.branding ?? {}) });
+    setTheme({ ...DEFAULT_THEME, ...(data.theme ?? {}) });
+    setHome({ ...DEFAULT_HOME, ...(data.home ?? {}) });
+    setFooter({ ...DEFAULT_FOOTER, ...(data.footer ?? {}) });
     setZonesText(JSON.stringify((data.shipping?.zones ?? []) as unknown[], null, 2));
   }, [data]);
+
 
   const save = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: Group }) =>
