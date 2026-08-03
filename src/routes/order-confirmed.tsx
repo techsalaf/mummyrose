@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getBankDetails } from "@/lib/payment-methods.functions";
 
 export const Route = createFileRoute("/order-confirmed")({
   validateSearch: z.object({ order: z.string().optional() }),
