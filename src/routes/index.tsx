@@ -54,6 +54,133 @@ function Home() {
   const grid = (featured.length ? featured : products).slice(0, 8);
   const promises = Array.isArray(home.promises) ? home.promises : [];
 
+  const sections: Record<string, React.ReactNode> = {
+    banners: <BannerSections placement="home_section" />,
+
+    promises:
+      home.promises_enabled && promises.length > 0 ? (
+        <section className="border-b border-border bg-sand">
+          <div className="container-page grid gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">
+            {promises.map((p) => {
+              const Icon = ICONS[(p.icon ?? "leaf").toLowerCase()] ?? Leaf;
+              return (
+                <div key={p.title} className="flex gap-3">
+                  <Icon className="mt-0.5 size-5 shrink-0 text-accent" />
+                  <div>
+                    <p className="font-display text-base">{p.title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{p.body}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null,
+
+    categories: home.categories_enabled ? (
+      <section className="container-page py-16 md:py-24">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow text-accent">{home.categories_eyebrow}</p>
+            <h2 className="mt-3 font-display text-3xl md:text-4xl">{home.categories_title}</h2>
+          </div>
+          <Link to="/products" className="hidden text-sm underline-offset-4 hover:underline sm:block">
+            View all products
+          </Link>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              to="/category/$slug"
+              params={{ slug: cat.slug }}
+              className="group relative aspect-[4/3] overflow-hidden rounded-lg"
+            >
+              <img
+                src={cat.image_url || categoryImage(cat.slug)}
+                alt={cat.name}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+              <div className="absolute right-5 bottom-5 left-5 text-ink-foreground">
+                <p className="font-display text-2xl">{cat.name}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-ink-foreground/75">{cat.description}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    ) : null,
+
+    featured: home.featured_enabled ? (
+      <section className="bg-secondary/40 py-16 md:py-24">
+        <div className="container-page">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow text-accent">{home.featured_eyebrow}</p>
+              <h2 className="mt-3 font-display text-3xl md:text-4xl">{home.featured_title}</h2>
+            </div>
+            <Link to="/products" className="hidden text-sm underline-offset-4 hover:underline sm:block">
+              Shop all
+            </Link>
+          </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {grid.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </div>
+      </section>
+    ) : null,
+
+    story: home.story_enabled ? (
+      <section className="container-page grid items-center gap-12 py-16 md:py-24 lg:grid-cols-2">
+        <img
+          src={home.story_image || storyFallback}
+          alt={home.story_image_alt || home.story_title}
+          className="rounded-lg object-cover"
+          loading="lazy"
+        />
+        <div>
+          <p className="eyebrow text-accent">{home.story_eyebrow}</p>
+          <h2 className="mt-3 font-display text-3xl md:text-4xl">{home.story_title}</h2>
+          <p className="mt-5 leading-relaxed whitespace-pre-line text-muted-foreground">{home.story_body}</p>
+          {home.story_cta_label ? (
+            <Button asChild variant="clay" className="mt-8">
+              <a href={home.story_cta_href || "/about"}>{home.story_cta_label}</a>
+            </Button>
+          ) : null}
+        </div>
+      </section>
+    ) : null,
+
+    testimonials:
+      home.testimonials_enabled && testimonials.length > 0 ? (
+        <section className="bg-ink py-16 text-ink-foreground md:py-24">
+          <div className="container-page">
+            <p className="eyebrow text-gold">{home.testimonials_eyebrow}</p>
+            <div className="mt-10 grid gap-8 md:grid-cols-3">
+              {testimonials.slice(0, 3).map((t) => (
+                <figure key={t.id} className="border-l-2 border-gold/50 pl-5">
+                  <blockquote className="font-display text-lg leading-snug">“{t.quote}”</blockquote>
+                  <figcaption className="mt-4 text-sm text-ink-foreground/60">
+                    {t.author}
+                    {t.role ? ` · ${t.role}` : ""}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null,
+  };
+
+  const order = (Array.isArray(home.section_order) && home.section_order.length
+    ? home.section_order
+    : HOME_SECTIONS.map((s) => s.id)) as string[];
+  const ordered = [...order, ...HOME_SECTIONS.map((s) => s.id).filter((id) => !order.includes(id))];
+
   return (
     <>
       <JsonLd
@@ -69,7 +196,7 @@ function Home() {
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
         <img
           src={home.hero_image || heroFallback}
-          alt={home.hero_title}
+          alt={home.hero_image_alt || home.hero_title}
           className="absolute inset-0 h-full w-full object-cover"
           style={{ opacity: Math.min(Math.max(Number(home.hero_overlay) || 35, 0), 100) / 100 }}
         />
@@ -99,123 +226,10 @@ function Home() {
         </div>
       </section>
 
-      <BannerSections placement="home_section" />
-
-      {home.promises_enabled && promises.length > 0 && (
-        <section className="border-b border-border bg-sand">
-          <div className="container-page grid gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">
-            {promises.map((p) => {
-              const Icon = ICONS[(p.icon ?? "leaf").toLowerCase()] ?? Leaf;
-              return (
-                <div key={p.title} className="flex gap-3">
-                  <Icon className="mt-0.5 size-5 shrink-0 text-accent" />
-                  <div>
-                    <p className="font-display text-base">{p.title}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{p.body}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {home.categories_enabled && (
-        <section className="container-page py-16 md:py-24">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow text-accent">{home.categories_eyebrow}</p>
-              <h2 className="mt-3 font-display text-3xl md:text-4xl">{home.categories_title}</h2>
-            </div>
-            <Link to="/products" className="hidden text-sm underline-offset-4 hover:underline sm:block">
-              View all products
-            </Link>
-          </div>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                to="/category/$slug"
-                params={{ slug: cat.slug }}
-                className="group relative aspect-[4/3] overflow-hidden rounded-lg"
-              >
-                <img
-                  src={cat.image_url || categoryImage(cat.slug)}
-                  alt={cat.name}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
-                <div className="absolute right-5 bottom-5 left-5 text-ink-foreground">
-                  <p className="font-display text-2xl">{cat.name}</p>
-                  <p className="mt-1 line-clamp-2 text-sm text-ink-foreground/75">{cat.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {home.featured_enabled && (
-        <section className="bg-secondary/40 py-16 md:py-24">
-          <div className="container-page">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="eyebrow text-accent">{home.featured_eyebrow}</p>
-                <h2 className="mt-3 font-display text-3xl md:text-4xl">{home.featured_title}</h2>
-              </div>
-              <Link to="/products" className="hidden text-sm underline-offset-4 hover:underline sm:block">
-                Shop all
-              </Link>
-            </div>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {grid.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {home.story_enabled && (
-        <section className="container-page grid items-center gap-12 py-16 md:py-24 lg:grid-cols-2">
-          <img
-            src={home.story_image || storyFallback}
-            alt={home.story_title}
-            className="rounded-lg object-cover"
-            loading="lazy"
-          />
-          <div>
-            <p className="eyebrow text-accent">{home.story_eyebrow}</p>
-            <h2 className="mt-3 font-display text-3xl md:text-4xl">{home.story_title}</h2>
-            <p className="mt-5 leading-relaxed whitespace-pre-line text-muted-foreground">{home.story_body}</p>
-            {home.story_cta_label ? (
-              <Button asChild variant="clay" className="mt-8">
-                <a href={home.story_cta_href || "/about"}>{home.story_cta_label}</a>
-              </Button>
-            ) : null}
-          </div>
-        </section>
-      )}
-
-      {home.testimonials_enabled && testimonials.length > 0 && (
-        <section className="bg-ink py-16 text-ink-foreground md:py-24">
-          <div className="container-page">
-            <p className="eyebrow text-gold">{home.testimonials_eyebrow}</p>
-            <div className="mt-10 grid gap-8 md:grid-cols-3">
-              {testimonials.slice(0, 3).map((t) => (
-                <figure key={t.id} className="border-l-2 border-gold/50 pl-5">
-                  <blockquote className="font-display text-lg leading-snug">“{t.quote}”</blockquote>
-                  <figcaption className="mt-4 text-sm text-ink-foreground/60">
-                    {t.author}
-                    {t.role ? ` · ${t.role}` : ""}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {ordered.map((id) => (
+        <div key={id}>{sections[id] ?? null}</div>
+      ))}
     </>
   );
 }
+
