@@ -100,14 +100,22 @@ export function SiteHeader() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/" className="flex flex-col leading-none">
-            <span className="font-display text-2xl font-semibold tracking-tight text-primary">
-              Mummy Rose
-            </span>
-            <span className="hidden text-[10px] tracking-[0.3em] text-muted-foreground uppercase sm:block">
-              Natural Nigerian Pantry
+          <Link to="/" className="flex items-center gap-2.5 leading-none">
+            {branding.logo_url ? (
+              <img src={branding.logo_url} alt={branding.name} className="h-10 w-auto max-w-40 object-contain" />
+            ) : null}
+            <span className="flex flex-col">
+              <span className="font-display text-2xl font-semibold tracking-tight text-primary">
+                {branding.name}
+              </span>
+              {branding.tagline ? (
+                <span className="hidden text-[10px] tracking-[0.3em] text-muted-foreground uppercase sm:block">
+                  {branding.tagline}
+                </span>
+              ) : null}
             </span>
           </Link>
+
         </div>
 
         <nav className="hidden items-center gap-7 text-sm lg:flex">
