@@ -72,7 +72,11 @@ function AdminMedia() {
   });
 
   const patch = (path: string, value: Partial<MediaMeta>) =>
-    setMeta((prev) => ({ ...prev, [path]: { alt: "", seo_title: "", ...prev[path], ...value } }));
+    setMeta((prev) => ({
+      ...prev,
+      [path]: { alt: "", seo_title: "", ...(prev[path] ?? {}), ...value },
+    }));
+
 
   return (
     <div className="space-y-6">
