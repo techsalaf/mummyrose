@@ -225,7 +225,9 @@ function Stat({
   );
 }
 
-function Row({ label, value, to }: { label: string; value: number; to: string }) {
+type AdminPath = "/admin/orders" | "/admin/inventory" | "/admin/inquiries" | "/admin/products";
+
+function Row({ label, value, to }: { label: string; value: number; to: AdminPath }) {
   return (
     <Link to={to} className="flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-muted">
       <span>{label}</span>
