@@ -5,13 +5,14 @@ import { Search, TrendingUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  CommandDialog,
+  Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { categoriesQuery, productsQuery } from "@/lib/queries";
 import { effectivePrice, formatNaira } from "@/lib/format";
 import { productImage } from "@/lib/catalog-images";
@@ -64,7 +65,10 @@ export function SearchCommand() {
       <Button variant="ghost" size="icon" aria-label="Search products" onClick={() => setOpen(true)}>
         <Search />
       </Button>
-      <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false} title="Search Mummy Rose">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="overflow-hidden p-0 sm:max-w-xl">
+          <DialogTitle className="sr-only">Search Mummy Rose</DialogTitle>
+          <Command shouldFilter={false}>
         <CommandInput
           value={term}
           onValueChange={setTerm}
@@ -124,7 +128,9 @@ export function SearchCommand() {
             </CommandGroup>
           ) : null}
         </CommandList>
-      </CommandDialog>
+          </Command>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
