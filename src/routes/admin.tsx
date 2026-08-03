@@ -71,14 +71,9 @@ function AdminLayout() {
   }
 
   if (!user) {
-    return (
-      <Gate title="Staff sign-in required" body="Sign in with your staff account to open the commerce console.">
-        <Button asChild>
-          <Link to="/account">Go to sign in</Link>
-        </Button>
-      </Gate>
-    );
+    return <AdminLogin />;
   }
+
 
   if (!isStaff) {
     return (
