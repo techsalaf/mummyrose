@@ -60,7 +60,12 @@ function CheckoutPage() {
   const discount = coupon ? Math.min(coupon.discount, subtotal) : 0;
 
 
-  const payments = pickPayments(settings);
+  const fetchPaymentMethods = useServerFn(getPaymentMethods);
+  const { data: payments } = useQuery({
+    queryKey: ["payment-methods"],
+    queryFn: () => fetchPaymentMethods(),
+    staleTime: 60_000,
+  });
   const whatsapp = pickWhatsApp(settings);
   const shippingConfig = pickShipping(settings);
 
