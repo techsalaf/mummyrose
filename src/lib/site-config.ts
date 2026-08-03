@@ -40,16 +40,30 @@ export type SeoMetaConfig = {
 
 export type HomePromise = { title: string; body: string; icon?: string };
 
+/** Ordered, toggleable home page content blocks. */
+export const HOME_SECTIONS = [
+  { id: "banners", label: "CMS banners" },
+  { id: "promises", label: "Trust badges" },
+  { id: "categories", label: "Categories" },
+  { id: "featured", label: "Best sellers" },
+  { id: "story", label: "Story" },
+  { id: "testimonials", label: "Testimonials" },
+] as const;
+
+export type HomeSectionId = (typeof HOME_SECTIONS)[number]["id"];
+
 export type HomeConfig = {
   hero_eyebrow: string;
   hero_title: string;
   hero_body: string;
   hero_image: string;
+  hero_image_alt: string;
   hero_overlay: number;
   primary_cta_label: string;
   primary_cta_href: string;
   secondary_cta_label: string;
   secondary_cta_href: string;
+  section_order: HomeSectionId[];
   promises: HomePromise[];
   promises_enabled: boolean;
   categories_eyebrow: string;
@@ -62,12 +76,14 @@ export type HomeConfig = {
   story_title: string;
   story_body: string;
   story_image: string;
+  story_image_alt: string;
   story_cta_label: string;
   story_cta_href: string;
   story_enabled: boolean;
   testimonials_eyebrow: string;
   testimonials_enabled: boolean;
 };
+
 
 export type FooterConfig = {
   blurb: string;
@@ -131,11 +147,14 @@ export const DEFAULT_HOME: HomeConfig = {
   hero_body:
     "Spices, stone-milled flours, cereals and herbal infusions sourced directly from Nigerian farms — for home kitchens, restaurants and global distributors.",
   hero_image: "",
+  hero_image_alt: "",
   hero_overlay: 35,
   primary_cta_label: "Shop the pantry",
   primary_cta_href: "/products",
   secondary_cta_label: "Wholesale & export",
   secondary_cta_href: "/wholesale",
+  section_order: ["banners", "promises", "categories", "featured", "story", "testimonials"],
+
   promises: [
     { icon: "leaf", title: "100% natural", body: "No preservatives, fillers or artificial colouring — ever." },
     { icon: "package", title: "Small batch", body: "Milled and blended weekly so nothing sits on a shelf." },
@@ -154,6 +173,8 @@ export const DEFAULT_HOME: HomeConfig = {
   story_body:
     "Mummy Rose began with one conviction: Nigerian food deserves ingredients that are clean, honest and consistent. We work directly with farming cooperatives, dry and mill in controlled batches, and pack without preservatives so every jar tastes the way it should.",
   story_image: "",
+  story_image_alt: "",
+
   story_cta_label: "Read our story",
   story_cta_href: "/about",
   story_enabled: true,
@@ -212,6 +233,64 @@ export function useSiteConfig(): SiteConfig {
   const { data } = useQuery({ ...settingsQuery, staleTime: 30_000 });
   return buildSiteConfig(data);
 }
+
+/* ---------------------------------------------------------------- per-page SEO */
+
+export type PageSeo = {
+  title: string;
+  description: string;
+  keywords: string;
+  og_image: string;
+};
+
+/** Every storefront route whose meta tags can be centrally overridden. */
+export const SEO_PAGES: { path: string; label: string }[] = [
+  { path: "/", label: "Home" },
+  { path: "/products", label: "Products" },
+  { path: "/recipes", label: "Recipes & journal" },
+  { path: "/about", label: "About" },
+  { path: "/contact", label: "Contact" },
+  { path: "/faq", label: "FAQ" },
+  { path: "/wholesale", label: "Wholesale" },
+  { path: "/export", label: "Export" },
+  { path: "/white-labelling", label: "White labelling" },
+  { path: "/corporate-supply", label: "Corporate supply" },
+  { path: "/custom-packaging", label: "Custom packaging" },
+  { path: "/track-order", label: "Track order" },
+  { path: "/cart", label: "Cart" },
+  { path: "/checkout", label: "Checkout" },
+];
+
+export const EMPTY_PAGE_SEO: PageSeo = { title: "", description: "", keywords: "", og_image: "" };
+
+/** Longest-prefix match so /products/ogiri inherits the /products overrides. */
+export function resolvePageSeo(
+  pages: Record<string, Partial<PageSeo>> | undefined,
+  pathname: string,
+): Partial<PageSeo> {
+  if (!pages) return {};
+  if (pages[pathname]) return pages[pathname];
+  const match = Object.keys(pages)
+    .filter((p) => p !== "/" && pathname.startsWith(p))
+    .sort((a, b) => b.length - a.length)[0];
+  return match ? pages[match] : {};
+}
+
+/** Meta overrides keyed by route path, edited in /admin/settings → SEO. */
+export function usePageSeoMap(): Record<string, Partial<PageSeo>> {
+  const { data } = useQuery({ ...settingsQuery, staleTime: 30_000 });
+  return (data?.pages_seo ?? {}) as Record<string, Partial<PageSeo>>;
+}
+
+/* ------------------------------------------------------------- media metadata */
+
+export type MediaMeta = { alt: string; seo_title: string };
+
+export function useMediaMeta(): Record<string, MediaMeta> {
+  const { data } = useQuery({ ...settingsQuery, staleTime: 30_000 });
+  return (data?.media_meta ?? {}) as Record<string, MediaMeta>;
+}
+
 
 export const GOOGLE_FONTS = [
   "Fraunces",

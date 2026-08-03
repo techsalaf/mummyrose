@@ -22,8 +22,19 @@ import {
   DEFAULT_FOOTER,
   DEFAULT_SEO_META,
   type HomePromise,
+  type HomeSectionId,
+  type PageSeo,
 } from "@/lib/site-config";
-import { ImageField, ColorField, FontField, PromisesEditor } from "@/components/admin/settings-fields";
+import {
+  ImageField,
+  ColorField,
+  FontField,
+  PromisesEditor,
+  SectionOrderEditor,
+  PageSeoEditor,
+  SeoPreview,
+} from "@/components/admin/settings-fields";
+
 
 
 export const Route = createFileRoute("/admin/settings")({
@@ -44,7 +55,9 @@ function AdminSettings() {
   const [theme, setTheme] = useState<Group>({});
   const [home, setHome] = useState<Group>({});
   const [footer, setFooter] = useState<Group>({});
+  const [pagesSeo, setPagesSeo] = useState<Record<string, Partial<PageSeo>>>({});
   const [zonesText, setZonesText] = useState("");
+
 
   useEffect(() => {
     if (!data) return;
@@ -57,7 +70,9 @@ function AdminSettings() {
     setTheme({ ...DEFAULT_THEME, ...(data.theme ?? {}) });
     setHome({ ...DEFAULT_HOME, ...(data.home ?? {}) });
     setFooter({ ...DEFAULT_FOOTER, ...(data.footer ?? {}) });
+    setPagesSeo((data.pages_seo ?? {}) as Record<string, Partial<PageSeo>>);
     setZonesText(JSON.stringify((data.shipping?.zones ?? []) as unknown[], null, 2));
+
   }, [data]);
 
 
@@ -170,6 +185,16 @@ function AdminSettings() {
             <Area label="Hero paragraph" value={home.hero_body} onChange={(v) => setHome({ ...home, hero_body: v })} />
             <ImageField label="Hero image" value={home.hero_image} onChange={(v) => setHome({ ...home, hero_image: v })} />
             <Text
+              label="Hero image alt text (SEO)"
+              value={home.hero_image_alt}
+              onChange={(v) => setHome({ ...home, hero_image_alt: v })}
+            />
+            <SectionOrderEditor
+              value={home.section_order}
+              onChange={(next: HomeSectionId[]) => setHome({ ...home, section_order: next })}
+            />
+
+            <Text
               label="Primary button label"
               value={home.primary_cta_label}
               onChange={(v) => setHome({ ...home, primary_cta_label: v })}
@@ -237,6 +262,12 @@ function AdminSettings() {
             <Text label="Story heading" value={home.story_title} onChange={(v) => setHome({ ...home, story_title: v })} />
             <Area label="Story paragraph" value={home.story_body} onChange={(v) => setHome({ ...home, story_body: v })} />
             <ImageField label="Story image" value={home.story_image} onChange={(v) => setHome({ ...home, story_image: v })} />
+            <Text
+              label="Story image alt text (SEO)"
+              value={home.story_image_alt}
+              onChange={(v) => setHome({ ...home, story_image_alt: v })}
+            />
+
             <Text
               label="Story button label"
               value={home.story_cta_label}
@@ -442,9 +473,29 @@ function AdminSettings() {
               onChange={(v) => setSeo({ ...seo, og_image: v })}
               help="1200×630 works best. Link previews may cache the old image for a while."
             />
+            <SeoPreview
+              url="/"
+              title={String(seo.title ?? "")}
+              description={String(seo.description ?? "")}
+              image={seo.og_image ? String(seo.og_image) : undefined}
+              siteName={String(branding.name ?? "Mummy Rose")}
+            />
+          </Panel>
 
+          <Panel
+            title="Per-page meta"
+            description="Override the title, description, keywords and social image for any storefront page, with a live search and social preview."
+            onSave={() => save.mutate({ key: "pages_seo", value: pagesSeo })}
+            pending={save.isPending}
+          >
+            <PageSeoEditor
+              value={pagesSeo}
+              onChange={setPagesSeo}
+              siteName={String(branding.name ?? "Mummy Rose")}
+            />
           </Panel>
         </TabsContent>
+
       </Tabs>
     </div>
   );
