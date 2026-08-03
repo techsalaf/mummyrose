@@ -292,13 +292,13 @@ function CheckoutPage() {
                 </span>
               </label>
             ))}
-            {provider === "bank_transfer" && payments.account_number && (
+            {provider === "bank_transfer" && (
               <div className="rounded-md border border-border bg-muted/40 p-3 text-xs">
-                <p className="font-medium">Transfer to</p>
-                <p>
-                  {payments.bank_name} · {payments.account_name} · {payments.account_number}
+                <p className="font-medium">Bank transfer</p>
+                <p className="mt-1 text-muted-foreground">
+                  We'll show the account details on the confirmation page and in your email — use your order
+                  number as the transfer reference.
                 </p>
-                <p className="mt-1 text-muted-foreground">Use your order number as the transfer reference.</p>
               </div>
             )}
           </fieldset>
