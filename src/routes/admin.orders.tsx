@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { adminOrdersQuery, useAdminRealtime } from "@/lib/admin-queries";
 import { saveRow } from "@/lib/admin-mutations";
 import { formatDateTime, formatNaira } from "@/lib/format";
-import { buildWhatsAppMessage, whatsappLink } from "@/lib/whatsapp";
+import { buildWhatsAppMessage, whatsAppLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/admin/orders")({
   component: AdminOrders,
@@ -296,7 +296,7 @@ function AdminOrders() {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      const link = whatsappLink(
+                      const link = whatsAppLink(
                         current.customer_phone ?? "",
                         buildWhatsAppMessage({
                           order_number: current.order_number,
