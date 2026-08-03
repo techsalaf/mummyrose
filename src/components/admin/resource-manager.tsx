@@ -37,7 +37,7 @@ export type Column = {
   className?: string;
 };
 
-type QueryLike = { queryKey: readonly unknown[]; queryFn: () => Promise<unknown> };
+type QueryLike = { queryKey: readonly unknown[]; queryFn?: unknown };
 
 export function AdminHeader({
   title,
@@ -87,7 +87,7 @@ export function ResourceManager({
   prepare?: (payload: Record<string, unknown>, values: FormValues) => Record<string, unknown>;
 }) {
   const queryClient = useQueryClient();
-  const { data, isLoading, error } = useQuery(query);
+  const { data, isLoading, error } = useQuery(query as Parameters<typeof useQuery>[0]);
   const rows = (data ?? []) as AdminRow[];
   useAdminRealtime(realtimeTables ?? [table], [query.queryKey as string[]]);
 

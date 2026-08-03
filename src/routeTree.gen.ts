@@ -34,6 +34,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
 import { Route as ApiPublicWebhooksFlutterwaveRouteImport } from './routes/api/public/webhooks/flutterwave'
 
@@ -162,6 +163,11 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiPublicWebhooksPaystackRoute =
   ApiPublicWebhooksPaystackRouteImport.update({
     id: '/api/public/webhooks/paystack',
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/products': typeof AdminProductsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
@@ -223,6 +230,7 @@ export interface FileRoutesByTo {
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/products': typeof AdminProductsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/white-labelling': typeof WhiteLabellingRoute
   '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/products': typeof AdminProductsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
@@ -284,6 +293,7 @@ export interface FileRouteTypes {
     | '/white-labelling'
     | '/wholesale'
     | '/wishlist'
+    | '/admin/products'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
@@ -312,6 +322,7 @@ export interface FileRouteTypes {
     | '/white-labelling'
     | '/wholesale'
     | '/wishlist'
+    | '/admin/products'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/white-labelling'
     | '/wholesale'
     | '/wishlist'
+    | '/admin/products'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
@@ -557,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/public/webhooks/paystack': {
       id: '/api/public/webhooks/paystack'
       path: '/api/public/webhooks/paystack'
@@ -575,10 +594,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminProductsRoute: typeof AdminProductsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminProductsRoute: AdminProductsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
