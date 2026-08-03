@@ -258,7 +258,9 @@ function AdminLogin() {
   );
 }
 
+function Gate({ title, body, children }: { title: string; body: string; children: React.ReactNode }) {
   return (
+
     <div className="grid min-h-screen place-items-center px-6">
       <div className="max-w-md text-center">
         <h1 className="font-display text-2xl font-semibold">{title}</h1>
