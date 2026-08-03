@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchCommand } from "@/components/search-command";
 import { useCart } from "@/lib/cart";
+import { useSiteConfig } from "@/lib/site-config";
+
 
 const shop = [
   { to: "/products", label: "All products" },
@@ -29,14 +31,18 @@ const business = [
 export function SiteHeader() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
+  const { branding } = useSiteConfig();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-md">
-      <div className="bg-ink text-ink-foreground">
-        <div className="container-page flex h-9 items-center justify-center gap-3 text-[11px] tracking-[0.18em] uppercase">
-          <span>Free delivery on orders over ₦50,000</span>
+      {branding.announcement_enabled && branding.announcement ? (
+        <div className="bg-ink text-ink-foreground">
+          <div className="container-page flex h-9 items-center justify-center gap-3 text-[11px] tracking-[0.18em] uppercase">
+            <span>{branding.announcement}</span>
+          </div>
         </div>
-      </div>
+      ) : null}
+
 
       <div className="container-page flex h-18 items-center justify-between gap-4 py-3">
         <div className="flex items-center gap-2">
@@ -94,14 +100,22 @@ export function SiteHeader() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/" className="flex flex-col leading-none">
-            <span className="font-display text-2xl font-semibold tracking-tight text-primary">
-              Mummy Rose
-            </span>
-            <span className="hidden text-[10px] tracking-[0.3em] text-muted-foreground uppercase sm:block">
-              Natural Nigerian Pantry
+          <Link to="/" className="flex items-center gap-2.5 leading-none">
+            {branding.logo_url ? (
+              <img src={branding.logo_url} alt={branding.name} className="h-10 w-auto max-w-40 object-contain" />
+            ) : null}
+            <span className="flex flex-col">
+              <span className="font-display text-2xl font-semibold tracking-tight text-primary">
+                {branding.name}
+              </span>
+              {branding.tagline ? (
+                <span className="hidden text-[10px] tracking-[0.3em] text-muted-foreground uppercase sm:block">
+                  {branding.tagline}
+                </span>
+              ) : null}
             </span>
           </Link>
+
         </div>
 
         <nav className="hidden items-center gap-7 text-sm lg:flex">
