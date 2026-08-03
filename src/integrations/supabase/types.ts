@@ -92,6 +92,54 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          discount_type: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          min_subtotal: number
+          starts_at: string | null
+          updated_at: string
+          used_count: number
+          value: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_subtotal?: number
+          starts_at?: string | null
+          updated_at?: string
+          used_count?: number
+          value?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_subtotal?: number
+          starts_at?: string | null
+          updated_at?: string
+          used_count?: number
+          value?: number
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string
@@ -315,11 +363,13 @@ export type Database = {
           address_line: string | null
           city: string | null
           country: string
+          coupon_code: string | null
           created_at: string
           currency: string
           customer_email: string
           customer_name: string
           customer_phone: string | null
+          discount_amount: number
           discount_percent: number
           id: string
           notes: string | null
@@ -342,11 +392,13 @@ export type Database = {
           address_line?: string | null
           city?: string | null
           country?: string
+          coupon_code?: string | null
           created_at?: string
           currency?: string
           customer_email: string
           customer_name: string
           customer_phone?: string | null
+          discount_amount?: number
           discount_percent?: number
           id?: string
           notes?: string | null
@@ -369,11 +421,13 @@ export type Database = {
           address_line?: string | null
           city?: string | null
           country?: string
+          coupon_code?: string | null
           created_at?: string
           currency?: string
           customer_email?: string
           customer_name?: string
           customer_phone?: string | null
+          discount_amount?: number
           discount_percent?: number
           id?: string
           notes?: string | null
@@ -401,6 +455,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pages: {
+        Row: {
+          created_at: string
+          hero_image: string | null
+          id: string
+          is_published: boolean
+          sections: Json
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hero_image?: string | null
+          id?: string
+          is_published?: boolean
+          sections?: Json
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hero_image?: string | null
+          id?: string
+          is_published?: boolean
+          sections?: Json
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       payment_transactions: {
         Row: {
@@ -505,6 +604,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      product_variants: {
+        Row: {
+          created_at: string
+          discount_price: number | null
+          id: string
+          is_active: boolean
+          label: string
+          price: number
+          product_id: string
+          sku: string | null
+          sort_order: number
+          stock_quantity: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          discount_price?: number | null
+          id?: string
+          is_active?: boolean
+          label: string
+          price?: number
+          product_id: string
+          sku?: string | null
+          sort_order?: number
+          stock_quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          discount_price?: number | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          price?: number
+          product_id?: string
+          sku?: string | null
+          sort_order?: number
+          stock_quantity?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -618,6 +767,36 @@ export type Database = {
           id?: string
           notes?: string | null
           phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      redirects: {
+        Row: {
+          created_at: string
+          from_path: string
+          id: string
+          is_active: boolean
+          status_code: number
+          to_path: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_path: string
+          id?: string
+          is_active?: boolean
+          status_code?: number
+          to_path: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_path?: string
+          id?: string
+          is_active?: boolean
+          status_code?: number
+          to_path?: string
           updated_at?: string
         }
         Relationships: []

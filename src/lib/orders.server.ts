@@ -39,12 +39,15 @@ export type CreatedOrder = {
   id: string;
   order_number: string;
   subtotal: number;
+  discount_amount: number;
+  coupon_code: string | null;
   shipping_fee: number;
   shipping_zone: string;
   total: number;
   payment_provider: string;
   items: { product_name: string; variant: string | null; quantity: number; unit_price: number }[];
 };
+
 
 /** Creates the order server-side, pricing every line from the database. */
 export async function createOrder(input: CheckoutInput, userId: string | null): Promise<CreatedOrder> {
@@ -107,6 +110,18 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
     country: input.country,
   });
 
+  // Coupons are re-validated here so a tampered client cannot invent a discount.
+  let couponCode: string | null = null;
+  let discountAmount = 0;
+  if (input.coupon_code && input.order_type !== "wholesale") {
+    const { validateCoupon } = await import("./coupons.server");
+    const coupon = await validateCoupon(input.coupon_code, subtotal);
+    couponCode = coupon.code;
+    discountAmount = coupon.discount;
+  }
+
+  const total = Number(Math.max(0, subtotal - discountAmount + quote.fee).toFixed(2));
+
   const { data: order, error: orderError } = await supabaseAdmin
     .from("orders")
     .insert({
@@ -123,7 +138,9 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
       notes: input.notes ?? null,
       subtotal,
       shipping_fee: quote.fee,
-      total: subtotal + quote.fee,
+      coupon_code: couponCode,
+      discount_amount: discountAmount,
+      total,
       payment_provider: input.payment_provider,
       payment_status: "unpaid",
       status: "pending",
@@ -131,7 +148,7 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
       discount_percent: discountPercent,
       wholesale_account_id: wholesaleAccountId,
     })
-    .select("id,order_number,total,subtotal,shipping_fee")
+    .select("id,order_number,total,subtotal,shipping_fee,discount_amount,coupon_code")
     .single();
   if (orderError || !order) throw new Error(orderError?.message ?? "Could not create order.");
 
@@ -157,10 +174,17 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
     });
   }
 
+  if (couponCode) {
+    const { redeemCoupon } = await import("./coupons.server");
+    await redeemCoupon(couponCode);
+  }
+
   return {
     id: order.id,
     order_number: order.order_number,
     subtotal: Number(order.subtotal),
+    discount_amount: Number(order.discount_amount ?? 0),
+    coupon_code: order.coupon_code ?? null,
     shipping_fee: Number(order.shipping_fee),
     shipping_zone: quote.zone,
     total: Number(order.total),
@@ -173,6 +197,7 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
     })),
   };
 }
+
 
 export async function lookupOrder(orderNumber: string, email: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

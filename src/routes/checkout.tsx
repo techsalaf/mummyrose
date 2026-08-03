@@ -11,6 +11,7 @@ import { useCart } from "@/lib/cart";
 import { formatNaira } from "@/lib/format";
 import { checkoutSchema, type CheckoutInput, type PaymentProvider } from "@/lib/schemas";
 import { placeOrder } from "@/lib/orders.functions";
+import { checkCoupon } from "@/lib/coupons.functions";
 import { settingsQuery } from "@/lib/queries";
 import { pickPayments, pickShipping, pickWhatsApp } from "@/lib/settings";
 import { quoteShipping } from "@/lib/shipping";
@@ -41,6 +42,20 @@ function CheckoutPage() {
   const [provider, setProvider] = useState<PaymentProvider>("paystack");
   const [state, setState] = useState("");
   const [country, setCountry] = useState("Nigeria");
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<{ code: string; discount: number; label: string } | null>(null);
+  const verifyCoupon = useServerFn(checkCoupon);
+  const couponCheck = useMutation({
+    mutationFn: (code: string) => verifyCoupon({ data: { code, subtotal } }),
+    onSuccess: (result) => {
+      setCoupon(result);
+      setCouponInput(result.code);
+      toast.success(`${result.code} applied — ${result.label}`);
+    },
+    onError: (error: Error) => toast.error(error.message || "That code isn't valid."),
+  });
+  const discount = coupon ? Math.min(coupon.discount, subtotal) : 0;
+
 
   const payments = pickPayments(settings);
   const whatsapp = pickWhatsApp(settings);
@@ -133,6 +148,7 @@ function CheckoutPage() {
     notes: String(form.get("notes") ?? "") || null,
     payment_provider: chosen,
     origin: typeof window === "undefined" ? null : window.location.origin,
+    coupon_code: coupon?.code ?? null,
     items: items.map((i) => ({ product_id: i.product_id, variant: i.variant, quantity: i.quantity })),
   });
 
@@ -263,20 +279,58 @@ function CheckoutPage() {
               </li>
             ))}
           </ul>
+          <div className="mt-5 border-t border-border pt-4">
+            <Label htmlFor="coupon">Discount code</Label>
+            <div className="mt-1.5 flex gap-2">
+              <Input
+                id="coupon"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.currentTarget.value.toUpperCase())}
+                placeholder="e.g. ROSE10"
+                maxLength={40}
+              />
+              {coupon ? (
+                <Button type="button" variant="outline" onClick={() => { setCoupon(null); setCouponInput(""); }}>
+                  Remove
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={couponCheck.isPending || couponInput.trim().length < 2}
+                  onClick={() => couponCheck.mutate(couponInput)}
+                >
+                  {couponCheck.isPending ? "Checking…" : "Apply"}
+                </Button>
+              )}
+            </div>
+            {coupon && (
+              <p className="mt-2 text-xs text-accent">
+                {coupon.code} applied — {coupon.label}
+              </p>
+            )}
+          </div>
           <dl className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Subtotal</dt>
               <dd>{formatNaira(subtotal)}</dd>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-accent">
+                <dt>Discount ({coupon?.code})</dt>
+                <dd>−{formatNaira(discount)}</dd>
+              </div>
+            )}
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Delivery ({quote.zone})</dt>
               <dd>{quote.fee === 0 ? "Free" : formatNaira(quote.fee)}</dd>
             </div>
             <div className="flex justify-between border-t border-border pt-3 font-display text-lg">
               <dt>Total</dt>
-              <dd>{formatNaira(subtotal + quote.fee)}</dd>
+              <dd>{formatNaira(Math.max(0, subtotal - discount) + quote.fee)}</dd>
             </div>
           </dl>
+
           <Button type="submit" variant="clay" size="lg" className="mt-6 w-full" disabled={mutation.isPending}>
             {mutation.isPending ? "Placing order…" : "Place order"}
           </Button>
