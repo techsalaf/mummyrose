@@ -40,6 +40,7 @@ import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminNavigationRouteImport } from './routes/admin.navigation'
+import { Route as AdminInventoryRouteImport } from './routes/admin.inventory'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
@@ -201,6 +202,11 @@ const AdminNavigationRoute = AdminNavigationRouteImport.update({
   path: '/navigation',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminInventoryRoute = AdminInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
   id: '/inquiries',
   path: '/inquiries',
@@ -252,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
+  '/admin/inventory': typeof AdminInventoryRoute
   '/admin/navigation': typeof AdminNavigationRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -289,6 +296,7 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
+  '/admin/inventory': typeof AdminInventoryRoute
   '/admin/navigation': typeof AdminNavigationRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
+  '/admin/inventory': typeof AdminInventoryRoute
   '/admin/navigation': typeof AdminNavigationRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -368,6 +377,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/faqs'
     | '/admin/inquiries'
+    | '/admin/inventory'
     | '/admin/navigation'
     | '/admin/orders'
     | '/admin/posts'
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/faqs'
     | '/admin/inquiries'
+    | '/admin/inventory'
     | '/admin/navigation'
     | '/admin/orders'
     | '/admin/posts'
@@ -443,6 +454,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/faqs'
     | '/admin/inquiries'
+    | '/admin/inventory'
     | '/admin/navigation'
     | '/admin/orders'
     | '/admin/posts'
@@ -707,6 +719,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNavigationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inventory': {
+      id: '/admin/inventory'
+      path: '/inventory'
+      fullPath: '/admin/inventory'
+      preLoaderRoute: typeof AdminInventoryRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/inquiries': {
       id: '/admin/inquiries'
       path: '/inquiries'
@@ -749,6 +768,7 @@ interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminFaqsRoute: typeof AdminFaqsRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
+  AdminInventoryRoute: typeof AdminInventoryRoute
   AdminNavigationRoute: typeof AdminNavigationRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminPostsRoute: typeof AdminPostsRoute
@@ -762,6 +782,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminFaqsRoute: AdminFaqsRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
+  AdminInventoryRoute: AdminInventoryRoute,
   AdminNavigationRoute: AdminNavigationRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminPostsRoute: AdminPostsRoute,
