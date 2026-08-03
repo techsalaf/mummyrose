@@ -1,7 +1,4 @@
-import {
-  GalleryHorizontal,
-  ShieldCheck,
-  Star, Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
   BarChart3,
   Boxes,
@@ -22,6 +19,9 @@ import {
   Tag,
   Ticket,
   Users,
+  GalleryHorizontal,
+  ShieldCheck,
+  Star,
 } from "lucide-react";
 
 import {
