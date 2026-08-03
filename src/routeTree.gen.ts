@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
-import { Route as WholesaleRouteImport } from './routes/wholesale'
 import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -28,6 +27,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WholesaleIndexRouteImport } from './routes/wholesale.index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes.index'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -54,11 +54,6 @@ import { Route as ApiPublicWebhooksFlutterwaveRouteImport } from './routes/api/p
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WholesaleRoute = WholesaleRouteImport.update({
-  id: '/wholesale',
-  path: '/wholesale',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WhiteLabellingRoute = WhiteLabellingRouteImport.update({
@@ -144,6 +139,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WholesaleIndexRoute = WholesaleIndexRouteImport.update({
+  id: '/wholesale/',
+  path: '/wholesale/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecipesIndexRoute = RecipesIndexRouteImport.update({
@@ -277,7 +277,6 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
-  '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -299,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
+  '/wholesale/': typeof WholesaleIndexRoute
   '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -319,7 +319,6 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
-  '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -341,6 +340,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/products': typeof ProductsIndexRoute
   '/recipes': typeof RecipesIndexRoute
+  '/wholesale': typeof WholesaleIndexRoute
   '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -363,7 +363,6 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
-  '/wholesale': typeof WholesaleRoute
   '/wishlist': typeof WishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -385,6 +384,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
+  '/wholesale/': typeof WholesaleIndexRoute
   '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -408,7 +408,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-order'
     | '/white-labelling'
-    | '/wholesale'
     | '/wishlist'
     | '/admin/analytics'
     | '/admin/categories'
@@ -430,6 +429,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/products/'
     | '/recipes/'
+    | '/wholesale/'
     | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   fileRoutesByTo: FileRoutesByTo
@@ -450,7 +450,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-order'
     | '/white-labelling'
-    | '/wholesale'
     | '/wishlist'
     | '/admin/analytics'
     | '/admin/categories'
@@ -472,6 +471,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/products'
     | '/recipes'
+    | '/wholesale'
     | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   id:
@@ -493,7 +493,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track-order'
     | '/white-labelling'
-    | '/wholesale'
     | '/wishlist'
     | '/admin/analytics'
     | '/admin/categories'
@@ -515,6 +514,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/products/'
     | '/recipes/'
+    | '/wholesale/'
     | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   fileRoutesById: FileRoutesById
@@ -537,13 +537,13 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TrackOrderRoute: typeof TrackOrderRoute
   WhiteLabellingRoute: typeof WhiteLabellingRoute
-  WholesaleRoute: typeof WholesaleRoute
   WishlistRoute: typeof WishlistRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
+  WholesaleIndexRoute: typeof WholesaleIndexRoute
   ApiPublicWebhooksFlutterwaveRoute: typeof ApiPublicWebhooksFlutterwaveRoute
   ApiPublicWebhooksPaystackRoute: typeof ApiPublicWebhooksPaystackRoute
 }
@@ -555,13 +555,6 @@ declare module '@tanstack/react-router' {
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof WishlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/wholesale': {
-      id: '/wholesale'
-      path: '/wholesale'
-      fullPath: '/wholesale'
-      preLoaderRoute: typeof WholesaleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/white-labelling': {
@@ -681,6 +674,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wholesale/': {
+      id: '/wholesale/'
+      path: '/wholesale'
+      fullPath: '/wholesale/'
+      preLoaderRoute: typeof WholesaleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recipes/': {
@@ -896,13 +896,13 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TrackOrderRoute: TrackOrderRoute,
   WhiteLabellingRoute: WhiteLabellingRoute,
-  WholesaleRoute: WholesaleRoute,
   WishlistRoute: WishlistRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   RecipesSlugRoute: RecipesSlugRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
+  WholesaleIndexRoute: WholesaleIndexRoute,
   ApiPublicWebhooksFlutterwaveRoute: ApiPublicWebhooksFlutterwaveRoute,
   ApiPublicWebhooksPaystackRoute: ApiPublicWebhooksPaystackRoute,
 }
