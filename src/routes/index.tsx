@@ -9,7 +9,7 @@ import { BannerSections } from "@/components/banner-sections";
 import { Button } from "@/components/ui/button";
 import { categoriesQuery, productsQuery, testimonialsQuery } from "@/lib/queries";
 import { categoryImage } from "@/lib/catalog-images";
-import { useSiteConfig } from "@/lib/site-config";
+import { useSiteConfig, HOME_SECTIONS } from "@/lib/site-config";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => {
