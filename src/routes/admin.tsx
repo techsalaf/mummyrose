@@ -55,7 +55,7 @@ const nav = [
   { to: "/admin/media", label: "Media", icon: ImageIcon },
   { to: "/admin/analytics", label: "Analytics & SEO", icon: BarChart3 },
   { to: "/admin/settings", label: "Settings", icon: Settings },
-] as const;
+] satisfies { to: string; label: string; icon: typeof Home; exact?: boolean }[];
 
 function AdminLayout() {
   const { user, isStaff, loading } = useAuth();
