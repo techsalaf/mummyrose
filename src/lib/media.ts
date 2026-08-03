@@ -53,3 +53,58 @@ export async function deleteMedia(path: string) {
   const { error } = await supabase.storage.from(BUCKET).remove([path]);
   if (error) throw new Error(error.message);
 }
+
+/** Uploads a generated blob (e.g. a cropped canvas export) to the library. */
+export async function uploadBlob(blob: Blob, name: string, folder = "uploads"): Promise<string> {
+  const file = new File([blob], name, { type: blob.type || "image/jpeg" });
+  return uploadMedia(file, folder);
+}
+
+export type CropSpec = { aspect: number; zoom: number; offsetX: number; offsetY: number };
+
+/**
+ * Center-anchored crop of an image URL, returned as a JPEG blob. Offsets are
+ * -50..50 percentages of the slack left after zooming.
+ */
+export async function cropImageUrl(url: string, spec: CropSpec, maxWidth = 1600): Promise<Blob> {
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const el = new Image();
+    el.crossOrigin = "anonymous";
+    el.onload = () => resolve(el);
+    el.onerror = () => reject(new Error("Could not load the image for cropping."));
+    el.src = url;
+  });
+
+  const srcAspect = img.width / img.height;
+  let sw = img.width;
+  let sh = img.height;
+  if (srcAspect > spec.aspect) sw = img.height * spec.aspect;
+  else sh = img.width / spec.aspect;
+  sw /= spec.zoom;
+  sh /= spec.zoom;
+
+  const sx = ((img.width - sw) / 2) * (1 + spec.offsetX / 50);
+  const sy = ((img.height - sh) / 2) * (1 + spec.offsetY / 50);
+
+  const outW = Math.min(maxWidth, Math.round(sw));
+  const canvas = document.createElement("canvas");
+  canvas.width = outW;
+  canvas.height = Math.round(outW / spec.aspect);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas is unavailable in this browser.");
+  ctx.drawImage(
+    img,
+    Math.max(0, sx),
+    Math.max(0, sy),
+    sw,
+    sh,
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+  );
+
+  return await new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Crop failed."))), "image/jpeg", 0.9),
+  );
+}
