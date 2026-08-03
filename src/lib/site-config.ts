@@ -40,16 +40,30 @@ export type SeoMetaConfig = {
 
 export type HomePromise = { title: string; body: string; icon?: string };
 
+/** Ordered, toggleable home page content blocks. */
+export const HOME_SECTIONS = [
+  { id: "banners", label: "CMS banners" },
+  { id: "promises", label: "Trust badges" },
+  { id: "categories", label: "Categories" },
+  { id: "featured", label: "Best sellers" },
+  { id: "story", label: "Story" },
+  { id: "testimonials", label: "Testimonials" },
+] as const;
+
+export type HomeSectionId = (typeof HOME_SECTIONS)[number]["id"];
+
 export type HomeConfig = {
   hero_eyebrow: string;
   hero_title: string;
   hero_body: string;
   hero_image: string;
+  hero_image_alt: string;
   hero_overlay: number;
   primary_cta_label: string;
   primary_cta_href: string;
   secondary_cta_label: string;
   secondary_cta_href: string;
+  section_order: HomeSectionId[];
   promises: HomePromise[];
   promises_enabled: boolean;
   categories_eyebrow: string;
@@ -62,12 +76,14 @@ export type HomeConfig = {
   story_title: string;
   story_body: string;
   story_image: string;
+  story_image_alt: string;
   story_cta_label: string;
   story_cta_href: string;
   story_enabled: boolean;
   testimonials_eyebrow: string;
   testimonials_enabled: boolean;
 };
+
 
 export type FooterConfig = {
   blurb: string;
