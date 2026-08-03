@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchCommand } from "@/components/search-command";
 import { useCart } from "@/lib/cart";
+import { useSiteConfig } from "@/lib/site-config";
+
 
 const shop = [
   { to: "/products", label: "All products" },
