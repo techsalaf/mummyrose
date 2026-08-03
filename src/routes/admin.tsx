@@ -1,32 +1,15 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import {
-  BarChart3,
-  Boxes,
-  FileText,
-  Folder,
-  Home,
-  Image as ImageIcon,
-  Inbox,
-  Layers,
-  LayoutDashboard,
-  Loader2,
-  MessageSquareQuote,
-  Navigation,
-  Package,
-  Quote,
-  Settings,
-  ShieldCheck,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
+import { Loader2, LogOut, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminGate, AdminLogin } from "@/components/admin/admin-shell";
+import { AdminSidebar, adminNavGroups } from "@/components/admin/admin-sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -39,24 +22,6 @@ export const Route = createFileRoute("/admin")({
   }),
   component: AdminLayout,
 });
-
-const nav = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { to: "/admin/products", label: "Products", icon: Package },
-  { to: "/admin/categories", label: "Categories", icon: Folder },
-  { to: "/admin/inventory", label: "Inventory", icon: Boxes },
-  { to: "/admin/wholesale", label: "Wholesale", icon: Layers },
-  { to: "/admin/inquiries", label: "Inquiries", icon: Inbox },
-  { to: "/admin/customers", label: "Customers", icon: Users },
-  { to: "/admin/posts", label: "Journal & recipes", icon: FileText },
-  { to: "/admin/testimonials", label: "Testimonials", icon: Quote },
-  { to: "/admin/faqs", label: "FAQs", icon: MessageSquareQuote },
-  { to: "/admin/navigation", label: "Navigation", icon: Navigation },
-  { to: "/admin/media", label: "Media", icon: ImageIcon },
-  { to: "/admin/analytics", label: "Analytics & SEO", icon: BarChart3 },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
-] satisfies { to: string; label: string; icon: typeof Home; exact?: boolean }[];
 
 function AdminLayout() {
   const { user, isStaff, loading } = useAuth();
