@@ -55,7 +55,9 @@ function AdminSettings() {
   const [theme, setTheme] = useState<Group>({});
   const [home, setHome] = useState<Group>({});
   const [footer, setFooter] = useState<Group>({});
+  const [pagesSeo, setPagesSeo] = useState<Record<string, Partial<PageSeo>>>({});
   const [zonesText, setZonesText] = useState("");
+
 
   useEffect(() => {
     if (!data) return;
