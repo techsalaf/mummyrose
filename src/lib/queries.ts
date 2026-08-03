@@ -95,3 +95,32 @@ export const settingsQuery = queryOptions({
 
 type Unwrap<T> = T extends Promise<infer U> ? U : T;
 export type ProductRow = Unwrap<ReturnType<NonNullable<typeof productsQuery.queryFn>>>[number];
+
+export const faqsQuery = queryOptions({
+  queryKey: ["faqs"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("faqs")
+      .select("id,question,answer,category,sort_order")
+      .eq("is_published", true)
+      .order("sort_order");
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
+export function navLinksQuery(group: string) {
+  return queryOptions({
+    queryKey: ["nav_links", group],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("nav_links")
+        .select("id,label,href,group_name,sort_order")
+        .eq("group_name", group)
+        .eq("is_active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
