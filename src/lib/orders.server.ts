@@ -78,6 +78,27 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
     };
   });
 
+  let discountPercent = 0;
+  let wholesaleAccountId: string | null = null;
+  if (input.order_type === "wholesale" && input.wholesale_account_id && userId) {
+    const { data: account } = await supabaseAdmin
+      .from("wholesale_accounts")
+      .select("id,discount_percent,status,user_id")
+      .eq("id", input.wholesale_account_id)
+      .maybeSingle();
+    if (account && account.status === "approved" && account.user_id === userId) {
+      discountPercent = Number(account.discount_percent ?? 0);
+      wholesaleAccountId = account.id;
+    }
+  }
+
+  if (discountPercent > 0) {
+    for (const line of lines) {
+      line.unit_price = Number((line.unit_price * (1 - discountPercent / 100)).toFixed(2));
+      line.line_total = Number((line.unit_price * line.quantity).toFixed(2));
+    }
+  }
+
   const subtotal = lines.reduce((sum, l) => sum + l.line_total, 0);
   const shippingConfig = await getShippingConfig();
   const quote = quoteShipping(shippingConfig, {
@@ -106,6 +127,9 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
       payment_provider: input.payment_provider,
       payment_status: "unpaid",
       status: "pending",
+      order_type: wholesaleAccountId ? "wholesale" : "retail",
+      discount_percent: discountPercent,
+      wholesale_account_id: wholesaleAccountId,
     })
     .select("id,order_number,total,subtotal,shipping_fee")
     .single();
