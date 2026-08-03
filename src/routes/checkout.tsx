@@ -11,6 +11,7 @@ import { useCart } from "@/lib/cart";
 import { formatNaira } from "@/lib/format";
 import { checkoutSchema, type CheckoutInput, type PaymentProvider } from "@/lib/schemas";
 import { placeOrder } from "@/lib/orders.functions";
+import { checkCoupon } from "@/lib/coupons.functions";
 import { settingsQuery } from "@/lib/queries";
 import { pickPayments, pickShipping, pickWhatsApp } from "@/lib/settings";
 import { quoteShipping } from "@/lib/shipping";
@@ -147,6 +148,7 @@ function CheckoutPage() {
     notes: String(form.get("notes") ?? "") || null,
     payment_provider: chosen,
     origin: typeof window === "undefined" ? null : window.location.origin,
+    coupon_code: coupon?.code ?? null,
     items: items.map((i) => ({ product_id: i.product_id, variant: i.variant, quantity: i.quantity })),
   });
 
