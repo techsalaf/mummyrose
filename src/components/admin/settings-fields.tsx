@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Loader2, Upload, X } from "lucide-react";
+import { ArrowDown, ArrowUp, GripVertical, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { uploadMedia } from "@/lib/media";
-import { GOOGLE_FONTS, type HomePromise } from "@/lib/site-config";
+import {
+  GOOGLE_FONTS,
+  HOME_SECTIONS,
+  SEO_PAGES,
+  EMPTY_PAGE_SEO,
+  type HomePromise,
+  type HomeSectionId,
+  type PageSeo,
+} from "@/lib/site-config";
+
 
 export function SettingLabel({ children }: { children: React.ReactNode }) {
   return <Label className="text-xs tracking-wide text-muted-foreground uppercase">{children}</Label>;
