@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { OrderPathsNote, WhatsAppOrderButton } from "@/components/whatsapp-order-button";
 import { useCart } from "@/lib/cart";
 import { formatNaira } from "@/lib/format";
 
