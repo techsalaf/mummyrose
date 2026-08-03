@@ -81,13 +81,13 @@ function CheckoutPage() {
 
   const options = useMemo(() => {
     const list: { value: PaymentProvider; label: string; hint?: string }[] = [];
-    if (payments.paystack_enabled !== false)
+    if (payments?.paystack_enabled !== false)
       list.push({ value: "paystack", label: "Paystack — card, bank & USSD", hint: "Secure checkout, instant confirmation" });
-    if (payments.flutterwave_enabled !== false)
+    if (payments?.flutterwave_enabled !== false)
       list.push({ value: "flutterwave", label: "Flutterwave", hint: "Cards and mobile money" });
-    if (payments.bank_transfer_enabled !== false)
+    if (payments?.bank_transfer_enabled !== false)
       list.push({ value: "bank_transfer", label: "Direct bank transfer", hint: "Transfer details shown after ordering" });
-    if (payments.pay_on_delivery_enabled !== false)
+    if (payments?.pay_on_delivery_enabled !== false)
       list.push({ value: "pay_on_delivery", label: "Pay on delivery", hint: "Available in selected cities" });
     return list;
   }, [payments]);
