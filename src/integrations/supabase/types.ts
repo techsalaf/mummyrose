@@ -92,6 +92,39 @@ export type Database = {
         }
         Relationships: []
       }
+      faqs: {
+        Row: {
+          answer: string
+          category: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          question: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          question: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          question?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inquiries: {
         Row: {
           admin_notes: string | null
@@ -175,6 +208,39 @@ export type Database = {
           },
         ]
       }
+      nav_links: {
+        Row: {
+          created_at: string
+          href: string
+          id: string
+          is_active: boolean
+          label: string
+          menu_group: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          href: string
+          id?: string
+          is_active?: boolean
+          label: string
+          menu_group?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          href?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          menu_group?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -254,9 +320,11 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone: string | null
+          discount_percent: number
           id: string
           notes: string | null
           order_number: string
+          order_type: string
           payment_provider: string | null
           payment_reference: string | null
           payment_status: Database["public"]["Enums"]["payment_status"]
@@ -268,6 +336,7 @@ export type Database = {
           total: number
           updated_at: string
           user_id: string | null
+          wholesale_account_id: string | null
         }
         Insert: {
           address_line?: string | null
@@ -278,9 +347,11 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone?: string | null
+          discount_percent?: number
           id?: string
           notes?: string | null
           order_number: string
+          order_type?: string
           payment_provider?: string | null
           payment_reference?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -292,6 +363,7 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+          wholesale_account_id?: string | null
         }
         Update: {
           address_line?: string | null
@@ -302,9 +374,11 @@ export type Database = {
           customer_email?: string
           customer_name?: string
           customer_phone?: string | null
+          discount_percent?: number
           id?: string
           notes?: string | null
           order_number?: string
+          order_type?: string
           payment_provider?: string | null
           payment_reference?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -316,8 +390,17 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+          wholesale_account_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_wholesale_account_id_fkey"
+            columns: ["wholesale_account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_transactions: {
         Row: {
@@ -667,6 +750,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_admin: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
