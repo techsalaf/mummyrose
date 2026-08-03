@@ -15,6 +15,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { adminSettingsQuery } from "@/lib/admin-queries";
 import { upsertRow } from "@/lib/admin-mutations";
 import { DEFAULT_SHIPPING } from "@/lib/shipping";
+import {
+  DEFAULT_BRANDING,
+  DEFAULT_THEME,
+  DEFAULT_HOME,
+  DEFAULT_FOOTER,
+  DEFAULT_SEO_META,
+  type HomePromise,
+} from "@/lib/site-config";
+import { ImageField, ColorField, FontField, PromisesEditor } from "@/components/admin/settings-fields";
+
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
