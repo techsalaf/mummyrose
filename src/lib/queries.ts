@@ -115,8 +115,8 @@ export function navLinksQuery(group: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("nav_links")
-        .select("id,label,href,group_name,sort_order")
-        .eq("group_name", group)
+        .select("id,label,href,menu_group,sort_order")
+        .eq("menu_group", group)
         .eq("is_active", true)
         .order("sort_order");
       if (error) throw error;
