@@ -37,6 +37,7 @@ import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as AdminWholesaleRouteImport } from './routes/admin.wholesale'
+import { Route as AdminVariantsRouteImport } from './routes/admin.variants'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
@@ -195,6 +196,11 @@ const AdminWholesaleRoute = AdminWholesaleRouteImport.update({
   path: '/wholesale',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminVariantsRoute = AdminVariantsRouteImport.update({
+  id: '/variants',
+  path: '/variants',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminTestimonialsRoute = AdminTestimonialsRouteImport.update({
   id: '/testimonials',
   path: '/testimonials',
@@ -317,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -363,6 +370,7 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -411,6 +419,7 @@ export interface FileRoutesById {
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -460,6 +469,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/settings'
     | '/admin/testimonials'
+    | '/admin/variants'
     | '/admin/wholesale'
     | '/category/$slug'
     | '/products/$slug'
@@ -506,6 +516,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/settings'
     | '/admin/testimonials'
+    | '/admin/variants'
     | '/admin/wholesale'
     | '/category/$slug'
     | '/products/$slug'
@@ -553,6 +564,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/settings'
     | '/admin/testimonials'
+    | '/admin/variants'
     | '/admin/wholesale'
     | '/category/$slug'
     | '/products/$slug'
@@ -796,6 +808,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWholesaleRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/variants': {
+      id: '/admin/variants'
+      path: '/variants'
+      fullPath: '/admin/variants'
+      preLoaderRoute: typeof AdminVariantsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/testimonials': {
       id: '/admin/testimonials'
       path: '/testimonials'
@@ -934,6 +953,7 @@ interface AdminRouteChildren {
   AdminProductsRoute: typeof AdminProductsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
+  AdminVariantsRoute: typeof AdminVariantsRoute
   AdminWholesaleRoute: typeof AdminWholesaleRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -954,6 +974,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminProductsRoute: AdminProductsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
+  AdminVariantsRoute: AdminVariantsRoute,
   AdminWholesaleRoute: AdminWholesaleRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
