@@ -70,7 +70,9 @@ function AdminSettings() {
     setTheme({ ...DEFAULT_THEME, ...(data.theme ?? {}) });
     setHome({ ...DEFAULT_HOME, ...(data.home ?? {}) });
     setFooter({ ...DEFAULT_FOOTER, ...(data.footer ?? {}) });
+    setPagesSeo((data.pages_seo ?? {}) as Record<string, Partial<PageSeo>>);
     setZonesText(JSON.stringify((data.shipping?.zones ?? []) as unknown[], null, 2));
+
   }, [data]);
 
 
