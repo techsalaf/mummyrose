@@ -13,7 +13,8 @@ import { checkoutSchema, type CheckoutInput, type PaymentProvider } from "@/lib/
 import { placeOrder } from "@/lib/orders.functions";
 import { checkCoupon } from "@/lib/coupons.functions";
 import { settingsQuery } from "@/lib/queries";
-import { pickPayments, pickShipping, pickWhatsApp } from "@/lib/settings";
+import { pickShipping, pickWhatsApp } from "@/lib/settings";
+import { getPaymentMethods } from "@/lib/payment-methods.functions";
 import { quoteShipping } from "@/lib/shipping";
 import { buildWhatsAppMessage, whatsAppLink } from "@/lib/whatsapp";
 import { track } from "@/lib/analytics";
@@ -59,7 +60,12 @@ function CheckoutPage() {
   const discount = coupon ? Math.min(coupon.discount, subtotal) : 0;
 
 
-  const payments = pickPayments(settings);
+  const fetchPaymentMethods = useServerFn(getPaymentMethods);
+  const { data: payments } = useQuery({
+    queryKey: ["payment-methods"],
+    queryFn: () => fetchPaymentMethods(),
+    staleTime: 60_000,
+  });
   const whatsapp = pickWhatsApp(settings);
   const shippingConfig = pickShipping(settings);
 
@@ -75,13 +81,13 @@ function CheckoutPage() {
 
   const options = useMemo(() => {
     const list: { value: PaymentProvider; label: string; hint?: string }[] = [];
-    if (payments.paystack_enabled !== false)
+    if (payments?.paystack_enabled !== false)
       list.push({ value: "paystack", label: "Paystack — card, bank & USSD", hint: "Secure checkout, instant confirmation" });
-    if (payments.flutterwave_enabled !== false)
+    if (payments?.flutterwave_enabled !== false)
       list.push({ value: "flutterwave", label: "Flutterwave", hint: "Cards and mobile money" });
-    if (payments.bank_transfer_enabled !== false)
+    if (payments?.bank_transfer_enabled !== false)
       list.push({ value: "bank_transfer", label: "Direct bank transfer", hint: "Transfer details shown after ordering" });
-    if (payments.pay_on_delivery_enabled !== false)
+    if (payments?.pay_on_delivery_enabled !== false)
       list.push({ value: "pay_on_delivery", label: "Pay on delivery", hint: "Available in selected cities" });
     return list;
   }, [payments]);
@@ -286,13 +292,13 @@ function CheckoutPage() {
                 </span>
               </label>
             ))}
-            {provider === "bank_transfer" && payments.account_number && (
+            {provider === "bank_transfer" && (
               <div className="rounded-md border border-border bg-muted/40 p-3 text-xs">
-                <p className="font-medium">Transfer to</p>
-                <p>
-                  {payments.bank_name} · {payments.account_name} · {payments.account_number}
+                <p className="font-medium">Bank transfer</p>
+                <p className="mt-1 text-muted-foreground">
+                  We'll show the account details on the confirmation page and in your email — use your order
+                  number as the transfer reference.
                 </p>
-                <p className="mt-1 text-muted-foreground">Use your order number as the transfer reference.</p>
               </div>
             )}
           </fieldset>
