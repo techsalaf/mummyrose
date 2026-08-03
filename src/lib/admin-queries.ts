@@ -267,17 +267,6 @@ export const adminBannersQuery = queryOptions({
   },
 });
 
-export const adminRolesQuery = queryOptions({
-  queryKey: ["admin", "user_roles"],
-  queryFn: async () => {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("id,user_id,role,created_at")
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return data ?? [];
-  },
-});
 
 
 /** Subscribes to Postgres changes and invalidates the matching admin query keys. */
