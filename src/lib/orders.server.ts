@@ -39,12 +39,15 @@ export type CreatedOrder = {
   id: string;
   order_number: string;
   subtotal: number;
+  discount_amount: number;
+  coupon_code: string | null;
   shipping_fee: number;
   shipping_zone: string;
   total: number;
   payment_provider: string;
   items: { product_name: string; variant: string | null; quantity: number; unit_price: number }[];
 };
+
 
 /** Creates the order server-side, pricing every line from the database. */
 export async function createOrder(input: CheckoutInput, userId: string | null): Promise<CreatedOrder> {
