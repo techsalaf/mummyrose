@@ -22,8 +22,19 @@ import {
   DEFAULT_FOOTER,
   DEFAULT_SEO_META,
   type HomePromise,
+  type HomeSectionId,
+  type PageSeo,
 } from "@/lib/site-config";
-import { ImageField, ColorField, FontField, PromisesEditor } from "@/components/admin/settings-fields";
+import {
+  ImageField,
+  ColorField,
+  FontField,
+  PromisesEditor,
+  SectionOrderEditor,
+  PageSeoEditor,
+  SeoPreview,
+} from "@/components/admin/settings-fields";
+
 
 
 export const Route = createFileRoute("/admin/settings")({
