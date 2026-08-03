@@ -38,7 +38,10 @@ function setLink(rel: string, href: string, id: string) {
  */
 export function SiteChrome() {
   const { branding, theme, seo } = useSiteConfig();
+  const pageSeoMap = usePageSeoMap();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const page = resolvePageSeo(pageSeoMap, pathname);
+
 
   useEffect(() => {
     const rules: string[] = [];
