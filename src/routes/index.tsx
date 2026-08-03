@@ -5,6 +5,7 @@ import hero from "@/assets/hero.jpg";
 import story from "@/assets/story.jpg";
 import { ProductCard } from "@/components/product-card";
 import { JsonLd } from "@/components/json-ld";
+import { BannerSections } from "@/components/banner-sections";
 import { Button } from "@/components/ui/button";
 import { categoriesQuery, productsQuery, testimonialsQuery } from "@/lib/queries";
 import { categoryImage } from "@/lib/catalog-images";
@@ -92,6 +93,8 @@ function Home() {
           </div>
         </div>
       </section>
+
+      <BannerSections placement="home_section" />
 
       <section className="border-b border-border bg-sand">
         <div className="container-page grid gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">
