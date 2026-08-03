@@ -176,6 +176,53 @@ export const adminRolesQuery = queryOptions({
   },
 });
 
+export const adminPagesQuery = queryOptions({
+  queryKey: ["admin", "pages"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("pages").select("*").order("sort_order");
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
+export const adminCouponsQuery = queryOptions({
+  queryKey: ["admin", "coupons"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("coupons")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
+export const adminVariantsQuery = queryOptions({
+  queryKey: ["admin", "product_variants"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("product_variants")
+      .select("*, products(name,slug)")
+      .order("sort_order");
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
+export const adminRedirectsQuery = queryOptions({
+  queryKey: ["admin", "redirects"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("redirects")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
+
+
 /** Subscribes to Postgres changes and invalidates the matching admin query keys. */
 export function useAdminRealtime(tables: string[], keys: string[][]) {
   const queryClient = useQueryClient();
