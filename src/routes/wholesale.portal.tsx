@@ -84,6 +84,8 @@ function WholesalePortal() {
 
   const place = useMutation({
     mutationFn: async () => {
+      if (!approved) throw new Error("Your trade account must be approved before placing wholesale orders.");
+
       if (selected.length === 0) throw new Error("Add at least one product to your order.");
       const result = await submit({
         data: {
