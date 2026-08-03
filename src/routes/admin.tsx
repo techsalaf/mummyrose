@@ -1,32 +1,15 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import {
-  BarChart3,
-  Boxes,
-  FileText,
-  Folder,
-  Home,
-  Image as ImageIcon,
-  Inbox,
-  Layers,
-  LayoutDashboard,
-  Loader2,
-  MessageSquareQuote,
-  Navigation,
-  Package,
-  Quote,
-  Settings,
-  ShieldCheck,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
+import { Loader2, LogOut, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminGate, AdminLogin } from "@/components/admin/admin-shell";
+import { AdminSidebar, adminNavGroups } from "@/components/admin/admin-sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -40,28 +23,15 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
-const nav = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { to: "/admin/products", label: "Products", icon: Package },
-  { to: "/admin/categories", label: "Categories", icon: Folder },
-  { to: "/admin/inventory", label: "Inventory", icon: Boxes },
-  { to: "/admin/wholesale", label: "Wholesale", icon: Layers },
-  { to: "/admin/inquiries", label: "Inquiries", icon: Inbox },
-  { to: "/admin/customers", label: "Customers", icon: Users },
-  { to: "/admin/posts", label: "Journal & recipes", icon: FileText },
-  { to: "/admin/testimonials", label: "Testimonials", icon: Quote },
-  { to: "/admin/faqs", label: "FAQs", icon: MessageSquareQuote },
-  { to: "/admin/navigation", label: "Navigation", icon: Navigation },
-  { to: "/admin/media", label: "Media", icon: ImageIcon },
-  { to: "/admin/analytics", label: "Analytics & SEO", icon: BarChart3 },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
-] satisfies { to: string; label: string; icon: typeof Home; exact?: boolean }[];
-
 function AdminLayout() {
   const { user, isStaff, loading } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [claiming, setClaiming] = useState(false);
+  const pageTitle =
+    adminNavGroups
+      .flatMap((g) => g.items)
+      .filter((i) => (i.exact ? pathname === i.to : pathname.startsWith(i.to)))
+      .sort((a, b) => b.to.length - a.to.length)[0]?.label ?? "Dashboard";
 
   if (loading) {
     return (
@@ -107,65 +77,41 @@ function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <div className="flex">
-        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-card lg:flex">
-          <div className="border-b px-5 py-4">
-            <p className="font-display text-lg font-semibold">Mummy Rose</p>
-            <p className="text-xs text-muted-foreground">Commerce console</p>
-          </div>
-          <nav className="flex-1 overflow-y-auto p-3">
-            {nav.map((item) => {
-              const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "mb-0.5 flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
-                    active ? "bg-primary text-primary-foreground" : "text-foreground/70 hover:bg-muted",
-                  )}
-                >
-                  <item.icon className="size-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="border-t p-3">
-            <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link to="/">
-                <Home className="size-4" /> View storefront
-              </Link>
-            </Button>
-          </div>
-        </aside>
-
-        <main className="min-w-0 flex-1">
-          <header className="flex items-center justify-between gap-3 border-b bg-card px-4 py-3 lg:hidden">
-            <p className="font-display font-semibold">Console</p>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/">Storefront</Link>
-            </Button>
-          </header>
-          <div className="overflow-x-auto border-b bg-card px-3 py-2 lg:hidden">
-            <div className="flex gap-1">
-              {nav.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className="whitespace-nowrap rounded-md px-3 py-1.5 text-xs text-foreground/70 hover:bg-muted"
-                >
-                  {item.label}
-                </Link>
-              ))}
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-muted/30">
+        <AdminSidebar />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b bg-card/90 px-3 py-2.5 backdrop-blur-md md:px-6">
+            <SidebarTrigger />
+            <div className="min-w-0">
+              <p className="truncate font-display text-sm font-semibold sm:text-base">{pageTitle}</p>
+              <p className="hidden truncate text-xs text-muted-foreground sm:block">{user.email}</p>
             </div>
-          </div>
-          <div className="p-4 md:p-8">
-            <Outlet />
-          </div>
-        </main>
+            <div className="flex shrink-0 items-center gap-1">
+              <ThemeToggle />
+              <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
+                <Link to="/">Storefront</Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Sign out"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.assign("/admin");
+                }}
+              >
+                <LogOut className="size-4" />
+              </Button>
+            </div>
+          </header>
+          <main className="min-w-0 flex-1 p-4 md:p-8">
+            <div className="rise-in">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
