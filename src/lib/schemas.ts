@@ -48,6 +48,8 @@ export const checkoutSchema = z.object({
   origin: z.string().trim().url().max(300).optional().nullable(),
   order_type: z.enum(["retail", "wholesale"]).default("retail"),
   wholesale_account_id: z.string().uuid().optional().nullable(),
+  coupon_code: z.string().trim().max(40).optional().nullable(),
+
   items: z
     .array(
       z.object({
