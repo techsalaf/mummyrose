@@ -215,7 +215,12 @@ function ProductDetail() {
               <Heart className={cn(isWishlisted(product.slug) && "fill-accent text-accent")} />
               {isWishlisted(product.slug) ? "Saved" : "Save"}
             </Button>
+            <WhatsAppOrderButton
+              lines={[{ name: product.name, variant: chosen, quantity: qty, unit_price: price }]}
+            />
           </div>
+          <OrderPathsNote className="mt-3 max-w-prose text-xs leading-relaxed text-muted-foreground" />
+
 
           <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
             <Truck className="size-4 text-accent" />
