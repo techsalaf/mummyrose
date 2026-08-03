@@ -124,3 +124,55 @@ export function navLinksQuery(group: string) {
     },
   });
 }
+
+export function productReviewsQuery(productId: string | undefined) {
+  return queryOptions({
+    queryKey: ["product_reviews", productId ?? "none"],
+    queryFn: async () => {
+      if (!productId) return [];
+      const { data, error } = await supabase
+        .from("product_reviews")
+        .select("id,author_name,rating,title,body,created_at,is_approved,user_id")
+        .eq("product_id", productId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function bannersQuery(placement: string) {
+  return queryOptions({
+    queryKey: ["banners", placement],
+    queryFn: async () => {
+      const nowIso = new Date().toISOString();
+      const { data, error } = await supabase
+        .from("banners")
+        .select("id,title,subtitle,body,image_url,cta_label,cta_href,theme,starts_at,expires_at")
+        .eq("placement", placement)
+        .eq("is_active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return (data ?? []).filter(
+        (b) => (!b.starts_at || b.starts_at <= nowIso) && (!b.expires_at || b.expires_at >= nowIso),
+      );
+    },
+  });
+}
+
+export function addressesQuery(userId: string | undefined) {
+  return queryOptions({
+    queryKey: ["customer_addresses", userId ?? "anon"],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from("customer_addresses")
+        .select("*")
+        .eq("user_id", userId)
+        .order("is_default", { ascending: false })
+        .order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
