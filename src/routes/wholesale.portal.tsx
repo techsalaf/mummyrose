@@ -32,7 +32,7 @@ export const Route = createFileRoute("/wholesale/portal")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: WholesalePortal;
+  component: WholesalePortal,
 });
 
 type OrderRow = {
