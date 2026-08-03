@@ -263,6 +263,12 @@ function AdminSettings() {
             <Area label="Story paragraph" value={home.story_body} onChange={(v) => setHome({ ...home, story_body: v })} />
             <ImageField label="Story image" value={home.story_image} onChange={(v) => setHome({ ...home, story_image: v })} />
             <Text
+              label="Story image alt text (SEO)"
+              value={home.story_image_alt}
+              onChange={(v) => setHome({ ...home, story_image_alt: v })}
+            />
+
+            <Text
               label="Story button label"
               value={home.story_cta_label}
               onChange={(v) => setHome({ ...home, story_cta_label: v })}
