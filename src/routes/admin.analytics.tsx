@@ -243,10 +243,37 @@ function AdminAnalytics() {
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
           <CardTitle className="text-base">SEO audit</CardTitle>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const rows = [
+                  ["Check", "Status", "Action needed"],
+                  ...audit.map((a) => [a.label, a.pass ? "Pass" : "Fail", a.pass ? "" : a.hint]),
+                ];
+                const csv = rows
+                  .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+                  .join("\n");
+                const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `mummy-rose-seo-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+                link.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              <Download className="size-4" /> CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Printer className="size-4" /> PDF
+            </Button>
+          </div>
           <Badge variant={score >= 80 ? "default" : score >= 50 ? "secondary" : "destructive"}>{score}/100</Badge>
         </CardHeader>
+
         <CardContent className="space-y-2.5">
           {audit.map((row) => (
             <div key={row.label} className="flex items-start gap-3 border-b pb-2 text-sm last:border-0">
