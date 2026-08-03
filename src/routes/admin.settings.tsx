@@ -67,7 +67,7 @@ function AdminSettings() {
     onSuccess: async () => {
       toast.success("Settings saved");
       await queryClient.invalidateQueries({ queryKey: adminSettingsQuery.queryKey });
-      await queryClient.invalidateQueries({ queryKey: ["settings"] });
+      await queryClient.invalidateQueries({ queryKey: ["site_settings"] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -78,17 +78,225 @@ function AdminSettings() {
     <div className="space-y-6">
       <AdminHeader
         title="Settings"
-        description="Store identity, delivery zones, payment methods, WhatsApp ordering and default SEO — all live on the storefront the moment you save."
+        description="Brand identity, colours, fonts, meta tags, home page content, footer, delivery, payments and WhatsApp — every change is live on the storefront the moment you save."
       />
 
-      <Tabs defaultValue="store">
+      <Tabs defaultValue="brand">
         <TabsList className="flex-wrap">
+          <TabsTrigger value="brand">Brand</TabsTrigger>
+          <TabsTrigger value="theme">Colours &amp; fonts</TabsTrigger>
+          <TabsTrigger value="home">Home page</TabsTrigger>
+          <TabsTrigger value="footer">Footer</TabsTrigger>
           <TabsTrigger value="store">Store</TabsTrigger>
           <TabsTrigger value="shipping">Delivery</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
-          <TabsTrigger value="seo">SEO</TabsTrigger>
+          <TabsTrigger value="seo">SEO &amp; meta</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="brand">
+          <Panel
+            title="Brand identity"
+            description="App name, tagline, logo, favicon and the announcement bar at the very top of the storefront."
+            onSave={() => save.mutate({ key: "branding", value: branding })}
+            pending={save.isPending}
+          >
+            <Text label="App / brand name" value={branding.name} onChange={(v) => setBranding({ ...branding, name: v })} />
+            <Text label="Tagline" value={branding.tagline} onChange={(v) => setBranding({ ...branding, tagline: v })} />
+            <ImageField
+              label="Logo"
+              value={branding.logo_url}
+              onChange={(v) => setBranding({ ...branding, logo_url: v })}
+              help="Shown in the header and footer. Transparent PNG or SVG works best."
+            />
+            <ImageField
+              label="Favicon"
+              value={branding.favicon_url}
+              onChange={(v) => setBranding({ ...branding, favicon_url: v })}
+              help="Square image, 32×32 or larger."
+            />
+            <Toggle
+              label="Show announcement bar"
+              value={branding.announcement_enabled}
+              onChange={(v) => setBranding({ ...branding, announcement_enabled: v })}
+            />
+            <Text
+              label="Announcement text"
+              value={branding.announcement}
+              onChange={(v) => setBranding({ ...branding, announcement: v })}
+            />
+          </Panel>
+        </TabsContent>
+
+        <TabsContent value="theme">
+          <Panel
+            title="Colours &amp; typography"
+            description="Leave a colour blank to keep the built-in spice palette. Hex values are supported and apply in light and dark mode."
+            onSave={() => save.mutate({ key: "theme", value: theme })}
+            pending={save.isPending}
+          >
+            <ColorField label="Primary" value={theme.primary} onChange={(v) => setTheme({ ...theme, primary: v })} />
+            <ColorField
+              label="Text on primary"
+              value={theme.primary_foreground}
+              onChange={(v) => setTheme({ ...theme, primary_foreground: v })}
+            />
+            <ColorField label="Accent" value={theme.accent} onChange={(v) => setTheme({ ...theme, accent: v })} />
+            <ColorField label="Gold / highlight" value={theme.gold} onChange={(v) => setTheme({ ...theme, gold: v })} />
+            <ColorField label="Page background" value={theme.background} onChange={(v) => setTheme({ ...theme, background: v })} />
+            <ColorField label="Body text" value={theme.foreground} onChange={(v) => setTheme({ ...theme, foreground: v })} />
+            <ColorField label="Dark panels (ink)" value={theme.ink} onChange={(v) => setTheme({ ...theme, ink: v })} />
+            <Text label="Corner radius (e.g. 0.25rem)" value={theme.radius} onChange={(v) => setTheme({ ...theme, radius: v })} />
+            <FontField label="Heading font" value={theme.heading_font} onChange={(v) => setTheme({ ...theme, heading_font: v })} />
+            <FontField label="Body font" value={theme.body_font} onChange={(v) => setTheme({ ...theme, body_font: v })} />
+          </Panel>
+        </TabsContent>
+
+        <TabsContent value="home">
+          <Panel
+            title="Home page content"
+            description="Hero, trust badges, section headings, story block and testimonials. Toggle any section off to hide it."
+            onSave={() => save.mutate({ key: "home", value: home })}
+            pending={save.isPending}
+          >
+            <Text label="Hero eyebrow" value={home.hero_eyebrow} onChange={(v) => setHome({ ...home, hero_eyebrow: v })} />
+            <Text
+              label="Hero overlay opacity (0-100)"
+              type="number"
+              value={home.hero_overlay}
+              onChange={(v) => setHome({ ...home, hero_overlay: Number(v) })}
+            />
+            <Area label="Hero headline" value={home.hero_title} onChange={(v) => setHome({ ...home, hero_title: v })} />
+            <Area label="Hero paragraph" value={home.hero_body} onChange={(v) => setHome({ ...home, hero_body: v })} />
+            <ImageField label="Hero image" value={home.hero_image} onChange={(v) => setHome({ ...home, hero_image: v })} />
+            <Text
+              label="Primary button label"
+              value={home.primary_cta_label}
+              onChange={(v) => setHome({ ...home, primary_cta_label: v })}
+            />
+            <Text
+              label="Primary button link"
+              value={home.primary_cta_href}
+              onChange={(v) => setHome({ ...home, primary_cta_href: v })}
+            />
+            <Text
+              label="Secondary button label"
+              value={home.secondary_cta_label}
+              onChange={(v) => setHome({ ...home, secondary_cta_label: v })}
+            />
+            <Text
+              label="Secondary button link"
+              value={home.secondary_cta_href}
+              onChange={(v) => setHome({ ...home, secondary_cta_href: v })}
+            />
+            <Toggle
+              label="Show trust badges"
+              value={home.promises_enabled}
+              onChange={(v) => setHome({ ...home, promises_enabled: v })}
+            />
+            <PromisesEditor
+              value={(home.promises ?? []) as HomePromise[]}
+              onChange={(next) => setHome({ ...home, promises: next })}
+            />
+            <Toggle
+              label="Show categories section"
+              value={home.categories_enabled}
+              onChange={(v) => setHome({ ...home, categories_enabled: v })}
+            />
+            <Text
+              label="Categories eyebrow"
+              value={home.categories_eyebrow}
+              onChange={(v) => setHome({ ...home, categories_eyebrow: v })}
+            />
+            <Text
+              label="Categories heading"
+              value={home.categories_title}
+              onChange={(v) => setHome({ ...home, categories_title: v })}
+            />
+            <Toggle
+              label="Show best sellers section"
+              value={home.featured_enabled}
+              onChange={(v) => setHome({ ...home, featured_enabled: v })}
+            />
+            <Text
+              label="Best sellers eyebrow"
+              value={home.featured_eyebrow}
+              onChange={(v) => setHome({ ...home, featured_eyebrow: v })}
+            />
+            <Text
+              label="Best sellers heading"
+              value={home.featured_title}
+              onChange={(v) => setHome({ ...home, featured_title: v })}
+            />
+            <Toggle
+              label="Show story section"
+              value={home.story_enabled}
+              onChange={(v) => setHome({ ...home, story_enabled: v })}
+            />
+            <Text label="Story eyebrow" value={home.story_eyebrow} onChange={(v) => setHome({ ...home, story_eyebrow: v })} />
+            <Text label="Story heading" value={home.story_title} onChange={(v) => setHome({ ...home, story_title: v })} />
+            <Area label="Story paragraph" value={home.story_body} onChange={(v) => setHome({ ...home, story_body: v })} />
+            <ImageField label="Story image" value={home.story_image} onChange={(v) => setHome({ ...home, story_image: v })} />
+            <Text
+              label="Story button label"
+              value={home.story_cta_label}
+              onChange={(v) => setHome({ ...home, story_cta_label: v })}
+            />
+            <Text
+              label="Story button link"
+              value={home.story_cta_href}
+              onChange={(v) => setHome({ ...home, story_cta_href: v })}
+            />
+            <Toggle
+              label="Show testimonials"
+              value={home.testimonials_enabled}
+              onChange={(v) => setHome({ ...home, testimonials_enabled: v })}
+            />
+            <Text
+              label="Testimonials eyebrow"
+              value={home.testimonials_eyebrow}
+              onChange={(v) => setHome({ ...home, testimonials_eyebrow: v })}
+            />
+          </Panel>
+        </TabsContent>
+
+        <TabsContent value="footer">
+          <Panel
+            title="Footer &amp; contact"
+            description="Contact details, social links, column headings and the copyright line."
+            onSave={() => save.mutate({ key: "footer", value: footer })}
+            pending={save.isPending}
+          >
+            <Area label="About blurb" value={footer.blurb} onChange={(v) => setFooter({ ...footer, blurb: v })} />
+            <Text label="Email" value={footer.email} onChange={(v) => setFooter({ ...footer, email: v })} />
+            <Text label="Phone" value={footer.phone} onChange={(v) => setFooter({ ...footer, phone: v })} />
+            <Text label="Address" value={footer.address} onChange={(v) => setFooter({ ...footer, address: v })} />
+            <Text label="Instagram URL" value={footer.instagram} onChange={(v) => setFooter({ ...footer, instagram: v })} />
+            <Text label="Facebook URL" value={footer.facebook} onChange={(v) => setFooter({ ...footer, facebook: v })} />
+            <Text label="X / Twitter URL" value={footer.twitter} onChange={(v) => setFooter({ ...footer, twitter: v })} />
+            <Text label="TikTok URL" value={footer.tiktok} onChange={(v) => setFooter({ ...footer, tiktok: v })} />
+            <Text label="YouTube URL" value={footer.youtube} onChange={(v) => setFooter({ ...footer, youtube: v })} />
+            <Text label="Shop column heading" value={footer.shop_heading} onChange={(v) => setFooter({ ...footer, shop_heading: v })} />
+            <Text
+              label="Business column heading"
+              value={footer.business_heading}
+              onChange={(v) => setFooter({ ...footer, business_heading: v })}
+            />
+            <Text
+              label="Newsletter heading"
+              value={footer.newsletter_heading}
+              onChange={(v) => setFooter({ ...footer, newsletter_heading: v })}
+            />
+            <Text
+              label="Newsletter blurb"
+              value={footer.newsletter_body}
+              onChange={(v) => setFooter({ ...footer, newsletter_body: v })}
+            />
+            <Text label="Copyright line" value={footer.copyright} onChange={(v) => setFooter({ ...footer, copyright: v })} />
+          </Panel>
+        </TabsContent>
+
+
 
         <TabsContent value="store">
           <Panel
