@@ -40,6 +40,7 @@ import { Route as AdminWholesaleRouteImport } from './routes/admin.wholesale'
 import { Route as AdminVariantsRouteImport } from './routes/admin.variants'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminRedirectsRouteImport } from './routes/admin.redirects'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
 import { Route as AdminPagesRouteImport } from './routes/admin.pages'
@@ -211,6 +212,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRedirectsRoute = AdminRedirectsRouteImport.update({
+  id: '/redirects',
+  path: '/redirects',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProductsRoute = AdminProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -321,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/admin/pages': typeof AdminPagesRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/redirects': typeof AdminRedirectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/variants': typeof AdminVariantsRoute
@@ -368,6 +375,7 @@ export interface FileRoutesByTo {
   '/admin/pages': typeof AdminPagesRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/redirects': typeof AdminRedirectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/variants': typeof AdminVariantsRoute
@@ -417,6 +425,7 @@ export interface FileRoutesById {
   '/admin/pages': typeof AdminPagesRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/redirects': typeof AdminRedirectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/variants': typeof AdminVariantsRoute
@@ -467,6 +476,7 @@ export interface FileRouteTypes {
     | '/admin/pages'
     | '/admin/posts'
     | '/admin/products'
+    | '/admin/redirects'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/admin/variants'
@@ -514,6 +524,7 @@ export interface FileRouteTypes {
     | '/admin/pages'
     | '/admin/posts'
     | '/admin/products'
+    | '/admin/redirects'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/admin/variants'
@@ -562,6 +573,7 @@ export interface FileRouteTypes {
     | '/admin/pages'
     | '/admin/posts'
     | '/admin/products'
+    | '/admin/redirects'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/admin/variants'
@@ -829,6 +841,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/redirects': {
+      id: '/admin/redirects'
+      path: '/redirects'
+      fullPath: '/admin/redirects'
+      preLoaderRoute: typeof AdminRedirectsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/products': {
       id: '/admin/products'
       path: '/products'
@@ -951,6 +970,7 @@ interface AdminRouteChildren {
   AdminPagesRoute: typeof AdminPagesRoute
   AdminPostsRoute: typeof AdminPostsRoute
   AdminProductsRoute: typeof AdminProductsRoute
+  AdminRedirectsRoute: typeof AdminRedirectsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminVariantsRoute: typeof AdminVariantsRoute
@@ -972,6 +992,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPagesRoute: AdminPagesRoute,
   AdminPostsRoute: AdminPostsRoute,
   AdminProductsRoute: AdminProductsRoute,
+  AdminRedirectsRoute: AdminRedirectsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminVariantsRoute: AdminVariantsRoute,
