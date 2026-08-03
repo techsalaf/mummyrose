@@ -46,6 +46,8 @@ export const checkoutSchema = z.object({
   notes: z.string().trim().max(1000).optional().nullable(),
   payment_provider: z.enum(paymentProviders),
   origin: z.string().trim().url().max(300).optional().nullable(),
+  order_type: z.enum(["retail", "wholesale"]).default("retail"),
+  wholesale_account_id: z.string().uuid().optional().nullable(),
   items: z
     .array(
       z.object({

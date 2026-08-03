@@ -17,6 +17,7 @@ const shop = [
 
 const business = [
   { to: "/wholesale", label: "Wholesale" },
+  { to: "/wholesale/portal", label: "Trade portal" },
   { to: "/export", label: "Export" },
   { to: "/white-labelling", label: "White labelling" },
   { to: "/custom-packaging", label: "Custom packaging" },
