@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BusinessPage } from "@/components/business-page";
 
-export const Route = createFileRoute("/wholesale")({
+export const Route = createFileRoute("/wholesale/")({
   head: () => ({
     meta: [
       { title: "Wholesale Supply — Bulk Nigerian Spices & Flours | Mummy Rose" },
