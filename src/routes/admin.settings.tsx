@@ -430,7 +430,19 @@ function AdminSettings() {
           >
             <Text label="Site title" value={seo.title} onChange={(v) => setSeo({ ...seo, title: v })} />
             <Text label="Keywords" value={seo.keywords} onChange={(v) => setSeo({ ...seo, keywords: v })} />
+            <Text
+              label="Twitter / X handle (@brand)"
+              value={seo.twitter_handle}
+              onChange={(v) => setSeo({ ...seo, twitter_handle: v })}
+            />
             <Area label="Meta description" value={seo.description} onChange={(v) => setSeo({ ...seo, description: v })} />
+            <ImageField
+              label="Social share image (og:image)"
+              value={seo.og_image}
+              onChange={(v) => setSeo({ ...seo, og_image: v })}
+              help="1200×630 works best. Link previews may cache the old image for a while."
+            />
+
           </Panel>
         </TabsContent>
       </Tabs>
