@@ -22,6 +22,7 @@ import {
   GalleryHorizontal,
   ShieldCheck,
   Star,
+  MonitorSmartphone,
 } from "lucide-react";
 
 import {
@@ -74,7 +75,8 @@ export const adminNavGroups: { group: string; items: Item[] }[] = [
       { to: "/admin/navigation", label: "Navigation", icon: Navigation },
       { to: "/admin/banners", label: "Banners", icon: GalleryHorizontal },
       { to: "/admin/reviews", label: "Reviews", icon: Star },
-      { to: "/admin/media", label: "Media library", icon: ImageIcon },
+      { to: "/admin/media", label: "Image manager", icon: ImageIcon },
+      { to: "/admin/preview", label: "Preview & test", icon: MonitorSmartphone },
     ],
   },
   {
