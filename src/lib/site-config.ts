@@ -173,6 +173,8 @@ export const DEFAULT_HOME: HomeConfig = {
   story_body:
     "Mummy Rose began with one conviction: Nigerian food deserves ingredients that are clean, honest and consistent. We work directly with farming cooperatives, dry and mill in controlled batches, and pack without preservatives so every jar tastes the way it should.",
   story_image: "",
+  story_image_alt: "",
+
   story_cta_label: "Read our story",
   story_cta_href: "/about",
   story_enabled: true,
