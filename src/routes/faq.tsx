@@ -1,39 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { JsonLd } from "@/components/json-ld";
+import { faqsQuery } from "@/lib/queries";
 
-const faqs = [
+const FALLBACK = [
   {
-    q: "How long does delivery take?",
-    a: "Lagos orders arrive in 1–2 business days. Other Nigerian states take 2–5 business days. International export orders are quoted per shipment.",
+    question: "How long does delivery take?",
+    answer:
+      "Lagos orders arrive in 1–2 business days. Other Nigerian states take 2–5 business days. International export orders are quoted per shipment.",
   },
   {
-    q: "Is delivery free?",
-    a: "Delivery is free on orders over ₦50,000. Below that, a flat ₦2,500 shipping fee applies nationwide.",
+    question: "How do I pay?",
+    answer:
+      "You can pay by card or transfer through Paystack or Flutterwave, by direct bank transfer, or on delivery within Lagos.",
   },
   {
-    q: "How do I pay?",
-    a: "You can pay by card or transfer through Paystack or Flutterwave, by direct bank transfer, or on delivery within Lagos.",
-  },
-  {
-    q: "Are your products preservative free?",
-    a: "Yes. Every product is milled, blended and packed without preservatives, fillers or artificial colouring.",
-  },
-  {
-    q: "How should I store the products?",
-    a: "Keep jars and pouches sealed in a cool, dry cupboard away from direct sunlight. Flours are best used within six months of opening.",
-  },
-  {
-    q: "Do you supply restaurants and retailers?",
-    a: "Yes. We supply wholesale, corporate and export partners, and we offer white-label and custom packaging programmes.",
-  },
-  {
-    q: "Can I return an order?",
-    a: "Unopened items can be returned within 7 days of delivery. Contact us with your order number and we'll arrange pickup.",
+    question: "Do you supply restaurants and retailers?",
+    answer:
+      "Yes. We supply wholesale, corporate and export partners, and we offer white-label and custom packaging programmes.",
   },
 ];
 
 export const Route = createFileRoute("/faq")({
+  loader: ({ context }) => {
+    void context.queryClient.ensureQueryData(faqsQuery);
+  },
   head: () => ({
     meta: [
       { title: "FAQ — Delivery, Payment & Product Questions | Mummy Rose" },
@@ -50,6 +42,9 @@ export const Route = createFileRoute("/faq")({
 });
 
 function FaqPage() {
+  const { data } = useQuery(faqsQuery);
+  const faqs = data && data.length > 0 ? data : FALLBACK;
+
   return (
     <div className="container-page max-w-3xl py-12 md:py-16">
       <JsonLd
@@ -58,8 +53,8 @@ function FaqPage() {
           "@type": "FAQPage",
           mainEntity: faqs.map((f) => ({
             "@type": "Question",
-            name: f.q,
-            acceptedAnswer: { "@type": "Answer", text: f.a },
+            name: f.question,
+            acceptedAnswer: { "@type": "Answer", text: f.answer },
           })),
         }}
       />
@@ -67,9 +62,9 @@ function FaqPage() {
       <h1 className="mt-3 font-display text-4xl md:text-5xl">Frequently asked questions</h1>
       <Accordion type="single" collapsible className="mt-10">
         {faqs.map((f) => (
-          <AccordionItem key={f.q} value={f.q}>
-            <AccordionTrigger className="text-left">{f.q}</AccordionTrigger>
-            <AccordionContent className="leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
+          <AccordionItem key={f.question} value={f.question}>
+            <AccordionTrigger className="text-left">{f.question}</AccordionTrigger>
+            <AccordionContent className="leading-relaxed text-muted-foreground">{f.answer}</AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>
