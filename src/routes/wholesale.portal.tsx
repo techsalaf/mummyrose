@@ -313,9 +313,20 @@ function WholesalePortal() {
                   <span className="text-muted-foreground">Subtotal ({selected.length} lines)</span>
                   <span className="font-medium">{formatNaira(subtotal)}</span>
                 </div>
-                <Button className="w-full" size="lg" disabled={place.isPending} onClick={() => place.mutate()}>
+                <Button
+                  className="w-full"
+                  size="lg"
+                  disabled={place.isPending || !approved}
+                  onClick={() => place.mutate()}
+                >
                   {place.isPending ? <Loader2 className="size-4 animate-spin" /> : null} Submit trade order
                 </Button>
+                {!approved ? (
+                  <p className="text-center text-xs text-muted-foreground">
+                    Trade ordering unlocks once your account is approved.
+                  </p>
+                ) : null}
+
               </CardContent>
             </Card>
           </div>
