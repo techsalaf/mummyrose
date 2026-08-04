@@ -262,7 +262,9 @@ export const SEO_PAGES: { path: string; label: string }[] = [
   { path: "/about", label: "About" },
   { path: "/contact", label: "Contact" },
   { path: "/faq", label: "FAQ" },
+  { path: "/retail", label: "Retail & stockists" },
   { path: "/wholesale", label: "Wholesale" },
+
   { path: "/export", label: "Export" },
   { path: "/white-labelling", label: "White labelling" },
   { path: "/corporate-supply", label: "Corporate supply" },
