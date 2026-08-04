@@ -146,7 +146,11 @@ export const DEFAULT_SEO_META: SeoMetaConfig = {
   keywords: "",
   og_image: "",
   twitter_handle: "",
+  site_url: "https://mummyrose.com",
+  ga4_id: "",
+  gsc_verification: "",
 };
+
 
 export const DEFAULT_HOME: HomeConfig = {
   hero_eyebrow: "Natural Nigerian pantry",
