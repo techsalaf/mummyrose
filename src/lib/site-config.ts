@@ -36,7 +36,14 @@ export type SeoMetaConfig = {
   keywords: string;
   og_image: string;
   twitter_handle: string;
+  /** Canonical origin used for canonical tags, og:url and sitemap.xml. */
+  site_url: string;
+  /** Google Analytics 4 measurement ID, e.g. G-XXXXXXXXXX. */
+  ga4_id: string;
+  /** google-site-verification token from Google Search Console. */
+  gsc_verification: string;
 };
+
 
 export type HomePromise = { title: string; body: string; icon?: string };
 
@@ -139,7 +146,11 @@ export const DEFAULT_SEO_META: SeoMetaConfig = {
   keywords: "",
   og_image: "",
   twitter_handle: "",
+  site_url: "https://mummyrose.com",
+  ga4_id: "",
+  gsc_verification: "",
 };
+
 
 export const DEFAULT_HOME: HomeConfig = {
   hero_eyebrow: "Natural Nigerian pantry",
@@ -251,7 +262,9 @@ export const SEO_PAGES: { path: string; label: string }[] = [
   { path: "/about", label: "About" },
   { path: "/contact", label: "Contact" },
   { path: "/faq", label: "FAQ" },
+  { path: "/retail", label: "Retail & stockists" },
   { path: "/wholesale", label: "Wholesale" },
+
   { path: "/export", label: "Export" },
   { path: "/white-labelling", label: "White labelling" },
   { path: "/corporate-supply", label: "Corporate supply" },

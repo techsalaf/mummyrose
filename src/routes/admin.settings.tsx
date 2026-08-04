@@ -466,6 +466,25 @@ function AdminSettings() {
               value={seo.twitter_handle}
               onChange={(v) => setSeo({ ...seo, twitter_handle: v })}
             />
+            <Text
+              label="Canonical site URL"
+              value={seo.site_url}
+              onChange={(v) => setSeo({ ...seo, site_url: v })}
+              help="e.g. https://mummyrose.com — used for canonical tags, social previews and sitemap.xml."
+            />
+            <Text
+              label="Google Analytics 4 measurement ID"
+              value={seo.ga4_id}
+              onChange={(v) => setSeo({ ...seo, ga4_id: v })}
+              help="Looks like G-XXXXXXXXXX. Leave empty to disable analytics tracking."
+            />
+            <Text
+              label="Google Search Console verification token"
+              value={seo.gsc_verification}
+              onChange={(v) => setSeo({ ...seo, gsc_verification: v })}
+              help="Paste only the content value from Google's HTML-tag verification method."
+            />
+
             <Area label="Meta description" value={seo.description} onChange={(v) => setSeo({ ...seo, description: v })} />
             <ImageField
               label="Social share image (og:image)"
@@ -535,19 +554,23 @@ function Text({
   value,
   onChange,
   type = "text",
+  help,
 }: {
   label: string;
   value: unknown;
   onChange: (value: string) => void;
   type?: string;
+  help?: string;
 }) {
   return (
     <div>
       <Label className="text-xs uppercase tracking-wide text-muted-foreground">{label}</Label>
       <Input className="mt-1.5" type={type} value={value == null ? "" : String(value)} onChange={(e) => onChange(e.target.value)} />
+      {help && <p className="mt-1 text-xs text-muted-foreground">{help}</p>}
     </div>
   );
 }
+
 
 function Area({ label, value, onChange }: { label: string; value: unknown; onChange: (value: string) => void }) {
   return (

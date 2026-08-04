@@ -120,6 +120,41 @@ export function SiteChrome() {
     if (seo.twitter_handle) setMeta("name", "twitter:site", seo.twitter_handle);
   }, [branding.name, seo, page, pathname]);
 
+  // Canonical + og:url, always self-referencing the current path.
+  useEffect(() => {
+    const origin = seo.site_url?.trim().replace(/\/$/, "") || window.location.origin;
+    const url = `${origin}${pathname === "/" ? "/" : pathname}`;
+    setLink("canonical", url, "canonical");
+    setMeta("property", "og:url", url);
+  }, [seo.site_url, pathname]);
+
+  // Google Search Console site verification token.
+  useEffect(() => {
+    const token = seo.gsc_verification?.trim();
+    if (token) setMeta("name", "google-site-verification", token);
+  }, [seo.gsc_verification]);
+
+  // Google Analytics 4 — injected only once a measurement ID is saved in the CMS.
+  useEffect(() => {
+    const id = seo.ga4_id?.trim();
+    if (!id || document.getElementById("ga4-src")) return;
+    const loader = document.createElement("script");
+    loader.id = "ga4-src";
+    loader.async = true;
+    loader.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+    document.head.appendChild(loader);
+    const inline = document.createElement("script");
+    inline.id = "ga4-init";
+    inline.textContent = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config',${JSON.stringify(id)});`;
+    document.head.appendChild(inline);
+  }, [seo.ga4_id]);
+
+  // Report client-side route changes as GA4 page views.
+  useEffect(() => {
+    const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
+    if (seo.ga4_id?.trim() && gtag) gtag("event", "page_view", { page_path: pathname });
+  }, [pathname, seo.ga4_id]);
 
   return null;
 }
+

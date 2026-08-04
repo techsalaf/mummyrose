@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://dezgbfewaprhxfhnbtqp.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "mummy-rose-e-commerce-hub",
+      "version": "1.0.0",
+      "title": "Mummy Rose E-commerce Hub"
+    },
+    "tools": [
+      {
+        "name": "search_products",
+        "title": "Search products",
+        "description": "Search the public Mummy Rose catalogue (spices, flours, seasonings, tea infusions) by name or description. Returns name, slug, price and stock status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Free-text search term, e.g. 'ginger' or 'yam flour'."
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of products to return (1-25)."
+            }
+          },
+          "required": [
+            "query",
+            "limit"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_product",
+        "title": "Get product details",
+        "description": "Fetch one published Mummy Rose product by its URL slug, including description, pricing, stock and active variants.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "slug": {
+              "type": "string",
+              "description": "Product slug, e.g. 'ginger-powder'."
+            }
+          },
+          "required": [
+            "slug"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_orders",
+        "title": "List my orders",
+        "description": "List the signed-in customer's own Mummy Rose orders with status, payment status, totals and line items. Never returns other customers' orders.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of orders to return (1-25)."
+            }
+          },
+          "required": [
+            "limit"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "track_order",
+        "title": "Track an order",
+        "description": "Look up the fulfilment and payment status of one of the signed-in customer's orders by its order number (e.g. MR-2026-0042).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_number": {
+              "type": "string",
+              "description": "Mummy Rose order number."
+            }
+          },
+          "required": [
+            "order_number"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_inquiry",
+        "title": "Send a business inquiry",
+        "description": "Submit a wholesale, export, white-labelling, corporate-supply or general inquiry to the Mummy Rose team on behalf of the signed-in user.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "contact",
+                "wholesale",
+                "export",
+                "white_label",
+                "corporate",
+                "custom_packaging"
+              ],
+              "description": "Inquiry channel."
+            },
+            "name": {
+              "type": "string",
+              "description": "Contact name."
+            },
+            "email": {
+              "type": "string",
+              "description": "Contact email address."
+            },
+            "phone": {
+              "type": "string",
+              "description": "Contact phone number, or an empty string."
+            },
+            "message": {
+              "type": "string",
+              "description": "The inquiry body."
+            }
+          },
+          "required": [
+            "type",
+            "name",
+            "email",
+            "phone",
+            "message"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

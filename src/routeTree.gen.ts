@@ -13,9 +13,12 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RetailRouteImport } from './routes/retail'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentCallbackRouteImport } from './routes/payment-callback'
 import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as CustomPackagingRouteImport } from './routes/custom-packaging'
@@ -58,6 +61,10 @@ import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
 import { Route as ApiPublicWebhooksFlutterwaveRouteImport } from './routes/api/public/webhooks/flutterwave'
 
@@ -81,6 +88,16 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetailRoute = RetailRouteImport.update({
+  id: '/retail',
+  path: '/retail',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -94,6 +111,11 @@ const PaymentCallbackRoute = PaymentCallbackRouteImport.update({
 const OrderConfirmedRoute = OrderConfirmedRouteImport.update({
   id: '/order-confirmed',
   path: '/order-confirmed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -306,6 +328,29 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWebhooksPaystackRoute =
   ApiPublicWebhooksPaystackRouteImport.update({
     id: '/api/public/webhooks/paystack',
@@ -331,13 +376,18 @@ export interface FileRoutesByFullPath {
   '/custom-packaging': typeof CustomPackagingRoute
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
+  '/mcp': typeof McpRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/retail': typeof RetailRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
   '/wishlist': typeof WishlistRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -369,6 +419,8 @@ export interface FileRoutesByFullPath {
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/wholesale/': typeof WholesaleIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -383,13 +435,18 @@ export interface FileRoutesByTo {
   '/custom-packaging': typeof CustomPackagingRoute
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
+  '/mcp': typeof McpRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/retail': typeof RetailRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
   '/wishlist': typeof WishlistRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -421,6 +478,8 @@ export interface FileRoutesByTo {
   '/products': typeof ProductsIndexRoute
   '/recipes': typeof RecipesIndexRoute
   '/wholesale': typeof WholesaleIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -437,13 +496,18 @@ export interface FileRoutesById {
   '/custom-packaging': typeof CustomPackagingRoute
   '/export': typeof ExportRoute
   '/faq': typeof FaqRoute
+  '/mcp': typeof McpRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/retail': typeof RetailRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/white-labelling': typeof WhiteLabellingRoute
   '/wishlist': typeof WishlistRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -475,6 +539,8 @@ export interface FileRoutesById {
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/wholesale/': typeof WholesaleIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/webhooks/flutterwave': typeof ApiPublicWebhooksFlutterwaveRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -492,13 +558,18 @@ export interface FileRouteTypes {
     | '/custom-packaging'
     | '/export'
     | '/faq'
+    | '/mcp'
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/retail'
+    | '/sitemap.xml'
     | '/terms'
     | '/track-order'
     | '/white-labelling'
     | '/wishlist'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/banners'
     | '/admin/categories'
@@ -530,6 +601,8 @@ export interface FileRouteTypes {
     | '/products/'
     | '/recipes/'
     | '/wholesale/'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   fileRoutesByTo: FileRoutesByTo
@@ -544,13 +617,18 @@ export interface FileRouteTypes {
     | '/custom-packaging'
     | '/export'
     | '/faq'
+    | '/mcp'
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/retail'
+    | '/sitemap.xml'
     | '/terms'
     | '/track-order'
     | '/white-labelling'
     | '/wishlist'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/banners'
     | '/admin/categories'
@@ -582,6 +660,8 @@ export interface FileRouteTypes {
     | '/products'
     | '/recipes'
     | '/wholesale'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   id:
@@ -597,13 +677,18 @@ export interface FileRouteTypes {
     | '/custom-packaging'
     | '/export'
     | '/faq'
+    | '/mcp'
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/retail'
+    | '/sitemap.xml'
     | '/terms'
     | '/track-order'
     | '/white-labelling'
     | '/wishlist'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/banners'
     | '/admin/categories'
@@ -635,6 +720,8 @@ export interface FileRouteTypes {
     | '/products/'
     | '/recipes/'
     | '/wholesale/'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/webhooks/flutterwave'
     | '/api/public/webhooks/paystack'
   fileRoutesById: FileRoutesById
@@ -651,13 +738,18 @@ export interface RootRouteChildren {
   CustomPackagingRoute: typeof CustomPackagingRoute
   ExportRoute: typeof ExportRoute
   FaqRoute: typeof FaqRoute
+  McpRoute: typeof McpRoute
   OrderConfirmedRoute: typeof OrderConfirmedRoute
   PaymentCallbackRoute: typeof PaymentCallbackRoute
   PrivacyRoute: typeof PrivacyRoute
+  RetailRoute: typeof RetailRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TrackOrderRoute: typeof TrackOrderRoute
   WhiteLabellingRoute: typeof WhiteLabellingRoute
   WishlistRoute: typeof WishlistRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
@@ -666,6 +758,8 @@ export interface RootRouteChildren {
   ProductsIndexRoute: typeof ProductsIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
   WholesaleIndexRoute: typeof WholesaleIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicWebhooksFlutterwaveRoute: typeof ApiPublicWebhooksFlutterwaveRoute
   ApiPublicWebhooksPaystackRoute: typeof ApiPublicWebhooksPaystackRoute
 }
@@ -700,6 +794,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retail': {
+      id: '/retail'
+      path: '/retail'
+      fullPath: '/retail'
+      preLoaderRoute: typeof RetailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -719,6 +827,13 @@ declare module '@tanstack/react-router' {
       path: '/order-confirmed'
       fullPath: '/order-confirmed'
       preLoaderRoute: typeof OrderConfirmedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -1015,6 +1130,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/paystack': {
       id: '/api/public/webhooks/paystack'
       path: '/api/public/webhooks/paystack'
@@ -1098,13 +1241,19 @@ const rootRouteChildren: RootRouteChildren = {
   CustomPackagingRoute: CustomPackagingRoute,
   ExportRoute: ExportRoute,
   FaqRoute: FaqRoute,
+  McpRoute: McpRoute,
   OrderConfirmedRoute: OrderConfirmedRoute,
   PaymentCallbackRoute: PaymentCallbackRoute,
   PrivacyRoute: PrivacyRoute,
+  RetailRoute: RetailRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TrackOrderRoute: TrackOrderRoute,
   WhiteLabellingRoute: WhiteLabellingRoute,
   WishlistRoute: WishlistRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   RecipesSlugRoute: RecipesSlugRoute,
@@ -1113,9 +1262,21 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsIndexRoute: ProductsIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
   WholesaleIndexRoute: WholesaleIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicWebhooksFlutterwaveRoute: ApiPublicWebhooksFlutterwaveRoute,
   ApiPublicWebhooksPaystackRoute: ApiPublicWebhooksPaystackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
