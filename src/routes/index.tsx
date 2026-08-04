@@ -25,10 +25,10 @@ export const Route = createFileRoute("/")({
         content:
           "Small-batch Nigerian spices, stone-milled flours and herbal infusions. Shop retail or partner with us for wholesale, export and white-label supply.",
       },
-      { property: "og:title", content: "Mummy Rose — Natural Nigerian Pantry" },
+      { property: "og:title", content: "Mummy Rose — Natural Nigerian Spices, Flours & Herbal Infusions" },
       {
         property: "og:description",
-        content: "Small-batch Nigerian spices, stone-milled flours and herbal infusions, delivered nationwide.",
+        content: "Small-batch Nigerian spices, stone-milled flours and herbal infusions. Shop retail or partner with us for wholesale, export and white-label supply.",
       },
     ],
   }),
