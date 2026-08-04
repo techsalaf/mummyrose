@@ -17,8 +17,8 @@ export default defineTool({
     message: z.string().trim().describe("The inquiry body."),
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
-  needsApproval: true,
   handler: async ({ type, name, email, phone, message }, ctx) => {
+
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     }
