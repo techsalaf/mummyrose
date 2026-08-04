@@ -47,7 +47,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
   },
   component: Consent,
   errorComponent: ({ error }) => (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
+    <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col justify-center px-6">
       <h1 className="font-display text-2xl">This connection request can't be loaded</h1>
       <p className="mt-3 text-sm text-muted-foreground">
         {String((error as Error)?.message ?? error)}
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
       <p className="mt-3 text-sm text-muted-foreground">
         Close this window and start the connection again from your AI client.
       </p>
-    </main>
+    </div>
   ),
 });
 
@@ -158,7 +158,7 @@ function Consent() {
   const clientName = loaderData.details?.client?.name ?? "an app";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
+    <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col justify-center px-6 py-12">
       <div className="rounded-xl border bg-card p-6 shadow-sm">
         <ShieldCheck className="size-6 text-accent" aria-hidden="true" />
         <h1 className="mt-4 font-display text-2xl">
@@ -221,6 +221,6 @@ function Consent() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }
