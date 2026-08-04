@@ -136,7 +136,7 @@
             "type": {
               "type": "string",
               "enum": [
-                "general",
+                "contact",
                 "wholesale",
                 "export",
                 "white_label",

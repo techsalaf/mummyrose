@@ -9,7 +9,7 @@ export default defineTool({
     "Submit a wholesale, export, white-labelling, corporate-supply or general inquiry to the Mummy Rose team on behalf of the signed-in user.",
   inputSchema: {
     type: z
-      .enum(["general", "wholesale", "export", "white_label", "corporate", "custom_packaging"])
+      .enum(["contact", "wholesale", "export", "white_label", "corporate", "custom_packaging"])
       .describe("Inquiry channel."),
     name: z.string().trim().describe("Contact name."),
     email: z.string().trim().describe("Contact email address."),
