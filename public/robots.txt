@@ -12,3 +12,12 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /cart
+Disallow: /account
+Disallow: /wholesale/portal
+Disallow: /order-confirmed
+Disallow: /payment-callback
+
+Sitemap: https://mummyrose.com/sitemap.xml
