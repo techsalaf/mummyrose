@@ -36,7 +36,14 @@ export type SeoMetaConfig = {
   keywords: string;
   og_image: string;
   twitter_handle: string;
+  /** Canonical origin used for canonical tags, og:url and sitemap.xml. */
+  site_url: string;
+  /** Google Analytics 4 measurement ID, e.g. G-XXXXXXXXXX. */
+  ga4_id: string;
+  /** google-site-verification token from Google Search Console. */
+  gsc_verification: string;
 };
+
 
 export type HomePromise = { title: string; body: string; icon?: string };
 
