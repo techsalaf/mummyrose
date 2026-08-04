@@ -14,6 +14,7 @@ import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RetailRouteImport } from './routes/retail'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentCallbackRouteImport } from './routes/payment-callback'
 import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
@@ -90,6 +91,11 @@ const TermsRoute = TermsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetailRoute = RetailRouteImport.update({
+  id: '/retail',
+  path: '/retail',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -374,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/retail': typeof RetailRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -432,6 +439,7 @@ export interface FileRoutesByTo {
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/retail': typeof RetailRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -492,6 +500,7 @@ export interface FileRoutesById {
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/retail': typeof RetailRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -553,6 +562,7 @@ export interface FileRouteTypes {
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/retail'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -611,6 +621,7 @@ export interface FileRouteTypes {
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/retail'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -670,6 +681,7 @@ export interface FileRouteTypes {
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/retail'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -730,6 +742,7 @@ export interface RootRouteChildren {
   OrderConfirmedRoute: typeof OrderConfirmedRoute
   PaymentCallbackRoute: typeof PaymentCallbackRoute
   PrivacyRoute: typeof PrivacyRoute
+  RetailRoute: typeof RetailRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TrackOrderRoute: typeof TrackOrderRoute
@@ -786,6 +799,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retail': {
+      id: '/retail'
+      path: '/retail'
+      fullPath: '/retail'
+      preLoaderRoute: typeof RetailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -1225,6 +1245,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrderConfirmedRoute: OrderConfirmedRoute,
   PaymentCallbackRoute: PaymentCallbackRoute,
   PrivacyRoute: PrivacyRoute,
+  RetailRoute: RetailRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TrackOrderRoute: TrackOrderRoute,
