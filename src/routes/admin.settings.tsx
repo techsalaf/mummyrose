@@ -554,19 +554,23 @@ function Text({
   value,
   onChange,
   type = "text",
+  help,
 }: {
   label: string;
   value: unknown;
   onChange: (value: string) => void;
   type?: string;
+  help?: string;
 }) {
   return (
     <div>
       <Label className="text-xs uppercase tracking-wide text-muted-foreground">{label}</Label>
       <Input className="mt-1.5" type={type} value={value == null ? "" : String(value)} onChange={(e) => onChange(e.target.value)} />
+      {help && <p className="mt-1 text-xs text-muted-foreground">{help}</p>}
     </div>
   );
 }
+
 
 function Area({ label, value, onChange }: { label: string; value: unknown; onChange: (value: string) => void }) {
   return (
