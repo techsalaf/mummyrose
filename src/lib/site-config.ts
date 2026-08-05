@@ -49,12 +49,16 @@ export type HomePromise = { title: string; body: string; icon?: string };
 
 /** Ordered, toggleable home page content blocks. */
 export const HOME_SECTIONS = [
-  { id: "banners", label: "CMS banners" },
-  { id: "promises", label: "Trust badges" },
-  { id: "categories", label: "Categories" },
+  { id: "promises", label: "Trust marquee" },
   { id: "featured", label: "Best sellers" },
-  { id: "story", label: "Story" },
-  { id: "testimonials", label: "Testimonials" },
+  { id: "story", label: "Story band" },
+  { id: "categories", label: "Editorial categories" },
+  { id: "sourcing", label: "Sourcing & craft bands" },
+  { id: "discovery", label: "New arrivals rail" },
+  { id: "testimonials", label: "Reviews" },
+  { id: "journal", label: "Journal & recipes" },
+  { id: "banners", label: "CMS banners" },
+  { id: "newsletter", label: "Newsletter" },
 ] as const;
 
 export type HomeSectionId = (typeof HOME_SECTIONS)[number]["id"];
@@ -87,6 +91,10 @@ export type HomeConfig = {
   story_cta_label: string;
   story_cta_href: string;
   story_enabled: boolean;
+  sourcing_enabled: boolean;
+  discovery_enabled: boolean;
+  journal_enabled: boolean;
+  newsletter_enabled: boolean;
   testimonials_eyebrow: string;
   testimonials_enabled: boolean;
 };
@@ -135,8 +143,8 @@ export const DEFAULT_THEME: ThemeConfig = {
   ink: "",
   gold: "",
   radius: "",
-  heading_font: "Fraunces",
-  body_font: "Karla",
+  heading_font: "Instrument Serif",
+  body_font: "Work Sans",
 };
 
 export const DEFAULT_SEO_META: SeoMetaConfig = {
@@ -159,12 +167,23 @@ export const DEFAULT_HOME: HomeConfig = {
     "Spices, stone-milled flours, cereals and herbal infusions sourced directly from Nigerian farms — for home kitchens, restaurants and global distributors.",
   hero_image: "",
   hero_image_alt: "",
-  hero_overlay: 35,
+  hero_overlay: 18,
   primary_cta_label: "Shop the pantry",
   primary_cta_href: "/products",
   secondary_cta_label: "Wholesale & export",
   secondary_cta_href: "/wholesale",
-  section_order: ["banners", "promises", "categories", "featured", "story", "testimonials"],
+  section_order: [
+    "promises",
+    "featured",
+    "story",
+    "categories",
+    "sourcing",
+    "discovery",
+    "testimonials",
+    "journal",
+    "banners",
+    "newsletter",
+  ],
 
   promises: [
     { icon: "leaf", title: "100% natural", body: "No preservatives, fillers or artificial colouring — ever." },
@@ -189,6 +208,10 @@ export const DEFAULT_HOME: HomeConfig = {
   story_cta_label: "Read our story",
   story_cta_href: "/about",
   story_enabled: true,
+  sourcing_enabled: true,
+  discovery_enabled: true,
+  journal_enabled: true,
+  newsletter_enabled: true,
   testimonials_eyebrow: "What customers say",
   testimonials_enabled: true,
 };
