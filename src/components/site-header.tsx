@@ -73,7 +73,7 @@ export function SiteHeader() {
                   </div>
                 </div>
                 <div>
-                  <p className="eyebrow text-muted-foreground">Business</p>
+                  <p className="eyebrow text-muted-foreground">Services</p>
                   <div className="mt-3 flex flex-col gap-2.5">
                     {business.map((item) => (
                       <Link key={item.to} to={item.to} className="font-display text-lg">
