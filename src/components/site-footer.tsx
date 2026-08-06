@@ -73,8 +73,10 @@ export function SiteFooter() {
           <p className="eyebrow text-ink-foreground/50">{footer.business_heading}</p>
           <ul className="mt-4 flex flex-col gap-2.5 text-sm text-ink-foreground/80">
             {[
+              ["/services", "All services"],
               ["/retail", "Retail & stockists"],
               ["/wholesale", "Wholesale"],
+
 
               ["/export", "Export"],
               ["/white-labelling", "White labelling"],

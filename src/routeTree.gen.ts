@@ -14,6 +14,7 @@ import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as RetailRouteImport } from './routes/retail'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentCallbackRouteImport } from './routes/payment-callback'
@@ -39,6 +40,7 @@ import { Route as WholesaleApplyRouteImport } from './routes/wholesale.apply'
 import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AdminWholesaleRouteImport } from './routes/admin.wholesale'
 import { Route as AdminVariantsRouteImport } from './routes/admin.variants'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
@@ -91,6 +93,11 @@ const TermsRoute = TermsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RetailRoute = RetailRouteImport.update({
@@ -216,6 +223,11 @@ const ProductsSlugRoute = ProductsSlugRouteImport.update({
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminWholesaleRoute = AdminWholesaleRouteImport.update({
@@ -381,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
   '/retail': typeof RetailRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -410,6 +423,7 @@ export interface FileRoutesByFullPath {
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
+  '/api/chat': typeof ApiChatRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
@@ -440,6 +454,7 @@ export interface FileRoutesByTo {
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
   '/retail': typeof RetailRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -469,6 +484,7 @@ export interface FileRoutesByTo {
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
+  '/api/chat': typeof ApiChatRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
@@ -501,6 +517,7 @@ export interface FileRoutesById {
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
   '/retail': typeof RetailRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -530,6 +547,7 @@ export interface FileRoutesById {
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
+  '/api/chat': typeof ApiChatRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
@@ -563,6 +581,7 @@ export interface FileRouteTypes {
     | '/payment-callback'
     | '/privacy'
     | '/retail'
+    | '/services'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -592,6 +611,7 @@ export interface FileRouteTypes {
     | '/admin/testimonials'
     | '/admin/variants'
     | '/admin/wholesale'
+    | '/api/chat'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
@@ -622,6 +642,7 @@ export interface FileRouteTypes {
     | '/payment-callback'
     | '/privacy'
     | '/retail'
+    | '/services'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -651,6 +672,7 @@ export interface FileRouteTypes {
     | '/admin/testimonials'
     | '/admin/variants'
     | '/admin/wholesale'
+    | '/api/chat'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
@@ -682,6 +704,7 @@ export interface FileRouteTypes {
     | '/payment-callback'
     | '/privacy'
     | '/retail'
+    | '/services'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -711,6 +734,7 @@ export interface FileRouteTypes {
     | '/admin/testimonials'
     | '/admin/variants'
     | '/admin/wholesale'
+    | '/api/chat'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
@@ -743,6 +767,7 @@ export interface RootRouteChildren {
   PaymentCallbackRoute: typeof PaymentCallbackRoute
   PrivacyRoute: typeof PrivacyRoute
   RetailRoute: typeof RetailRoute
+  ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TrackOrderRoute: typeof TrackOrderRoute
@@ -750,6 +775,7 @@ export interface RootRouteChildren {
   WishlistRoute: typeof WishlistRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  ApiChatRoute: typeof ApiChatRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
@@ -799,6 +825,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/retail': {
@@ -974,6 +1007,13 @@ declare module '@tanstack/react-router' {
       path: '/category/$slug'
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/wholesale': {
@@ -1246,6 +1286,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentCallbackRoute: PaymentCallbackRoute,
   PrivacyRoute: PrivacyRoute,
   RetailRoute: RetailRoute,
+  ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TrackOrderRoute: TrackOrderRoute,
@@ -1254,6 +1295,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  ApiChatRoute: ApiChatRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   RecipesSlugRoute: RecipesSlugRoute,

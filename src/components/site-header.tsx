@@ -20,6 +20,7 @@ const shop = [
 ] as const;
 
 const business = [
+  { to: "/services", label: "All services" },
   { to: "/retail", label: "Retail & stockists" },
   { to: "/wholesale", label: "Wholesale" },
   { to: "/wholesale/portal", label: "Trade portal" },
@@ -72,7 +73,7 @@ export function SiteHeader() {
                   </div>
                 </div>
                 <div>
-                  <p className="eyebrow text-muted-foreground">Business</p>
+                  <p className="eyebrow text-muted-foreground">Services</p>
                   <div className="mt-3 flex flex-col gap-2.5">
                     {business.map((item) => (
                       <Link key={item.to} to={item.to} className="font-display text-lg">
@@ -120,18 +121,27 @@ export function SiteHeader() {
 
         </div>
 
-        <nav className="hidden items-center gap-7 text-sm lg:flex">
-          <NavDropdown label="Shop" items={shop} />
-          <Link to="/recipes" className="transition-colors hover:text-accent">
-            Recipes
+        <nav className="hidden items-center gap-6 text-sm lg:flex">
+          <Link to="/" className="transition-colors hover:text-accent">
+            Home
           </Link>
-          <NavDropdown label="Business" items={business} />
           <Link to="/about" className="transition-colors hover:text-accent">
             About
           </Link>
+          <Link to="/products" className="transition-colors hover:text-accent">
+            Products
+          </Link>
+          <NavDropdown label="Services" items={business} />
+          <Link to="/recipes" className="transition-colors hover:text-accent">
+            Recipes
+          </Link>
+          <NavDropdown label="Shop" items={shop} />
           <Link to="/contact" className="transition-colors hover:text-accent">
             Contact
           </Link>
+          <Button asChild size="sm" className="ml-1">
+            <Link to="/products">Shop now</Link>
+          </Button>
         </nav>
 
         <div className="flex items-center gap-0.5">
