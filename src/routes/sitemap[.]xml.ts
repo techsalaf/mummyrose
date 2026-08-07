@@ -21,6 +21,7 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/corporate-supply", changefreq: "monthly", priority: "0.8" },
   { path: "/custom-packaging", changefreq: "monthly", priority: "0.8" },
   { path: "/recipes", changefreq: "weekly", priority: "0.7" },
+  { path: "/blog", changefreq: "weekly", priority: "0.7" },
   { path: "/about", changefreq: "yearly", priority: "0.6" },
   { path: "/contact", changefreq: "yearly", priority: "0.6" },
   { path: "/faq", changefreq: "monthly", priority: "0.5" },
@@ -48,7 +49,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           const [products, categories, posts, pages, settings] = await Promise.all([
             supabase.from("products").select("slug").eq("is_active", true),
             supabase.from("categories").select("slug").eq("is_active", true),
-            supabase.from("posts").select("slug").eq("is_published", true),
+            supabase.from("posts").select("slug,kind,updated_at").eq("is_published", true),
             supabase.from("pages").select("slug").eq("is_published", true),
             supabase.from("site_settings").select("value").eq("key", "seo").maybeSingle(),
           ]);
@@ -61,7 +62,11 @@ export const Route = createFileRoute("/sitemap.xml")({
           for (const row of products.data ?? [])
             entries.push({ path: `/products/${row.slug}`, changefreq: "weekly", priority: "0.8" });
           for (const row of posts.data ?? [])
-            entries.push({ path: `/recipes/${row.slug}`, changefreq: "monthly", priority: "0.6" });
+            entries.push({
+              path: row.kind === "recipe" ? `/recipes/${row.slug}` : `/blog/${row.slug}`,
+              changefreq: "monthly",
+              priority: "0.6",
+            });
           for (const row of pages.data ?? [])
             entries.push({ path: `/${row.slug}`, changefreq: "monthly", priority: "0.5" });
         }
