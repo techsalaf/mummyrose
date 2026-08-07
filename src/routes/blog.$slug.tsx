@@ -19,7 +19,7 @@ export const Route = createFileRoute("/blog/$slug")({
     const post = await context.queryClient.ensureQueryData(postQuery(params.slug));
     if (!post) throw notFound();
     // Recipes live under /recipes — keep one canonical home per piece of content.
-    if (post.kind === "recipe") throw redirect({ to: `/recipes/${params.slug}` });
+    if (post.kind === "recipe") throw redirect({ to: "/recipes/$slug", params: { slug: params.slug } });
     void context.queryClient.ensureQueryData(articlesQuery);
     return {
       title: post.seo_title ?? post.title,
@@ -98,7 +98,7 @@ function ArticleDetail() {
           description: post.excerpt ?? undefined,
           image: image?.startsWith("http") ? [image] : undefined,
           articleSection: post.category ?? undefined,
-          keywords: post.seo_keywords ?? (post.tags ?? []).join(", ") || undefined,
+          keywords: post.seo_keywords ?? ((post.tags ?? []).join(", ") || undefined),
           author: { "@type": "Organization", name: post.author ?? "Mummy Rose" },
           publisher: { "@type": "Organization", name: "Mummy Rose" },
           datePublished: post.published_at ?? undefined,

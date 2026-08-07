@@ -21,7 +21,7 @@ export const Route = createFileRoute("/recipes/$slug")({
     const post = await context.queryClient.ensureQueryData(postQuery(params.slug));
     if (!post) throw notFound();
     // Articles live under /blog — keep one canonical home per piece of content.
-    if (post.kind !== "recipe") throw redirect({ to: `/blog/${params.slug}` });
+    if (post.kind !== "recipe") throw redirect({ to: "/blog/$slug", params: { slug: params.slug } });
     void context.queryClient.ensureQueryData(recipesQuery);
     return {
       title: post.seo_title ?? post.title,
@@ -121,7 +121,7 @@ function RecipeDetail() {
                 dateModified: post.updated_at ?? undefined,
                 recipeCategory: post.category ?? undefined,
                 recipeCuisine: "Nigerian",
-                keywords: post.seo_keywords ?? (post.tags ?? []).join(", ") || undefined,
+                keywords: post.seo_keywords ?? ((post.tags ?? []).join(", ") || undefined),
                 prepTime: isoDuration(post.prep_minutes),
                 cookTime: isoDuration(post.cook_minutes),
                 totalTime: isoDuration(total),
