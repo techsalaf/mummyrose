@@ -3,6 +3,7 @@ import { Bold, Heading2, Italic, Link2, List, Quote } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { slugify } from "@/lib/format";
 
 /**
  * Lightweight markdown-flavoured rich text editing + rendering.
@@ -138,21 +139,21 @@ export function RichText({ content, className }: { content: string | null | unde
         }
         if (block.startsWith("### ")) {
           return (
-            <h3 key={index} className="mt-6 font-display text-lg">
+            <h3 key={index} id={slugify(block.slice(4))} className="mt-6 scroll-mt-28 font-display text-lg">
               {inline(block.slice(4))}
             </h3>
           );
         }
         if (block.startsWith("## ")) {
           return (
-            <h2 key={index} className="mt-8 font-display text-xl">
+            <h2 key={index} id={slugify(block.slice(3))} className="mt-8 scroll-mt-28 font-display text-xl">
               {inline(block.slice(3))}
             </h2>
           );
         }
         if (block.startsWith("# ")) {
           return (
-            <h2 key={index} className="mt-8 font-display text-2xl">
+            <h2 key={index} id={slugify(block.slice(2))} className="mt-8 scroll-mt-28 font-display text-2xl">
               {inline(block.slice(2))}
             </h2>
           );
