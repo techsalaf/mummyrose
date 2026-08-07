@@ -83,7 +83,8 @@ export function SiteFooter() {
               ["/custom-packaging", "Custom packaging"],
               ["/corporate-supply", "Corporate supply"],
               ["/about", "About us"],
-              ["/recipes", "Recipes & Journal"],
+              ["/recipes", "Recipes"],
+              ["/blog", "Journal & guides"],
               ["/faq", "FAQ"],
             ].map(([to, label]) => (
               <li key={to}>

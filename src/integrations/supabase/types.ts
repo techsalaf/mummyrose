@@ -683,55 +683,94 @@ export type Database = {
       posts: {
         Row: {
           author: string | null
+          canonical_url: string | null
           category: string | null
           content: string | null
+          cook_minutes: number | null
           cover_image: string | null
           created_at: string
+          difficulty: string | null
           excerpt: string | null
           id: string
+          ingredients: string[]
+          instructions: string[]
           is_featured: boolean
           is_published: boolean
           kind: string
+          prep_minutes: number | null
           published_at: string | null
+          reading_minutes: number | null
+          related_product_ids: string[]
           seo_description: string | null
+          seo_keywords: string | null
           seo_title: string | null
+          serving_suggestions: string | null
+          servings: string | null
           slug: string
+          tags: string[]
+          tips: string[]
           title: string
           updated_at: string
         }
         Insert: {
           author?: string | null
+          canonical_url?: string | null
           category?: string | null
           content?: string | null
+          cook_minutes?: number | null
           cover_image?: string | null
           created_at?: string
+          difficulty?: string | null
           excerpt?: string | null
           id?: string
+          ingredients?: string[]
+          instructions?: string[]
           is_featured?: boolean
           is_published?: boolean
           kind?: string
+          prep_minutes?: number | null
           published_at?: string | null
+          reading_minutes?: number | null
+          related_product_ids?: string[]
           seo_description?: string | null
+          seo_keywords?: string | null
           seo_title?: string | null
+          serving_suggestions?: string | null
+          servings?: string | null
           slug: string
+          tags?: string[]
+          tips?: string[]
           title: string
           updated_at?: string
         }
         Update: {
           author?: string | null
+          canonical_url?: string | null
           category?: string | null
           content?: string | null
+          cook_minutes?: number | null
           cover_image?: string | null
           created_at?: string
+          difficulty?: string | null
           excerpt?: string | null
           id?: string
+          ingredients?: string[]
+          instructions?: string[]
           is_featured?: boolean
           is_published?: boolean
           kind?: string
+          prep_minutes?: number | null
           published_at?: string | null
+          reading_minutes?: number | null
+          related_product_ids?: string[]
           seo_description?: string | null
+          seo_keywords?: string | null
           seo_title?: string | null
+          serving_suggestions?: string | null
+          servings?: string | null
           slug?: string
+          tags?: string[]
+          tips?: string[]
           title?: string
           updated_at?: string
         }

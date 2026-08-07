@@ -34,12 +34,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WholesaleIndexRouteImport } from './routes/wholesale.index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes.index'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WholesalePortalRouteImport } from './routes/wholesale.portal'
 import { Route as WholesaleApplyRouteImport } from './routes/wholesale.apply'
 import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AdminWholesaleRouteImport } from './routes/admin.wholesale'
 import { Route as AdminVariantsRouteImport } from './routes/admin.variants'
@@ -195,6 +197,11 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -223,6 +230,11 @@ const ProductsSlugRoute = ProductsSlugRouteImport.update({
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -424,12 +436,14 @@ export interface FileRoutesByFullPath {
   '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
   '/api/chat': typeof ApiChatRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
   '/wholesale/apply': typeof WholesaleApplyRoute
   '/wholesale/portal': typeof WholesalePortalRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/wholesale/': typeof WholesaleIndexRoute
@@ -485,12 +499,14 @@ export interface FileRoutesByTo {
   '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
   '/api/chat': typeof ApiChatRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
   '/wholesale/apply': typeof WholesaleApplyRoute
   '/wholesale/portal': typeof WholesalePortalRoute
   '/admin': typeof AdminIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/products': typeof ProductsIndexRoute
   '/recipes': typeof RecipesIndexRoute
   '/wholesale': typeof WholesaleIndexRoute
@@ -548,12 +564,14 @@ export interface FileRoutesById {
   '/admin/variants': typeof AdminVariantsRoute
   '/admin/wholesale': typeof AdminWholesaleRoute
   '/api/chat': typeof ApiChatRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/recipes/$slug': typeof RecipesSlugRoute
   '/wholesale/apply': typeof WholesaleApplyRoute
   '/wholesale/portal': typeof WholesalePortalRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/wholesale/': typeof WholesaleIndexRoute
@@ -612,12 +630,14 @@ export interface FileRouteTypes {
     | '/admin/variants'
     | '/admin/wholesale'
     | '/api/chat'
+    | '/blog/$slug'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
     | '/wholesale/apply'
     | '/wholesale/portal'
     | '/admin/'
+    | '/blog/'
     | '/products/'
     | '/recipes/'
     | '/wholesale/'
@@ -673,12 +693,14 @@ export interface FileRouteTypes {
     | '/admin/variants'
     | '/admin/wholesale'
     | '/api/chat'
+    | '/blog/$slug'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
     | '/wholesale/apply'
     | '/wholesale/portal'
     | '/admin'
+    | '/blog'
     | '/products'
     | '/recipes'
     | '/wholesale'
@@ -735,12 +757,14 @@ export interface FileRouteTypes {
     | '/admin/variants'
     | '/admin/wholesale'
     | '/api/chat'
+    | '/blog/$slug'
     | '/category/$slug'
     | '/products/$slug'
     | '/recipes/$slug'
     | '/wholesale/apply'
     | '/wholesale/portal'
     | '/admin/'
+    | '/blog/'
     | '/products/'
     | '/recipes/'
     | '/wholesale/'
@@ -776,11 +800,13 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiChatRoute: typeof ApiChatRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
   WholesaleApplyRoute: typeof WholesaleApplyRoute
   WholesalePortalRoute: typeof WholesalePortalRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
   WholesaleIndexRoute: typeof WholesaleIndexRoute
@@ -967,6 +993,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -1007,6 +1040,13 @@ declare module '@tanstack/react-router' {
       path: '/category/$slug'
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -1296,11 +1336,13 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiChatRoute: ApiChatRoute,
+  BlogSlugRoute: BlogSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   RecipesSlugRoute: RecipesSlugRoute,
   WholesaleApplyRoute: WholesaleApplyRoute,
   WholesalePortalRoute: WholesalePortalRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
   WholesaleIndexRoute: WholesaleIndexRoute,
