@@ -55,17 +55,39 @@ export const testimonialsQuery = queryOptions({
   },
 });
 
-export const postsQuery = queryOptions({
-  queryKey: ["posts"],
-  queryFn: async () => {
-    const { data, error } = await supabase
+const POST_LIST_FIELDS =
+  "id,slug,title,excerpt,cover_image,category,kind,tags,author,published_at,updated_at,is_featured,reading_minutes,prep_minutes,cook_minutes,servings,difficulty";
+
+/**
+ * Published posts, newest first. Scheduled posts (a future `published_at`)
+ * stay hidden until their date arrives, matching the database policy.
+ */
+function fetchPosts(kind?: "recipe" | "article") {
+  return async () => {
+    const nowIso = new Date().toISOString();
+    let request = supabase
       .from("posts")
-      .select("id,slug,title,excerpt,cover_image,category,kind,author,published_at,is_featured")
+      .select(POST_LIST_FIELDS)
+      .eq("is_published", true)
+      .or(`published_at.is.null,published_at.lte.${nowIso}`)
       .order("published_at", { ascending: false });
+    if (kind) request = request.eq("kind", kind);
+    const { data, error } = await request;
     if (error) throw error;
     return data ?? [];
-  },
-});
+  };
+}
+
+/** Every published post, both recipes and articles. */
+export const postsQuery = queryOptions({ queryKey: ["posts", "all"], queryFn: fetchPosts() });
+
+/** Published recipes only — powers /recipes. */
+export const recipesQuery = queryOptions({ queryKey: ["posts", "recipe"], queryFn: fetchPosts("recipe") });
+
+/** Published articles only — powers /blog. */
+export const articlesQuery = queryOptions({ queryKey: ["posts", "article"], queryFn: fetchPosts("article") });
+
+export type PostListRow = Awaited<ReturnType<ReturnType<typeof fetchPosts>>>[number];
 
 export function postQuery(slug: string) {
   return queryOptions({
@@ -78,6 +100,20 @@ export function postQuery(slug: string) {
         .maybeSingle();
       if (error) throw error;
       return data;
+    },
+  });
+}
+
+/** Products explicitly linked to a recipe or article, for "shop this recipe" blocks. */
+export function relatedProductsQuery(ids: string[] | null | undefined) {
+  const list = (ids ?? []).filter(Boolean);
+  return queryOptions({
+    queryKey: ["related_products", list.join(",")],
+    queryFn: async () => {
+      if (list.length === 0) return [];
+      const { data, error } = await supabase.from("products").select(PRODUCT_FIELDS).in("id", list);
+      if (error) throw error;
+      return data ?? [];
     },
   });
 }

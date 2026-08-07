@@ -34,6 +34,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WholesaleIndexRouteImport } from './routes/wholesale.index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes.index'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WholesalePortalRouteImport } from './routes/wholesale.portal'
 import { Route as WholesaleApplyRouteImport } from './routes/wholesale.apply'
@@ -193,6 +194,11 @@ const RecipesIndexRoute = RecipesIndexRouteImport.update({
 const ProductsIndexRoute = ProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -430,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/wholesale/apply': typeof WholesaleApplyRoute
   '/wholesale/portal': typeof WholesalePortalRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/wholesale/': typeof WholesaleIndexRoute
@@ -491,6 +498,7 @@ export interface FileRoutesByTo {
   '/wholesale/apply': typeof WholesaleApplyRoute
   '/wholesale/portal': typeof WholesalePortalRoute
   '/admin': typeof AdminIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/products': typeof ProductsIndexRoute
   '/recipes': typeof RecipesIndexRoute
   '/wholesale': typeof WholesaleIndexRoute
@@ -554,6 +562,7 @@ export interface FileRoutesById {
   '/wholesale/apply': typeof WholesaleApplyRoute
   '/wholesale/portal': typeof WholesalePortalRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/wholesale/': typeof WholesaleIndexRoute
@@ -618,6 +627,7 @@ export interface FileRouteTypes {
     | '/wholesale/apply'
     | '/wholesale/portal'
     | '/admin/'
+    | '/blog/'
     | '/products/'
     | '/recipes/'
     | '/wholesale/'
@@ -679,6 +689,7 @@ export interface FileRouteTypes {
     | '/wholesale/apply'
     | '/wholesale/portal'
     | '/admin'
+    | '/blog'
     | '/products'
     | '/recipes'
     | '/wholesale'
@@ -741,6 +752,7 @@ export interface FileRouteTypes {
     | '/wholesale/apply'
     | '/wholesale/portal'
     | '/admin/'
+    | '/blog/'
     | '/products/'
     | '/recipes/'
     | '/wholesale/'
@@ -781,6 +793,7 @@ export interface RootRouteChildren {
   RecipesSlugRoute: typeof RecipesSlugRoute
   WholesaleApplyRoute: typeof WholesaleApplyRoute
   WholesalePortalRoute: typeof WholesalePortalRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
   WholesaleIndexRoute: typeof WholesaleIndexRoute
@@ -965,6 +978,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/products/'
       preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -1301,6 +1321,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecipesSlugRoute: RecipesSlugRoute,
   WholesaleApplyRoute: WholesaleApplyRoute,
   WholesalePortalRoute: WholesalePortalRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
   WholesaleIndexRoute: WholesaleIndexRoute,
