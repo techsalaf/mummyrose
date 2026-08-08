@@ -5,12 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Mummy Rose design system — "Ivory Editorial".
- * Ivory #F8F5EF · Warm Linen #E9DFCF · Deep Cocoa #2F211B
- * Olive #6F7E4F · Burnt Terracotta #C46E45 · Muted Gold #C9A24D (accents only)
- * Airy, warm, luxurious. All colour values are oklch tokens — never hardcode
+ * Mummy Rose design system — "Heritage Editorial".
+ * Cream #F8F5EF · Earthy Beige #EFE6D6 · Charcoal #242423
+ * Deep Heritage Red #8C1D2C (primary) · Herbal Green #5C7A3F (accent)
+ * Burnt Terracotta #C46E45 (clay) · Muted Gold #C9A24D (fine detail only)
+ * Warm, rooted, premium. All colour values are oklch tokens — never hardcode
  * colours in components.
  */
+
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 2px);
