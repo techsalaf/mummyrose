@@ -13,11 +13,16 @@ export function CmsPage({
   eyebrow,
   heroImage,
   fallbackTitle,
+  fallbackSubtitle,
+  fallbackSections = [],
 }: {
   slug: string;
   eyebrow?: string;
   heroImage?: string;
   fallbackTitle?: string;
+  fallbackSubtitle?: string;
+  /** Rendered until staff publish a `pages` row for this slug. */
+  fallbackSections?: PageSection[];
 }) {
   const { data, isLoading } = useQuery(pageQuery(slug));
 
@@ -29,16 +34,19 @@ export function CmsPage({
     );
   }
 
-  const sections: PageSection[] = Array.isArray(data?.sections) ? data.sections : [];
+  const saved: PageSection[] = Array.isArray(data?.sections) ? data.sections : [];
+  const sections = saved.length ? saved : fallbackSections;
   const image = data?.hero_image || heroImage;
+  const subtitle = data?.subtitle || fallbackSubtitle;
 
   return (
     <div className="container-page max-w-3xl py-12 md:py-16">
       {eyebrow ? <p className="eyebrow text-accent">{eyebrow}</p> : null}
       <h1 className="mt-3 font-display text-4xl">{data?.title ?? fallbackTitle ?? "Page"}</h1>
-      {data?.subtitle ? (
-        <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">{data.subtitle}</p>
+      {subtitle ? (
+        <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">{subtitle}</p>
       ) : null}
+
 
       {image ? (
         <img
