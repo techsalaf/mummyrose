@@ -51,7 +51,7 @@ function AdminLayout() {
     return (
       <AdminGate
         title="No staff access on this account"
-        body="This account is signed in but has no admin or staff role yet. If this is a brand-new store, you can claim the first admin role."
+        body="This account is signed in but has no admin or staff role. The store owner account already holds the admin role — sign in with it, or ask an admin to add this email under Team & roles."
       >
         <Button
           disabled={claiming}
@@ -59,7 +59,10 @@ function AdminLayout() {
             setClaiming(true);
             const { data, error } = await supabase.rpc("claim_admin");
             setClaiming(false);
-            if (error) return toast.error(error.message);
+            if (error)
+              return toast.error(
+                "Self-claiming admin is disabled for security. Ask an existing admin to grant this account access.",
+              );
             if (data) {
               toast.success("Admin role granted — reloading");
               window.location.reload();
