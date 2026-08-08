@@ -14,6 +14,7 @@ import { Route as WhiteLabellingRouteImport } from './routes/white-labelling'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as RetailRouteImport } from './routes/retail'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -95,6 +96,11 @@ const TermsRoute = TermsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesRoute = ServicesRouteImport.update({
@@ -406,6 +412,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/retail': typeof RetailRoute
   '/services': typeof ServicesRoute
+  '/shipping': typeof ShippingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -469,6 +476,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/retail': typeof RetailRoute
   '/services': typeof ServicesRoute
+  '/shipping': typeof ShippingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -534,6 +542,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/retail': typeof RetailRoute
   '/services': typeof ServicesRoute
+  '/shipping': typeof ShippingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
@@ -600,6 +609,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/retail'
     | '/services'
+    | '/shipping'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -663,6 +673,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/retail'
     | '/services'
+    | '/shipping'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -727,6 +738,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/retail'
     | '/services'
+    | '/shipping'
     | '/sitemap.xml'
     | '/terms'
     | '/track-order'
@@ -792,6 +804,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RetailRoute: typeof RetailRoute
   ServicesRoute: typeof ServicesRoute
+  ShippingRoute: typeof ShippingRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TrackOrderRoute: typeof TrackOrderRoute
@@ -851,6 +864,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services': {
@@ -1327,6 +1347,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RetailRoute: RetailRoute,
   ServicesRoute: ServicesRoute,
+  ShippingRoute: ShippingRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TrackOrderRoute: TrackOrderRoute,
