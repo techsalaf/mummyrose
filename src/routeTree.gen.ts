@@ -17,6 +17,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as RetailRouteImport } from './routes/retail'
+import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentCallbackRouteImport } from './routes/payment-callback'
 import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
@@ -111,6 +112,11 @@ const ServicesRoute = ServicesRouteImport.update({
 const RetailRoute = RetailRouteImport.update({
   id: '/retail',
   path: '/retail',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundsRoute = RefundsRouteImport.update({
+  id: '/refunds',
+  path: '/refunds',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -410,6 +416,7 @@ export interface FileRoutesByFullPath {
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/refunds': typeof RefundsRoute
   '/retail': typeof RetailRoute
   '/services': typeof ServicesRoute
   '/shipping': typeof ShippingRoute
@@ -474,6 +481,7 @@ export interface FileRoutesByTo {
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/refunds': typeof RefundsRoute
   '/retail': typeof RetailRoute
   '/services': typeof ServicesRoute
   '/shipping': typeof ShippingRoute
@@ -540,6 +548,7 @@ export interface FileRoutesById {
   '/order-confirmed': typeof OrderConfirmedRoute
   '/payment-callback': typeof PaymentCallbackRoute
   '/privacy': typeof PrivacyRoute
+  '/refunds': typeof RefundsRoute
   '/retail': typeof RetailRoute
   '/services': typeof ServicesRoute
   '/shipping': typeof ShippingRoute
@@ -607,6 +616,7 @@ export interface FileRouteTypes {
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/refunds'
     | '/retail'
     | '/services'
     | '/shipping'
@@ -671,6 +681,7 @@ export interface FileRouteTypes {
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/refunds'
     | '/retail'
     | '/services'
     | '/shipping'
@@ -736,6 +747,7 @@ export interface FileRouteTypes {
     | '/order-confirmed'
     | '/payment-callback'
     | '/privacy'
+    | '/refunds'
     | '/retail'
     | '/services'
     | '/shipping'
@@ -802,6 +814,7 @@ export interface RootRouteChildren {
   OrderConfirmedRoute: typeof OrderConfirmedRoute
   PaymentCallbackRoute: typeof PaymentCallbackRoute
   PrivacyRoute: typeof PrivacyRoute
+  RefundsRoute: typeof RefundsRoute
   RetailRoute: typeof RetailRoute
   ServicesRoute: typeof ServicesRoute
   ShippingRoute: typeof ShippingRoute
@@ -885,6 +898,13 @@ declare module '@tanstack/react-router' {
       path: '/retail'
       fullPath: '/retail'
       preLoaderRoute: typeof RetailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refunds': {
+      id: '/refunds'
+      path: '/refunds'
+      fullPath: '/refunds'
+      preLoaderRoute: typeof RefundsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -1345,6 +1365,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrderConfirmedRoute: OrderConfirmedRoute,
   PaymentCallbackRoute: PaymentCallbackRoute,
   PrivacyRoute: PrivacyRoute,
+  RefundsRoute: RefundsRoute,
   RetailRoute: RetailRoute,
   ServicesRoute: ServicesRoute,
   ShippingRoute: ShippingRoute,
