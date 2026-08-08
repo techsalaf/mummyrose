@@ -292,6 +292,8 @@ export const SEO_PAGES: { path: string; label: string }[] = [
   { path: "/white-labelling", label: "White labelling" },
   { path: "/corporate-supply", label: "Corporate supply" },
   { path: "/custom-packaging", label: "Custom packaging" },
+  { path: "/shipping", label: "Shipping & delivery" },
+  { path: "/refunds", label: "Returns & refunds" },
   { path: "/track-order", label: "Track order" },
   { path: "/cart", label: "Cart" },
   { path: "/checkout", label: "Checkout" },

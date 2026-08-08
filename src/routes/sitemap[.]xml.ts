@@ -70,8 +70,12 @@ export const Route = createFileRoute("/sitemap.xml")({
               changefreq: "monthly",
               priority: "0.6",
             });
-          for (const row of pages.data ?? [])
-            entries.push({ path: `/${row.slug}`, changefreq: "monthly", priority: "0.5" });
+          const known = new Set(STATIC_ENTRIES.map((e) => e.path));
+          for (const row of pages.data ?? []) {
+            const path = `/${row.slug}`;
+            if (known.has(path)) continue;
+            entries.push({ path, changefreq: "monthly", priority: "0.5" });
+          }
         }
 
         const urls = entries.map((e) =>
