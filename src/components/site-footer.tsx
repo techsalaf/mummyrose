@@ -124,7 +124,13 @@ export function SiteFooter() {
       <div className="border-t border-ink-foreground/10">
         <div className="container-page flex flex-col items-center justify-between gap-3 py-6 text-xs text-ink-foreground/60 sm:flex-row">
           <p>{footer.copyright || `© ${year} ${branding.name}. All rights reserved.`}</p>
-          <div className="flex gap-5">
+          <div className="flex flex-wrap justify-center gap-5">
+            <Link to="/shipping" className="hover:text-gold">
+              Shipping
+            </Link>
+            <Link to="/refunds" className="hover:text-gold">
+              Returns
+            </Link>
             <Link to="/privacy" className="hover:text-gold">
               Privacy policy
             </Link>
@@ -135,6 +141,7 @@ export function SiteFooter() {
               Track order
             </Link>
           </div>
+
         </div>
       </div>
     </footer>
