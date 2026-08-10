@@ -1,4 +1,7 @@
-import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
+import { createStart, createMiddleware } from "@tanstack/react-start";
+// createCsrfMiddleware is only available in Cloudflare Workers builds of
+// @tanstack/react-start — guard its usage so Node.js (Vercel) doesn't crash.
+import { createCsrfMiddleware as _createCsrfMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
@@ -71,12 +74,13 @@ const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => 
   return result;
 });
 
-// Start installs this automatically when src/start.ts is absent; defining the
-// file opts out, so re-add it explicitly to keep server functions protected
-// from cross-site requests.
-const csrfMiddleware = createCsrfMiddleware({
-  filter: (ctx) => ctx.handlerType === "serverFn",
-});
+// Start installs CSRF protection automatically when src/start.ts is absent;
+// defining the file opts out, so re-add it explicitly. Guard with typeof so
+// the server doesn't crash on Node.js/Vercel where the export may be absent.
+const csrfMiddleware =
+  typeof _createCsrfMiddleware === "function"
+    ? _createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === "serverFn" })
+    : createMiddleware().server(async ({ next }) => next()); // no-op on Node.js
 
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth],
