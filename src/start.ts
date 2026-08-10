@@ -1,7 +1,16 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
-// createCsrfMiddleware is only available in Cloudflare Workers builds of
-// @tanstack/react-start — guard its usage so Node.js (Vercel) doesn't crash.
-import { createCsrfMiddleware as _createCsrfMiddleware } from "@tanstack/react-start";
+// NOTE: createCsrfMiddleware is NOT statically imported here.
+//
+// The original static import:
+//   import { createCsrfMiddleware as _createCsrfMiddleware } from "@tanstack/react-start"
+// caused a crash at module initialisation time on Vercel/Node.js even though
+// a `typeof` guard was in place. esbuild/Rollup (used by Nitro) statically
+// analyses named imports and can inline/optimise away the typeof check,
+// resulting in a direct `createCsrfMiddleware(...)` call inside the bundled
+// serverless module before any user code runs. Replacing the static import
+// with a dynamic import() makes the guard genuinely runtime-only and opaque
+// to the bundler — it cannot see through an expression like
+// `import(someVariable)` to decide the result is always a function.
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
@@ -74,13 +83,43 @@ const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => 
   return result;
 });
 
-// Start installs CSRF protection automatically when src/start.ts is absent;
-// defining the file opts out, so re-add it explicitly. Guard with typeof so
-// the server doesn't crash on Node.js/Vercel where the export may be absent.
-const csrfMiddleware =
-  typeof _createCsrfMiddleware === "function"
-    ? _createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === "serverFn" })
-    : createMiddleware().server(async ({ next }) => next()); // no-op on Node.js
+// Build a CSRF middleware that is genuinely safe on every runtime:
+//
+// - Cloudflare Workers: @tanstack/react-start exports createCsrfMiddleware,
+//   the dynamic import resolves it, and we use the real implementation.
+//
+// - Node.js / Vercel: createCsrfMiddleware is either absent from the exports
+//   or resolves to undefined. The dynamic import catches both cases and falls
+//   back to a pass-through no-op so the server starts cleanly.
+//
+// Using a dynamic import (rather than a static named import + typeof guard)
+// is critical: esbuild can see through a static import and inline the binding
+// at bundle time, stripping the typeof check before it runs. A dynamic import
+// expression is opaque to the bundler, so the guard is always evaluated at
+// actual runtime.
+async function buildCsrfMiddleware() {
+  try {
+    // Use a variable so bundlers can't statically resolve the specifier and
+    // inline the binding — keeping the guard genuinely runtime-only.
+    const specifier = "@tanstack/react-start";
+    const mod = await import(/* @vite-ignore */ specifier);
+    if (typeof mod.createCsrfMiddleware === "function") {
+      return mod.createCsrfMiddleware({
+        filter: (ctx: { handlerType: string }) => ctx.handlerType === "serverFn",
+      });
+    }
+  } catch {
+    // Package doesn't export createCsrfMiddleware on this runtime — fall through.
+  }
+  // No-op fallback: passes every request straight through without CSRF checks.
+  // On Node.js/Vercel, TanStack Start's built-in server-function token
+  // validation is unavailable anyway, so this matches the actual security
+  // posture rather than silently breaking it.
+  return createMiddleware().server(async ({ next }) => next());
+}
+
+// Resolve the middleware once at cold-start. Subsequent requests reuse it.
+const csrfMiddleware = await buildCsrfMiddleware();
 
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth],

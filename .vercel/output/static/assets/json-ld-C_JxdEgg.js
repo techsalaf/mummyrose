@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-B74pBk57.js";var t=e();function n({data:e}){return(0,t.jsx)(`script`,{type:`application/ld+json`,dangerouslySetInnerHTML:{__html:JSON.stringify(e)}})}export{n as t};

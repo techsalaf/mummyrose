@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-B74pBk57.js";var t=e(),n=()=>(0,t.jsx)(`div`,{className:`container-page py-24 text-center`,children:(0,t.jsx)(`h1`,{className:`font-display text-3xl`,children:`This category didn't load`})});export{n as errorComponent};
