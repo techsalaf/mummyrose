@@ -13,7 +13,14 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  nitro: {
+    // Override default Lovable cloudflare-module preset to support Vercel deployment.
+    // Vercel cannot run Cloudflare Workers bundles — the "vercel" preset outputs
+    // a standard Node.js / Edge Function that Vercel understands.
+    preset: "vercel",
+  },
   vite: {
     plugins: [mcpPlugin()],
   },
 });
+
