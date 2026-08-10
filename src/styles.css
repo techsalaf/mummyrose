@@ -433,3 +433,49 @@
     transform-origin: left;
   }
 }
+
+@utility hover-zoom-img {
+  overflow: hidden;
+  position: relative;
+
+  & img {
+    transition: transform 0.8s var(--ease-editorial), filter 0.8s var(--ease-editorial);
+    will-change: transform, filter;
+  }
+
+  &:hover img {
+    transform: scale(1.06);
+    filter: brightness(1.03);
+  }
+}
+
+@utility glass-header {
+  background-color: color-mix(in oklab, var(--color-background) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(180%);
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+@utility badge-pill {
+  font-family: var(--font-sans);
+  font-size: 0.725rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+@utility editorial-border-card {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+  transition: border-color 0.4s var(--ease-editorial), box-shadow 0.4s var(--ease-editorial);
+
+  &:hover {
+    border-color: color-mix(in oklab, var(--color-primary) 35%, var(--color-border));
+    box-shadow: var(--shadow-lift);
+  }
+}
+

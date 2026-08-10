@@ -1,112 +1,144 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, Sparkles, ShieldCheck, Leaf, Heart } from "lucide-react";
 import heroFallback from "@/assets/hero-editorial.jpg";
+import lifestyleTable from "@/assets/lifestyle-table.jpg";
 import { Button } from "@/components/ui/button";
 import { useScrollY } from "@/components/reveal";
 import type { HomeConfig } from "@/lib/site-config";
 
-const BADGES = ["100% Natural", "Made in Nigeria", "Ships Worldwide"];
+const TRUST_BADGES = [
+  { icon: Leaf, label: "100% Natural Ingredients" },
+  { icon: ShieldCheck, label: "Strict Quality Control" },
+  { icon: Heart, label: "Generational Recipes" },
+];
 
-/**
- * Immersive editorial hero: ivory type panel offset against a full-bleed
- * lifestyle frame, soft parallax and drifting ingredient motes.
- */
 export function HomeHero({ home }: { home: HomeConfig }) {
   const y = useScrollY();
-  const shift = Math.min(y, 700) * 0.12;
+  const shift = Math.min(y, 700) * 0.1;
+
+  const headline = home.hero_title || "Nature’s Goodness. Mummy’s Touch.";
+  const bodyCopy =
+    home.hero_body ||
+    "Spices, flours and herbal infusions inspired by generations of home cooking — crafted without preservatives or artificial fillers.";
 
   return (
-    <section className="relative overflow-hidden bg-background pt-6 pb-10 md:pt-10 md:pb-20">
-      <div className="container-wide">
-        <div className="relative grid items-center gap-8 lg:grid-cols-12 lg:gap-0">
-          {/* Type panel — 60 */}
-          <div className="relative z-20 order-2 lg:order-1 lg:col-span-7 lg:pr-16">
-            <div className="rise-in">
-              <p className="eyebrow flex items-center gap-3 text-muted-foreground">
-                <span className="h-px w-10 bg-primary" />
-                {home.hero_eyebrow || "Natural Nigerian pantry"}
-              </p>
-              <h1 className="display-hero mt-6 max-w-[16ch] text-balance">
-                {home.hero_title}
-              </h1>
-              <p className="lead mt-7 max-w-lg">{home.hero_body}</p>
+    <section className="relative overflow-hidden bg-background pt-8 pb-16 md:pt-14 md:pb-24 lg:pt-16 lg:pb-28">
+      {/* Soft background ambient gradient */}
+      <div className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-secondary/60 blur-3xl opacity-60" />
 
-              <div className="mt-10 flex flex-wrap items-center gap-3">
-                {home.primary_cta_label ? (
-                  <Button asChild size="xl" className="rounded-sm tracking-[0.18em] uppercase">
-                    <Link to="/products">{home.primary_cta_label}</Link>
-                  </Button>
-                ) : null}
-                {home.secondary_cta_label ? (
-                  <Button
-                    asChild
-                    size="xl"
-                    variant="outline"
-                    className="rounded-sm border-foreground/20 bg-transparent tracking-[0.18em] uppercase hover:bg-foreground hover:text-background"
-                  >
-                    <Link to="/wholesale">
-                      {home.secondary_cta_label} <ArrowUpRight className="size-4" />
-                    </Link>
-                  </Button>
-                ) : null}
+      <div className="container-wide">
+        <div className="relative grid items-center gap-12 lg:grid-cols-12 lg:gap-8">
+          
+          {/* Left Type Column */}
+          <div className="relative z-20 order-2 lg:order-1 lg:col-span-7 lg:pr-6">
+            <div className="rise-in">
+              <div className="inline-flex items-center gap-2 rounded-full bg-secondary/80 px-3.5 py-1.5 border border-border/60 text-xs font-semibold tracking-wider text-primary uppercase">
+                <Sparkles className="size-3.5 text-accent" />
+                <span>{home.hero_eyebrow || "Heritage Food Brand & FMCG Solutions"}</span>
               </div>
 
-              <ul className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6">
-                {BADGES.map((badge) => (
-                  <li
-                    key={badge}
-                    className="flex items-center gap-2 text-[10px] tracking-[0.24em] text-muted-foreground uppercase"
-                  >
-                    <span className="size-1.5 rounded-full bg-accent" />
-                    {badge}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+              <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl xl:text-8xl mt-6 leading-[0.98] text-balance">
+                {headline}
+              </h1>
 
-          {/* Image — 40, overlapping into the type column */}
-          <div className="relative order-1 lg:order-2 lg:col-span-5">
-            <div
-              className="grain relative overflow-hidden rounded-sm shadow-editorial lg:-ml-24 lg:aspect-3/4"
-              style={{ transform: `translate3d(0, ${-shift}px, 0)` }}
-            >
-              <img
-                src={home.hero_image || heroFallback}
-                alt={home.hero_image_alt || "Nigerian spices in ceramic bowls on warm linen"}
-                width={1600}
-                height={1200}
-                className="aspect-4/3 h-full w-full object-cover lg:aspect-auto"
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: "var(--gradient-ink)",
-                  opacity: Math.min(Math.max(Number(home.hero_overlay) || 18, 0), 100) / 100,
-                }}
-              />
-            </div>
-
-            {/* Floating ingredient motes */}
-            <span className="float-slow pointer-events-none absolute -top-4 -left-6 hidden size-2.5 rounded-full bg-accent/70 lg:block" />
-            <span
-              className="float-slow pointer-events-none absolute top-1/3 -right-4 hidden size-1.5 rounded-full bg-primary/60 lg:block"
-              style={{ animationDelay: "2.5s" }}
-            />
-            <span
-              className="float-slow pointer-events-none absolute bottom-10 -left-10 hidden size-2 rounded-full bg-olive/50 lg:block"
-              style={{ animationDelay: "5s" }}
-            />
-
-            <div className="absolute -bottom-6 -left-4 z-20 hidden max-w-56 bg-background/95 p-5 shadow-soft backdrop-blur lg:block">
-              <p className="font-display text-4xl leading-none">14</p>
-              <p className="mt-2 text-[10px] leading-relaxed tracking-[0.2em] text-muted-foreground uppercase">
-                Farm partners across Nigeria's food belt
+              <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg lg:text-xl leading-relaxed">
+                {bodyCopy}
               </p>
+
+              <div className="mt-9 flex flex-wrap items-center gap-4">
+                <Button asChild size="xl" className="font-semibold px-8 py-6 text-base tracking-wide shadow-md hover:shadow-lg transition-all">
+                  <Link to="/products">
+                    Shop the Collection <ArrowRight className="ml-2.5 size-5" />
+                  </Link>
+                </Button>
+
+                <Button
+                  asChild
+                  size="xl"
+                  variant="outline"
+                  className="font-semibold px-7 py-6 text-base border-primary/30 hover:border-primary hover:bg-secondary transition-all"
+                >
+                  <Link to="/about">
+                    Discover Our Story
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Trust badging footer */}
+              <div className="mt-12 grid grid-cols-1 gap-4 border-t border-border/80 pt-7 sm:grid-cols-3">
+                {TRUST_BADGES.map((b) => (
+                  <div key={b.label} className="flex items-center gap-2.5">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+                      <b.icon className="size-4" />
+                    </div>
+                    <span className="text-xs font-semibold tracking-wide text-foreground/90 uppercase">
+                      {b.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* Right Image Composition */}
+          <div className="relative order-1 lg:order-2 lg:col-span-5">
+            <div className="relative mx-auto max-w-md lg:max-w-none">
+              
+              {/* Main Card Image */}
+              <div
+                className="hover-zoom-img relative overflow-hidden rounded-2xl border border-border/80 shadow-editorial bg-card"
+                style={{ transform: `translate3d(0, ${-shift}px, 0)` }}
+              >
+                <img
+                  src={home.hero_image || heroFallback}
+                  alt={home.hero_image_alt || "Mummy Rose natural spices, flours, and herbal infusions"}
+                  width={1200}
+                  height={1400}
+                  className="h-[420px] w-full object-cover sm:h-[500px] lg:h-[580px]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+                
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <span className="eyebrow text-accent-foreground/90 tracking-widest uppercase">
+                    Pure &amp; Authentically Sourced
+                  </span>
+                  <p className="font-display text-2xl font-semibold mt-1 text-white">
+                    "Spices, Flours &amp; Infusions — just the way Mummy made them."
+                  </p>
+                </div>
+              </div>
+
+              {/* Secondary Floating Image Card */}
+              <div
+                className="absolute -bottom-8 -left-8 hidden size-40 overflow-hidden rounded-xl border-2 border-background shadow-xl lg:block"
+                style={{ transform: `translate3d(0, ${shift * 0.5}px, 0)` }}
+              >
+                <img
+                  src={lifestyleTable}
+                  alt="Traditional Nigerian meal table"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              {/* Floating Stat Badge */}
+              <div className="absolute -top-6 -right-4 z-20 rounded-xl border border-border bg-card/95 p-4 shadow-xl backdrop-blur sm:-top-8 sm:-right-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-display text-xl font-bold">
+                    100%
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-foreground">Natural &amp; Pure</p>
+                    <p className="text-[11px] text-muted-foreground">Zero Preservatives</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
   );
 }
+

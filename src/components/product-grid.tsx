@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, RotateCcw, Sparkles } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,11 @@ import type { ProductRow } from "@/lib/queries";
 export type SortKey = "featured" | "newest" | "price-asc" | "price-desc" | "name";
 
 const sorts: { key: SortKey; label: string }[] = [
-  { key: "featured", label: "Featured" },
-  { key: "newest", label: "Newest" },
-  { key: "price-asc", label: "Price: low to high" },
-  { key: "price-desc", label: "Price: high to low" },
-  { key: "name", label: "A – Z" },
+  { key: "featured", label: "Sort by: Bestsellers" },
+  { key: "newest", label: "Sort by: Newest Batch" },
+  { key: "price-asc", label: "Price: Low to High" },
+  { key: "price-desc", label: "Price: High to Low" },
+  { key: "name", label: "Name: A to Z" },
 ];
 
 export function ProductGrid({
@@ -29,10 +29,9 @@ export function ProductGrid({
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [sort, setSort] = useState<SortKey>("featured");
-  const [activeCategories, setActiveCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [onOfferOnly, setOnOfferOnly] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -43,7 +42,7 @@ export function ProductGrid({
         }`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
-      if (activeCategories.length && !activeCategories.includes(p.category_id ?? "")) return false;
+      if (selectedCategory && p.category_id !== selectedCategory) return false;
       if (inStockOnly && p.stock_quantity <= 0) return false;
       if (onOfferOnly && effectivePrice(p) >= Number(p.price)) return false;
       return true;
@@ -67,89 +66,135 @@ export function ProductGrid({
         break;
     }
     return list;
-  }, [products, query, sort, activeCategories, inStockOnly, onOfferOnly]);
+  }, [products, query, sort, selectedCategory, inStockOnly, onOfferOnly]);
 
-  const toggleCategory = (id: string) =>
-    setActiveCategories((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
+  const resetFilters = () => {
+    setQuery("");
+    setSelectedCategory(null);
+    setInStockOnly(false);
+    setOnOfferOnly(false);
+    setSort("featured");
+  };
 
   return (
     <div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products, spices, flours…"
-            aria-label="Search products"
-            className="pl-9"
-          />
-        </div>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortKey)}
-          aria-label="Sort products"
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-        >
-          {sorts.map((s) => (
-            <option key={s.key} value={s.key}>
-              {s.label}
-            </option>
-          ))}
-        </select>
-        <Button variant="outline" onClick={() => setShowFilters((v) => !v)} className="sm:w-auto">
-          <SlidersHorizontal /> Filters
-        </Button>
-      </div>
+      {/* Category Pill Tabs */}
+      {showCategoryFilter && categories.length > 0 && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setSelectedCategory(null)}
+            className={`rounded-full px-4 py-2 text-xs font-semibold tracking-wide transition-all ${
+              selectedCategory === null
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-secondary text-foreground hover:bg-secondary/80"
+            }`}
+          >
+            All Products ({products.length})
+          </button>
+          {categories.map((c) => {
+            const isSelected = selectedCategory === c.id;
+            const count = products.filter((p) => p.category_id === c.id).length;
 
-      {showFilters && (
-        <div className="surface-card mt-4 flex flex-wrap items-center gap-2 rounded-md p-4">
-          {showCategoryFilter &&
-            categories.map((c) => (
+            return (
               <button
                 key={c.id}
                 type="button"
-                onClick={() => toggleCategory(c.id)}
-                className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
-                  activeCategories.includes(c.id)
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border hover:border-accent"
+                onClick={() => setSelectedCategory(isSelected ? null : c.id)}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold tracking-wide transition-all ${
+                  isSelected
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "bg-secondary text-foreground hover:bg-secondary/80"
                 }`}
               >
-                {c.name}
+                {c.name} ({count})
               </button>
-            ))}
+            );
+          })}
+        </div>
+      )}
+
+      {/* Control Bar: Search Input & Sort Selector */}
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center justify-between border-y border-border/60 py-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search spices, flours, tea infusions…"
+            aria-label="Search products"
+            className="pl-9 bg-card border-border/80"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setInStockOnly((v) => !v)}
-            className={`rounded-full border px-3 py-1.5 text-xs ${
-              inStockOnly ? "border-accent bg-accent text-accent-foreground" : "border-border"
+            className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all ${
+              inStockOnly ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
             }`}
           >
-            In stock
+            In Stock Only
           </button>
           <button
             type="button"
             onClick={() => setOnOfferOnly((v) => !v)}
-            className={`rounded-full border px-3 py-1.5 text-xs ${
-              onOfferOnly ? "border-accent bg-accent text-accent-foreground" : "border-border"
+            className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all ${
+              onOfferOnly ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
             }`}
           >
-            On offer
+            Special Offers
           </button>
+
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            aria-label="Sort products"
+            className="h-9 rounded-lg border border-input bg-card px-3 text-xs font-semibold text-foreground"
+          >
+            {sorts.map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.label}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+      </div>
 
-      <p className="mt-6 text-sm text-muted-foreground">
-        {results.length} product{results.length === 1 ? "" : "s"}
-      </p>
-
-      {results.length === 0 ? (
-        <p className="py-16 text-center text-muted-foreground">
-          Nothing matched that search. Try a different word.
+      {/* Result Count and Active Filters Bar */}
+      <div className="mt-4 flex items-center justify-between">
+        <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+          Showing <span className="text-foreground font-bold">{results.length}</span> of {products.length} Products
         </p>
+
+        {(query || selectedCategory || inStockOnly || onOfferOnly) && (
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+          >
+            <RotateCcw className="size-3.5" /> Reset Filters
+          </button>
+        )}
+      </div>
+
+      {/* Products Grid */}
+      {results.length === 0 ? (
+        <div className="my-16 rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+          <Sparkles className="mx-auto size-10 text-muted-foreground/60" />
+          <h3 className="font-display text-2xl font-bold text-foreground mt-4">
+            No pantry items match your search
+          </h3>
+          <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
+            Try adjusting your search query or clear the active category filters.
+          </p>
+          <Button onClick={resetFilters} variant="outline" className="mt-6 font-semibold">
+            Clear All Filters
+          </Button>
+        </div>
       ) : (
-        <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {results.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -158,3 +203,4 @@ export function ProductGrid({
     </div>
   );
 }
+

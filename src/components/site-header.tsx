@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, Search, ShoppingBag, Heart, User } from "lucide-react";
+import { Menu, ShoppingBag, Heart, User, ArrowRight, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -8,164 +8,193 @@ import { SearchCommand } from "@/components/search-command";
 import { useCart } from "@/lib/cart";
 import { useSiteConfig } from "@/lib/site-config";
 
-
-const shop = [
-  { to: "/products", label: "All products" },
-  { to: "/category/$slug", params: { slug: "flours" }, label: "Flours" },
-  { to: "/category/$slug", params: { slug: "seasonings" }, label: "Seasonings" },
-  { to: "/category/$slug", params: { slug: "spices" }, label: "Spices" },
-  { to: "/category/$slug", params: { slug: "sweet-savory" }, label: "Sweet & Savory" },
-  { to: "/category/$slug", params: { slug: "tea-infusions" }, label: "Tea Infusions" },
-  { to: "/category/$slug", params: { slug: "cereals" }, label: "Cereals" },
+const shopCategories = [
+  { to: "/products", label: "All Products", description: "Explore the full Mummy Rose pantry collection" },
+  { to: "/category/$slug", params: { slug: "spices" }, label: "Spices & Seasonings", description: "Spices the way Mummy made them" },
+  { to: "/category/$slug", params: { slug: "flours" }, label: "Flours & Cereals", description: "From Grain to Goodness" },
+  { to: "/category/$slug", params: { slug: "tea-infusions" }, label: "Tea Infusions", description: "Brew with love, sip with memory" },
+  { to: "/category/$slug", params: { slug: "sweet-savory" }, label: "Sweet & Savory", description: "Natural sweeteners & nut powders" },
 ] as const;
 
-const business = [
-  { to: "/services", label: "All services" },
-  { to: "/retail", label: "Retail & stockists" },
-  { to: "/wholesale", label: "Wholesale" },
-  { to: "/wholesale/portal", label: "Trade portal" },
-
-  { to: "/export", label: "Export" },
-  { to: "/white-labelling", label: "White labelling" },
-  { to: "/custom-packaging", label: "Custom packaging" },
-  { to: "/corporate-supply", label: "Corporate supply" },
+const servicesList = [
+  { to: "/services", label: "Overview of Solutions", description: "Complete B2B food manufacturing portal" },
+  { to: "/white-labelling", label: "White Labelling", description: "Build your brand with Mummy Rose processing" },
+  { to: "/wholesale", label: "Wholesale & Bulk", description: "Direct supply for distributors & retailers" },
+  { to: "/custom-packaging", label: "Custom Packaging", description: "Tailored jars, sachets & retail cartons" },
+  { to: "/export", label: "Global Export", description: "African food products delivered worldwide" },
+  { to: "/corporate-supply", label: "Corporate & Events", description: "Custom gifting & wellness hampers" },
 ] as const;
 
 export function SiteHeader() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { branding } = useSiteConfig();
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 24);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-md">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "border-b border-border/80 bg-background/95 shadow-sm backdrop-blur-md py-1"
+          : "border-b border-border/40 bg-background/75 backdrop-blur-sm py-2.5"
+      }`}
+    >
       {branding.announcement_enabled && branding.announcement ? (
-        <div className="bg-ink text-ink-foreground">
-          <div className="container-page flex h-9 items-center justify-center gap-3 text-[11px] tracking-[0.18em] uppercase">
+        <div className="bg-primary text-primary-foreground">
+          <div className="container-page flex h-8 items-center justify-center gap-3 text-[11px] font-medium tracking-[0.2em] uppercase">
             <span>{branding.announcement}</span>
           </div>
         </div>
       ) : null}
 
-
-      <div className="container-page flex h-18 items-center justify-between gap-4 py-3">
-        <div className="flex items-center gap-2">
+      <div className="container-page flex items-center justify-between gap-4">
+        {/* Mobile menu trigger & Logo */}
+        <div className="flex items-center gap-3">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
-                <Menu />
+                <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[86vw] max-w-sm overflow-y-auto">
-              <nav className="mt-8 flex flex-col gap-6" onClick={() => setOpen(false)}>
+            <SheetContent side="left" className="w-[88vw] max-w-md overflow-y-auto bg-background p-6">
+              <div className="flex items-center gap-2 border-b pb-5">
+                <span className="font-display text-2xl font-bold tracking-tight text-primary">
+                  {branding.name}
+                </span>
+              </div>
+              <nav className="mt-6 flex flex-col gap-6" onClick={() => setOpen(false)}>
                 <div>
-                  <p className="eyebrow text-muted-foreground">Shop</p>
+                  <p className="eyebrow text-muted-foreground">Main Navigation</p>
+                  <div className="mt-3 flex flex-col gap-3 font-display text-xl">
+                    <Link to="/" className="hover:text-primary transition-colors">
+                      Home
+                    </Link>
+                    <Link to="/about" className="hover:text-primary transition-colors">
+                      Our Story
+                    </Link>
+                    <Link to="/recipes" className="hover:text-primary transition-colors">
+                      Recipes &amp; Ideas
+                    </Link>
+                    <Link to="/contact" className="hover:text-primary transition-colors">
+                      Contact
+                    </Link>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="eyebrow text-muted-foreground">Shop Collections</p>
                   <div className="mt-3 flex flex-col gap-2.5">
-                    {shop.map((item) => (
+                    {shopCategories.map((item) => (
                       <Link
                         key={item.label}
                         to={item.to}
                         params={"params" in item ? item.params : undefined}
-                        className="font-display text-lg"
+                        className="group flex flex-col text-sm font-medium hover:text-primary"
                       >
-                        {item.label}
+                        <span>{item.label}</span>
+                        <span className="text-xs font-normal text-muted-foreground">{item.description}</span>
                       </Link>
                     ))}
                   </div>
                 </div>
+
                 <div>
-                  <p className="eyebrow text-muted-foreground">Services</p>
+                  <p className="eyebrow text-muted-foreground">Business Solutions</p>
                   <div className="mt-3 flex flex-col gap-2.5">
-                    {business.map((item) => (
-                      <Link key={item.to} to={item.to} className="font-display text-lg">
-                        {item.label}
+                    {servicesList.map((item) => (
+                      <Link key={item.to} to={item.to} className="group flex flex-col text-sm font-medium hover:text-primary">
+                        <span>{item.label}</span>
+                        <span className="text-xs font-normal text-muted-foreground">{item.description}</span>
                       </Link>
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-col gap-2.5 border-t border-border pt-6">
-                  <Link to="/recipes" className="font-display text-lg">
-                    Recipes &amp; Journal
-                  </Link>
-                  <Link to="/about" className="font-display text-lg">
-                    About us
-                  </Link>
-                  <Link to="/faq" className="font-display text-lg">
-                    FAQ
-                  </Link>
-                  <Link to="/contact" className="font-display text-lg">
-                    Contact
-                  </Link>
-                  <Link to="/account" className="font-display text-lg">
-                    Account
-                  </Link>
+
+                <div className="border-t pt-5">
+                  <Button asChild className="w-full">
+                    <Link to="/products">
+                      Shop Now <ArrowRight className="ml-2 size-4" />
+                    </Link>
+                  </Button>
                 </div>
               </nav>
             </SheetContent>
           </Sheet>
 
-          <Link to="/" className="flex items-center gap-2.5 leading-none">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2.5">
             {branding.logo_url ? (
               <img src={branding.logo_url} alt={branding.name} className="h-10 w-auto max-w-40 object-contain" />
             ) : null}
             <span className="flex flex-col">
-              <span className="font-display text-2xl font-semibold tracking-tight text-primary">
+              <span className="font-display text-2xl font-bold tracking-tight text-primary sm:text-2xl">
                 {branding.name}
               </span>
-              {branding.tagline ? (
-                <span className="hidden text-[10px] tracking-[0.3em] text-muted-foreground uppercase sm:block">
-                  {branding.tagline}
-                </span>
-              ) : null}
+              <span className="hidden text-[9px] font-semibold tracking-[0.3em] text-accent uppercase md:block">
+                Nature’s Goodness · Mummy’s Touch
+              </span>
             </span>
           </Link>
-
         </div>
 
-        <nav className="hidden items-center gap-6 text-sm lg:flex">
-          <Link to="/" className="transition-colors hover:text-accent">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden items-center gap-7 text-sm font-medium lg:flex">
+          <Link to="/" className="transition-colors hover:text-primary">
             Home
           </Link>
-          <Link to="/about" className="transition-colors hover:text-accent">
-            About
+          <Link to="/about" className="transition-colors hover:text-primary">
+            Our Story
           </Link>
-          <Link to="/products" className="transition-colors hover:text-accent">
-            Products
-          </Link>
-          <NavDropdown label="Services" items={business} />
-          <Link to="/recipes" className="transition-colors hover:text-accent">
+
+          <NavMegaMenu label="Shop" items={shopCategories} mainTo="/products" />
+          <NavMegaMenu label="Services" items={servicesList} mainTo="/services" />
+
+          <Link to="/recipes" className="transition-colors hover:text-primary">
             Recipes
           </Link>
-          <NavDropdown label="Shop" items={shop} />
-          <Link to="/contact" className="transition-colors hover:text-accent">
+          <Link to="/contact" className="transition-colors hover:text-primary">
             Contact
           </Link>
-          <Button asChild size="sm" className="ml-1">
-            <Link to="/products">Shop now</Link>
-          </Button>
         </nav>
 
-        <div className="flex items-center gap-0.5">
-          <ThemeToggle />
+        {/* Action icons */}
+        <div className="flex items-center gap-1 sm:gap-2">
           <SearchCommand />
-          <Button variant="ghost" size="icon" asChild aria-label="Wishlist">
+          
+          <Button variant="ghost" size="icon" asChild aria-label="Wishlist" className="hover:text-primary">
             <Link to="/wishlist">
-              <Heart />
+              <Heart className="size-5" />
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" asChild aria-label="Account">
+
+          <Button variant="ghost" size="icon" asChild aria-label="Account" className="hover:text-primary">
             <Link to="/account">
-              <User />
+              <User className="size-5" />
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" asChild aria-label="Cart" className="relative">
+
+          <Button variant="ghost" size="icon" asChild aria-label="Cart" className="relative hover:text-primary">
             <Link to="/cart">
-              <ShoppingBag />
+              <ShoppingBag className="size-5" />
               {count > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
+                <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow-sm">
                   {count}
                 </span>
               )}
             </Link>
+          </Button>
+
+          <Button asChild size="sm" className="hidden font-medium sm:inline-flex ml-1">
+            <Link to="/products">Shop Now</Link>
           </Button>
         </div>
       </div>
@@ -173,30 +202,44 @@ export function SiteHeader() {
   );
 }
 
-function NavDropdown({
+function NavMegaMenu({
   label,
   items,
+  mainTo,
 }: {
   label: string;
-  items: readonly { to: string; label: string; params?: Record<string, string> }[];
+  items: readonly { to: string; label: string; description?: string; params?: Record<string, string> }[];
+  mainTo: string;
 }) {
   return (
     <div className="group relative">
-      <button className="cursor-pointer py-2 transition-colors group-hover:text-accent">{label}</button>
-      <div className="invisible absolute top-full left-1/2 z-50 w-56 -translate-x-1/2 pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
-        <div className="surface-card rounded-md p-2">
-          {items.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              params={item.params}
-              className="block rounded-sm px-3 py-2 text-sm transition-colors hover:bg-secondary"
-            >
-              {item.label}
-            </Link>
-          ))}
+      <Link to={mainTo} className="inline-flex items-center gap-1 py-2 font-medium transition-colors hover:text-primary">
+        <span>{label}</span>
+        <ChevronDown className="size-3.5 transition-transform group-hover:rotate-180 text-muted-foreground" />
+      </Link>
+      
+      <div className="invisible absolute top-full left-1/2 z-50 w-72 -translate-x-1/2 pt-2 opacity-0 transition-all duration-250 ease-out group-hover:visible group-hover:opacity-100">
+        <div className="surface-card rounded-lg p-3 shadow-xl border border-border">
+          <div className="grid gap-1">
+            {items.map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                params={item.params}
+                className="group/item flex flex-col rounded-md p-2.5 transition-colors hover:bg-secondary"
+              >
+                <span className="text-sm font-semibold text-foreground group-hover/item:text-primary">
+                  {item.label}
+                </span>
+                {item.description ? (
+                  <span className="text-xs text-muted-foreground">{item.description}</span>
+                ) : null}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
+

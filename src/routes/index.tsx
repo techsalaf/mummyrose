@@ -2,8 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import heroFallback from "@/assets/hero-editorial.jpg";
 import farmersImage from "@/assets/story-farmers.jpg";
-import millingImage from "@/assets/process-milling.jpg";
-import tableImage from "@/assets/lifestyle-table.jpg";
 import { JsonLd } from "@/components/json-ld";
 import { BannerSections } from "@/components/banner-sections";
 import { HomeHero } from "@/components/home/hero";
@@ -14,6 +12,9 @@ import { ProductRail } from "@/components/home/product-rail";
 import { ReviewCarousel } from "@/components/home/review-carousel";
 import { JournalStrip } from "@/components/home/journal-strip";
 import { NewsletterCta } from "@/components/home/newsletter-cta";
+import { ProcessStepper } from "@/components/home/process-stepper";
+import { InteractiveValues } from "@/components/home/interactive-values";
+import { B2BSpotlight } from "@/components/home/b2b-spotlight";
 import { categoriesQuery, postsQuery, productsQuery, testimonialsQuery } from "@/lib/queries";
 import { useSiteConfig, HOME_SECTIONS } from "@/lib/site-config";
 
@@ -26,17 +27,17 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Mummy Rose — Premium Natural Nigerian Pantry" },
+      { title: "Mummy Rose — Premium Natural Spices, Flours & Infusions" },
       {
         name: "description",
         content:
-          "Small-batch Nigerian spices, stone-milled flours, cereals and herbal infusions — sourced directly from farm cooperatives and packed without preservatives.",
+          "Nature’s Goodness, Mummy’s Touch. Premium Nigerian spices, stone-milled flours, and herbal tea infusions. Just the way Mummy made them.",
       },
-      { property: "og:title", content: "Mummy Rose — Premium Natural Nigerian Pantry" },
+      { property: "og:title", content: "Mummy Rose — Premium Natural Spices, Flours & Infusions" },
       {
         property: "og:description",
         content:
-          "Small-batch Nigerian spices, stone-milled flours and herbal infusions, sourced directly from Nigerian farms.",
+          "Spices, Flours & Infusions — just the way Mummy made them. Sourced from local farm cooperatives.",
       },
     ],
   }),
@@ -60,32 +61,6 @@ function Home() {
 
     promises: home.promises_enabled ? <TrustMarquee promises={promises} /> : null,
 
-    featured: home.featured_enabled ? (
-      <ProductRail
-        eyebrow={home.featured_eyebrow}
-        title={home.featured_title}
-        description="Milled and blended weekly in small batches — the jars our customers reorder most."
-        products={bestSellers}
-        linkLabel="Shop all products"
-      />
-    ) : null,
-
-    story: home.story_enabled ? (
-      <EditorialBand
-        index="01"
-        eyebrow={home.story_eyebrow}
-        title={home.story_title}
-        body={home.story_body}
-        image={home.story_image || farmersImage}
-        imageAlt={home.story_image_alt || "Nigerian farmers sorting dried peppers and herbs at golden hour"}
-        ctaLabel={home.story_cta_label}
-        ctaHref={home.story_cta_href || "/about"}
-        align="right"
-        tone="ivory"
-        stat={{ value: "14", label: "Farm cooperatives we buy from directly" }}
-      />
-    ) : null,
-
     categories: home.categories_enabled ? (
       <CategoryEditorial
         categories={categories}
@@ -94,45 +69,49 @@ function Home() {
       />
     ) : null,
 
+    featured: home.featured_enabled ? (
+      <ProductRail
+        eyebrow={home.featured_eyebrow || "Shop Bestsellers"}
+        title={home.featured_title || "Our Most Beloved Blends"}
+        description="Milled and blended weekly in small batches — the natural pantry items our customers reorder most."
+        products={bestSellers}
+        linkLabel="Shop all products"
+      />
+    ) : null,
+
+    story: home.story_enabled ? (
+      <EditorialBand
+        index="01"
+        eyebrow={home.story_eyebrow || "More Than a Mother"}
+        title={home.story_title || "The Heart Behind Every Meal"}
+        body={
+          home.story_body ||
+          "Mummy Rose was more than a mother. She was a nurturer, home cook, healer, and the heart of every meal shared at our table. Inspired by her timeless kitchen wisdom, Mummy Rose is an exaltation to her legacy — crafting flavor-rich spices, nutrient-dense flours, and wellness-driven tea infusions with love."
+        }
+        image={home.story_image || farmersImage}
+        imageAlt={home.story_image_alt || "Nigerian farmers sorting dried peppers and herbs at golden hour"}
+        ctaLabel={home.story_cta_label || "Discover Our Full Story"}
+        ctaHref={home.story_cta_href || "/about"}
+        align="right"
+        tone="ivory"
+        stat={{ value: "100%", label: "Pure, natural ingredients inspired by Mummy's kitchen" }}
+      />
+    ) : null,
+
     sourcing: home.sourcing_enabled ? (
       <>
-        <EditorialBand
-          index="02"
-          eyebrow="Traditional milling"
-          title="Stone-milled slowly, so flavour survives the process"
-          body={
-            "Heat is the enemy of aroma. We mill on stone at low speed, sieve by hand and pack the same week — which is why our flours smell like the grain they came from and our pepper still bites.\n\nNothing is bulked out with fillers. Nothing sits in a warehouse for a season."
-          }
-          image={millingImage}
-          imageAlt="Golden flour falling from a traditional stone mill"
-          align="left"
-          tone="cocoa"
-          stat={{ value: "0", label: "Preservatives, fillers or artificial colour" }}
-          ctaLabel="How we source"
-          ctaHref="/about"
-        />
-        <EditorialBand
-          index="03"
-          eyebrow="From Nigerian farms to your kitchen"
-          title="Ingredients with an address, not a barcode"
-          body={
-            "Every batch is traceable to the cooperative that grew it — in Kaduna, Jos, Oyo and Benue. We pay above market, buy at harvest and dry with the farmers rather than after the fact.\n\nThat relationship is the reason the taste is consistent, jar after jar."
-          }
-          image={tableImage}
-          imageAlt="Overhead Nigerian meal in progress with spices and fresh herbs on linen"
-          align="right"
-          tone="linen"
-          ctaLabel="Meet our farmers"
-          ctaHref="/about"
-        />
+        <ProcessStepper />
+        <InteractiveValues />
       </>
     ) : null,
 
+    b2b: <B2BSpotlight />,
+
     discovery: home.discovery_enabled ? (
       <ProductRail
-        eyebrow="New arrivals"
-        title="Just milled, just landed"
-        description="Fresh from this week's batch — restocks, seasonal picks and the blends people keep asking for."
+        eyebrow="Freshly Milled"
+        title="Just Landed in the Pantry"
+        description="Fresh from this week's batch — restocks, seasonal picks, and traditional blends."
         products={newArrivals}
         linkLabel="Explore everything"
       />
@@ -147,8 +126,8 @@ function Home() {
 
     newsletter: home.newsletter_enabled ? (
       <NewsletterCta
-        heading="Recipes, restocks and quiet offers"
-        body="Join the pantry letter for seasonal cooking notes from our kitchen, early access to new blends and the occasional quiet discount. No noise."
+        heading="Bring a Little More Mummy into Your Kitchen"
+        body="Join the Mummy Rose family letter for seasonal cooking notes, authentic African recipes, early access to new spice restocks, and wellness tips."
       />
     ) : null,
   };
@@ -156,7 +135,19 @@ function Home() {
   const order = (Array.isArray(home.section_order) && home.section_order.length
     ? home.section_order
     : HOME_SECTIONS.map((s) => s.id)) as string[];
-  const ordered = [...order, ...HOME_SECTIONS.map((s) => s.id).filter((id) => !order.includes(id))];
+  
+  // Ensure custom B2B section is included in flow
+  const fullOrder = [...order];
+  if (!fullOrder.includes("b2b")) {
+    const sourcingIdx = fullOrder.indexOf("sourcing");
+    if (sourcingIdx !== -1) {
+      fullOrder.splice(sourcingIdx + 1, 0, "b2b");
+    } else {
+      fullOrder.push("b2b");
+    }
+  }
+
+  const ordered = [...fullOrder, ...HOME_SECTIONS.map((s) => s.id).filter((id) => !fullOrder.includes(id))];
 
   return (
     <>
@@ -179,3 +170,4 @@ function Home() {
     </>
   );
 }
+

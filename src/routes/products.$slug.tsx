@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Heart, Minus, Plus, Truck } from "lucide-react";
+import { Heart, Minus, Plus, Truck, ShieldCheck, Leaf, Sparkles, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -46,15 +46,15 @@ export const Route = createFileRoute("/products/$slug")({
   component: ProductDetail,
   notFoundComponent: () => (
     <div className="container-page py-24 text-center">
-      <h1 className="font-display text-3xl">Product not found</h1>
-      <Link to="/products" className="mt-4 inline-block text-sm underline">
-        Back to shop
-      </Link>
+      <h1 className="font-display text-4xl font-bold">Product Not Found</h1>
+      <Button asChild className="mt-6 font-semibold">
+        <Link to="/products">Explore Pantry Catalog</Link>
+      </Button>
     </div>
   ),
   errorComponent: () => (
     <div className="container-page py-24 text-center">
-      <h1 className="font-display text-3xl">This product didn't load</h1>
+      <h1 className="font-display text-4xl font-bold">Failed to load product details</h1>
     </div>
   ),
 });
@@ -67,6 +67,7 @@ function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [variant, setVariant] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     if (product?.slug) pushRecentlyViewed(product.slug);
@@ -86,8 +87,25 @@ function ProductDetail() {
     .slice(0, 4);
   const nutrition = (product.nutrition ?? {}) as Record<string, string | number>;
 
+  const handleAddToCart = () => {
+    addItem(
+      {
+        product_id: product.id,
+        slug: product.slug,
+        name: product.name,
+        image: cover,
+        unit_price: price,
+        variant: chosen,
+      },
+      qty,
+    );
+    setAdded(true);
+    toast.success(`${qty}x ${product.name} (${chosen ?? "standard"}) added to cart`);
+    setTimeout(() => setAdded(false), 2000);
+  };
+
   return (
-    <div className="container-page py-10 md:py-14">
+    <div className="container-page py-10 md:py-16">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -105,35 +123,43 @@ function ProductDetail() {
         }}
       />
 
-      <nav className="text-xs text-muted-foreground">
-        <Link to="/products" className="hover:text-accent">
-          Products
+      <nav className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        <Link to="/products" className="hover:text-primary transition-colors">
+          Pantry
         </Link>
-        <span className="px-2">/</span>
-        <span>{product.name}</span>
+        <span>/</span>
+        <Link to="/category/$slug" params={{ slug: product.categories?.slug ?? "spices" }} className="hover:text-primary transition-colors">
+          {product.categories?.name ?? "Collection"}
+        </Link>
+        <span>/</span>
+        <span className="text-foreground">{product.name}</span>
       </nav>
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-2">
-        <div>
-          <div className="overflow-hidden rounded-lg bg-sand">
+      <div className="mt-8 grid gap-12 lg:grid-cols-12 items-start">
+        
+        {/* Left Column: Product Gallery */}
+        <div className="lg:col-span-6 lg:sticky lg:top-24">
+          <div className="hover-zoom-img relative overflow-hidden rounded-2xl border border-border bg-card shadow-md aspect-square">
             <img
               src={images[activeImage] ?? cover}
               alt={product.name}
               width={1200}
               height={1200}
-              className="aspect-square w-full object-cover"
+              className="h-full w-full object-cover"
             />
           </div>
+
           {images.length > 1 && (
-            <div className="mt-3 flex gap-3">
+            <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
               {images.map((img, i) => (
                 <button
                   key={img + i}
+                  type="button"
                   onClick={() => setActiveImage(i)}
-                  aria-label={`View image ${i + 1}`}
+                  aria-label={`View product image ${i + 1}`}
                   className={cn(
-                    "size-20 overflow-hidden rounded-md border",
-                    activeImage === i ? "border-accent" : "border-border",
+                    "relative size-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all cursor-pointer",
+                    activeImage === i ? "border-primary shadow-md scale-105" : "border-border/60 hover:border-primary/50",
                   )}
                 >
                   <img src={img} alt="" className="h-full w-full object-cover" />
@@ -143,28 +169,61 @@ function ProductDetail() {
           )}
         </div>
 
-        <div>
-          <p className="eyebrow text-muted-foreground">{product.categories?.name}</p>
-          <h1 className="mt-3 font-display text-3xl md:text-4xl">{product.name}</h1>
-          <div className="mt-4 flex items-center gap-3">
-            <span className="font-display text-2xl">{formatNaira(price)}</span>
+        {/* Right Column: Details & Purchase Form */}
+        <div className="lg:col-span-6">
+          <div className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-xs font-bold text-accent uppercase">
+            <Leaf className="size-3.5" />
+            <span>{product.categories?.name ?? "Mummy Rose Pantry"}</span>
+          </div>
+
+          <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-foreground mt-3">
+            {product.name}
+          </h1>
+
+          <div className="mt-4 flex items-baseline gap-3">
+            <span className="font-display text-3xl font-bold text-foreground">
+              {formatNaira(price)}
+            </span>
             {hasDiscount && (
-              <span className="text-muted-foreground line-through">{formatNaira(product.price)}</span>
+              <span className="text-base text-muted-foreground line-through">
+                {formatNaira(product.price)}
+              </span>
             )}
           </div>
-          <p className="mt-5 leading-relaxed text-muted-foreground">{product.short_description}</p>
 
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+            {product.short_description}
+          </p>
+
+          {/* Trust Badges Bar */}
+          <div className="mt-6 grid grid-cols-2 gap-3 rounded-xl border border-border/80 bg-card p-4 text-xs font-semibold text-foreground">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="size-4 text-accent" />
+              <span>100% Natural &amp; Preservative Free</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Sparkles className="size-4 text-accent" />
+              <span>Generational Family Recipe</span>
+            </div>
+          </div>
+
+          {/* Size Option Selector */}
           {options.length > 0 && (
             <div className="mt-6">
-              <p className="text-sm font-medium">Size</p>
-              <div className="mt-2 flex flex-wrap gap-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Select Package Size:
+              </label>
+              <div className="mt-2.5 flex flex-wrap gap-2.5">
                 {options.map((opt) => (
                   <button
                     key={opt}
+                    type="button"
                     onClick={() => setVariant(opt)}
                     className={cn(
-                      "rounded-full border px-4 py-1.5 text-sm transition-colors",
-                      chosen === opt ? "border-accent bg-accent text-accent-foreground" : "border-border",
+                      "rounded-full border px-5 py-2 text-xs font-bold transition-all cursor-pointer",
+                      chosen === opt
+                        ? "border-primary bg-primary text-primary-foreground shadow-md"
+                        : "border-border bg-card hover:border-primary/50 text-foreground",
                     )}
                   >
                     {opt}
@@ -174,107 +233,132 @@ function ProductDetail() {
             </div>
           )}
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <div className="flex items-center rounded-md border border-input">
+          {/* Quantity and Actions */}
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="flex h-12 items-center rounded-xl border border-border bg-card px-2 shadow-xs">
               <button
+                type="button"
                 aria-label="Decrease quantity"
-                className="px-3 py-2"
+                className="grid size-9 place-items-center rounded-lg hover:bg-secondary text-foreground"
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
               >
                 <Minus className="size-4" />
               </button>
-              <span className="w-10 text-center text-sm">{qty}</span>
+              <span className="w-10 text-center font-bold text-sm">{qty}</span>
               <button
+                type="button"
                 aria-label="Increase quantity"
-                className="px-3 py-2"
+                className="grid size-9 place-items-center rounded-lg hover:bg-secondary text-foreground"
                 onClick={() => setQty((q) => Math.min(99, q + 1))}
               >
                 <Plus className="size-4" />
               </button>
             </div>
+
             <Button
-              size="lg"
-              variant="clay"
+              size="xl"
               disabled={soldOut}
-              onClick={() => {
-                addItem(
-                  {
-                    product_id: product.id,
-                    slug: product.slug,
-                    name: product.name,
-                    image: cover,
-                    unit_price: price,
-                    variant: chosen,
-                  },
-                  qty,
-                );
-                toast.success(`${product.name} added to cart`);
-              }}
+              onClick={handleAddToCart}
+              className="flex-1 font-semibold text-base py-6 shadow-md hover:shadow-lg transition-all"
             >
-              {soldOut ? "Sold out" : "Add to cart"}
+              {added ? (
+                <>
+                  <Check className="mr-2 size-5" /> Added to Cart
+                </>
+              ) : soldOut ? (
+                "Sold Out"
+              ) : (
+                `Add to Cart — ${formatNaira(price * qty)}`
+              )}
             </Button>
-            <Button variant="outline" size="lg" onClick={() => toggleWishlist(product.slug)}>
-              <Heart className={cn(isWishlisted(product.slug) && "fill-accent text-accent")} />
-              {isWishlisted(product.slug) ? "Saved" : "Save"}
+
+            <Button
+              variant="outline"
+              size="xl"
+              onClick={() => toggleWishlist(product.slug)}
+              className="size-12 p-0 rounded-xl"
+              aria-label="Wishlist"
+            >
+              <Heart className={cn("size-5", isWishlisted(product.slug) && "fill-primary text-primary")} />
             </Button>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-2">
             <WhatsAppOrderButton
               lines={[{ name: product.name, variant: chosen, quantity: qty, unit_price: price }]}
             />
+            <OrderPathsNote className="text-xs leading-relaxed text-muted-foreground" />
           </div>
-          <OrderPathsNote className="mt-3 max-w-prose text-xs leading-relaxed text-muted-foreground" />
 
-
-          <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
+          <p className="mt-6 flex items-center gap-2 text-xs font-semibold text-muted-foreground border-t border-border/60 pt-4">
             <Truck className="size-4 text-accent" />
             {soldOut
-              ? "Out of stock — join the waitlist by contacting us."
-              : `${product.stock_quantity} in stock · dispatched within 48 hours`}
+              ? "Out of stock — contact us to get notified on next batch restock."
+              : `${product.stock_quantity} available in batch · Dispatched within 48 hours`}
           </p>
 
+          {/* Product Specifications Accordion */}
           <Accordion type="single" collapsible className="mt-8" defaultValue="description">
             <AccordionItem value="description">
-              <AccordionTrigger>Description</AccordionTrigger>
-              <AccordionContent className="leading-relaxed whitespace-pre-line text-muted-foreground">
+              <AccordionTrigger className="font-display text-lg font-bold">Product Story &amp; Details</AccordionTrigger>
+              <AccordionContent className="leading-relaxed whitespace-pre-line text-sm text-muted-foreground">
                 {product.description || product.short_description}
               </AccordionContent>
             </AccordionItem>
+            
             {product.ingredients && (
               <AccordionItem value="ingredients">
-                <AccordionTrigger>Ingredients</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">{product.ingredients}</AccordionContent>
+                <AccordionTrigger className="font-display text-lg font-bold">Ingredient Transparency</AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                  <p className="font-semibold text-foreground mb-1">100% Pure &amp; Unadulterated:</p>
+                  {product.ingredients}
+                </AccordionContent>
               </AccordionItem>
             )}
+
             {Object.keys(nutrition).length > 0 && (
               <AccordionItem value="nutrition">
-                <AccordionTrigger>Nutrition</AccordionTrigger>
+                <AccordionTrigger className="font-display text-lg font-bold">Nutritional Profile</AccordionTrigger>
                 <AccordionContent>
-                  <dl className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                  <dl className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
                     {Object.entries(nutrition).map(([key, value]) => (
-                      <div key={key} className="flex justify-between border-b border-border/60 py-1">
-                        <dt className="capitalize">{key.replace(/_/g, " ")}</dt>
-                        <dd>{String(value)}</dd>
+                      <div key={key} className="flex justify-between rounded-lg bg-secondary/50 p-2.5">
+                        <dt className="font-semibold capitalize text-foreground">{key.replace(/_/g, " ")}</dt>
+                        <dd className="font-bold">{String(value)}</dd>
                       </div>
                     ))}
                   </dl>
                 </AccordionContent>
               </AccordionItem>
             )}
+
             <AccordionItem value="delivery">
-              <AccordionTrigger>Delivery &amp; returns</AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                Nationwide delivery within 2–5 business days. Free over ₦50,000. Unopened items can be returned
-                within 7 days.
+              <AccordionTrigger className="font-display text-lg font-bold">Shipping &amp; Storage</AccordionTrigger>
+              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                Nationwide delivery across Nigeria in 2–4 business days. International shipping via express courier. Store in a cool, dry pantry away from direct sunlight.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+
         </div>
       </div>
 
+      {/* Pairs Beautifully With Section */}
       {related.length > 0 && (
-        <section className="mt-20">
-          <p className="eyebrow text-accent">You may also like</p>
-          <h2 className="mt-2 font-display text-2xl">More from {product.categories?.name}</h2>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mt-24 border-t border-border/80 pt-16">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="eyebrow text-accent uppercase tracking-widest">Perfect Combinations</span>
+              <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl mt-1">
+                Pairs Beautifully With...
+              </h2>
+            </div>
+            <Link to="/products" className="text-sm font-semibold text-primary hover:underline">
+              View All Pantry
+            </Link>
+          </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -282,9 +366,11 @@ function ProductDetail() {
         </section>
       )}
 
+      {/* Customer Reviews */}
       <ProductReviews productId={product.id} productName={product.name} />
 
       <RecentlyViewed products={products} excludeSlug={product.slug} />
     </div>
   );
 }
+
