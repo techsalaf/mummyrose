@@ -1,12 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Heart, ShieldCheck, Leaf, Sparkles, Award, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, Heart, ShieldCheck, Leaf, Sparkles, Award } from "lucide-react";
 import story from "@/assets/story.jpg";
-import farmersImage from "@/assets/story-farmers.jpg";
-import millingImage from "@/assets/process-milling.jpg";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
+import { CmsPageSections } from "@/components/cms-page-sections";
+import { cmsPageQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/about")({
+  loader: ({ context }) => {
+    // Pre-fetch CMS page in background — used for SEO overrides
+    void context.queryClient.ensureQueryData(cmsPageQuery("about"));
+  },
   head: () => ({
     meta: [
       { title: "About Mummy Rose — Our Heritage, Vision & Kitchen Legacy" },
@@ -49,6 +54,10 @@ const CORE_VALUES = [
 ];
 
 function AboutPage() {
+  // CMS override: when admin publishes an 'about' page it enriches the content.
+  const { data: cmsPage } = useQuery(cmsPageQuery("about"));
+  const heroTagline = cmsPage?.subtitle ?? "\u201cMummy Rose was a nurturer, a home cook, a healer, and the heart of every meal shared at our table.\u201d";
+
   return (
     <>
       {/* Editorial Hero */}
@@ -66,7 +75,7 @@ function AboutPage() {
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl leading-relaxed text-primary-foreground/90 max-w-2xl">
-              "Mummy Rose was a nurturer, a home cook, a healer, and the heart of every meal shared at our table."
+              {heroTagline}
             </p>
           </Reveal>
         </div>
@@ -194,7 +203,15 @@ function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* CMS extra sections — added via Admin → Pages → about */}
+      {cmsPage && Array.isArray(cmsPage.sections) && (cmsPage.sections as unknown[]).length > 0 && (
+        <section className="py-20 bg-secondary/30 border-t border-border">
+          <div className="container-wide">
+            <CmsPageSections page={cmsPage} />
+          </div>
+        </section>
+      )}
     </>
   );
 }
-

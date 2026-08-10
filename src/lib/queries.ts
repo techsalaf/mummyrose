@@ -212,3 +212,19 @@ export function addressesQuery(userId: string | undefined) {
     },
   });
 }
+
+/** Public query for a CMS-managed standalone page (About, Services, etc.) */
+export function cmsPageQuery(slug: string) {
+  return queryOptions({
+    queryKey: ["cms_page", slug],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("pages")
+        .select("*")
+        .eq("slug", slug)
+        .eq("is_published", true)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+}
