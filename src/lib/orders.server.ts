@@ -18,8 +18,10 @@ export async function resolveUserId(): Promise<string | null> {
     const header = getRequestHeader("authorization");
     const token = header?.startsWith("Bearer ") ? header.slice(7) : null;
     if (!token) return null;
-    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
-    const client = createClient(process.env.SUPABASE_URL!, key, {
+    const url = (typeof process !== "undefined" ? process.env?.SUPABASE_URL || process.env?.VITE_SUPABASE_URL : undefined) || "https://dezgbfewaprhxfhnbtqp.supabase.co";
+    const key = (typeof process !== "undefined" ? process.env?.SUPABASE_SERVICE_ROLE_KEY || process.env?.SUPABASE_PUBLISHABLE_KEY : undefined) || "sb_publishable_ABDiKOfAfzJYEaf9MAPtgw_ux8asbLh";
+    const client = createClient(url, key, {
+
       auth: { persistSession: false, autoRefreshToken: false },
     });
     const { data } = await client.auth.getUser(token);
