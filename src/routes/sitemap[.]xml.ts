@@ -2,17 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-const FALLBACK_BASE_URL = "https://mummyrose.com";
+const FALLBACK_BASE_URL = "https://www.mummyrose.com";
 
 interface SitemapEntry {
   path: string;
+  lastmod?: string;
   changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
   priority?: string;
 }
 
+const today = new Date().toISOString().split("T")[0];
+
 const STATIC_ENTRIES: SitemapEntry[] = [
-  { path: "/", changefreq: "weekly", priority: "1.0" },
-  { path: "/products", changefreq: "daily", priority: "0.9" },
+  { path: "/", changefreq: "weekly", priority: "1.0", lastmod: today },
+  { path: "/products", changefreq: "daily", priority: "0.9", lastmod: today },
   { path: "/services", changefreq: "monthly", priority: "0.8" },
   { path: "/retail", changefreq: "monthly", priority: "0.8" },
   { path: "/wholesale", changefreq: "monthly", priority: "0.8" },
@@ -30,16 +33,20 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/refunds", changefreq: "monthly", priority: "0.4" },
   { path: "/privacy", changefreq: "yearly", priority: "0.2" },
   { path: "/terms", changefreq: "yearly", priority: "0.2" },
-
 ];
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const supabaseUrl = (typeof process !== "undefined" ? process.env?.["SUPABASE_URL"] ?? process.env?.["VITE_SUPABASE_URL"] : undefined) ?? "https://dezgbfewaprhxfhnbtqp.supabase.co";
-        const supabaseKey = (typeof process !== "undefined" ? process.env?.["SUPABASE_PUBLISHABLE_KEY"] ?? process.env?.["VITE_SUPABASE_PUBLISHABLE_KEY"] : undefined) ?? "sb_publishable_ABDiKOfAfzJYEaf9MAPtgw_ux8asbLh";
-
+        const supabaseUrl =
+          (typeof process !== "undefined"
+            ? process.env?.["SUPABASE_URL"] ?? process.env?.["VITE_SUPABASE_URL"]
+            : undefined) ?? "https://dezgbfewaprhxfhnbtqp.supabase.co";
+        const supabaseKey =
+          (typeof process !== "undefined"
+            ? process.env?.["SUPABASE_PUBLISHABLE_KEY"] ?? process.env?.["VITE_SUPABASE_PUBLISHABLE_KEY"]
+            : undefined) ?? "sb_publishable_ABDiKOfAfzJYEaf9MAPtgw_ux8asbLh";
 
         const entries: SitemapEntry[] = [...STATIC_ENTRIES];
         let baseUrl = FALLBACK_BASE_URL;
@@ -50,10 +57,10 @@ export const Route = createFileRoute("/sitemap.xml")({
           });
 
           const [products, categories, posts, pages, settings] = await Promise.all([
-            supabase.from("products").select("slug").eq("is_active", true),
+            supabase.from("products").select("slug,updated_at").eq("is_active", true),
             supabase.from("categories").select("slug").eq("is_active", true),
             supabase.from("posts").select("slug,kind,updated_at").eq("is_published", true),
-            supabase.from("pages").select("slug").eq("is_published", true),
+            supabase.from("pages").select("slug,updated_at").eq("is_published", true),
             supabase.from("site_settings").select("value").eq("key", "seo").maybeSingle(),
           ]);
 
@@ -62,19 +69,35 @@ export const Route = createFileRoute("/sitemap.xml")({
 
           for (const row of categories.data ?? [])
             entries.push({ path: `/category/${row.slug}`, changefreq: "weekly", priority: "0.8" });
+
           for (const row of products.data ?? [])
-            entries.push({ path: `/products/${row.slug}`, changefreq: "weekly", priority: "0.8" });
+            entries.push({
+              path: `/products/${row.slug}`,
+              changefreq: "weekly",
+              priority: "0.8",
+              lastmod: row.updated_at ? row.updated_at.split("T")[0] : undefined,
+            });
+
           for (const row of posts.data ?? [])
             entries.push({
               path: row.kind === "recipe" ? `/recipes/${row.slug}` : `/blog/${row.slug}`,
               changefreq: "monthly",
               priority: "0.6",
+              lastmod: row.updated_at ? row.updated_at.split("T")[0] : undefined,
             });
+
           const known = new Set(STATIC_ENTRIES.map((e) => e.path));
           for (const row of pages.data ?? []) {
             const path = `/${row.slug}`;
             if (known.has(path)) continue;
-            entries.push({ path, changefreq: "monthly", priority: "0.5" });
+            entries.push({
+              path,
+              changefreq: "monthly",
+              priority: "0.5",
+              lastmod: (row as { updated_at?: string }).updated_at
+                ? (row as { updated_at?: string }).updated_at!.split("T")[0]
+                : undefined,
+            });
           }
         }
 
@@ -82,6 +105,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           [
             `  <url>`,
             `    <loc>${baseUrl}${e.path}</loc>`,
+            e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,

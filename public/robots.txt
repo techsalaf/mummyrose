@@ -20,4 +20,4 @@ Disallow: /wholesale/portal
 Disallow: /order-confirmed
 Disallow: /payment-callback
 
-Sitemap: https://mummyrose.com/sitemap.xml
+Sitemap: https://www.mummyrose.com/sitemap.xml

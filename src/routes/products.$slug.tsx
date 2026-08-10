@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { Heart, Minus, Plus, Truck, ShieldCheck, Leaf, Sparkles, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ProductCard } from "@/components/product-card";
-import { ProductReviews } from "@/components/product-reviews";
+import { ProductReviews, ratingSummary } from "@/components/product-reviews";
 import { RecentlyViewed } from "@/components/recently-viewed";
 import { JsonLd } from "@/components/json-ld";
 import { OrderPathsNote, WhatsAppOrderButton } from "@/components/whatsapp-order-button";
-import { productQuery, productsQuery } from "@/lib/queries";
+import { productQuery, productsQuery, productReviewsQuery } from "@/lib/queries";
 import { effectivePrice, formatNaira } from "@/lib/format";
 import { productImage } from "@/lib/catalog-images";
 import { useCart } from "@/lib/cart";
@@ -21,10 +21,14 @@ export const Route = createFileRoute("/products/$slug")({
     const product = await context.queryClient.ensureQueryData(productQuery(params.slug));
     context.queryClient.ensureQueryData(productsQuery);
     if (!product) throw notFound();
+    const cover = product.image_url ?? "";
     return {
       name: product.name,
       description: product.seo_description ?? product.short_description ?? "",
       title: product.seo_title ?? product.name,
+      image: cover.startsWith("http") ? cover : "",
+      price: product.price,
+      sku: product.sku ?? "",
     };
   },
   head: ({ loaderData }) => {
@@ -40,6 +44,15 @@ export const Route = createFileRoute("/products/$slug")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "product" },
+        ...(loaderData.image ? [
+          { property: "og:image", content: loaderData.image },
+          { name: "twitter:image", content: loaderData.image },
+          { name: "twitter:card", content: "summary_large_image" },
+        ] : []),
+        ...(loaderData.price ? [
+          { property: "product:price:amount", content: String(loaderData.price) },
+          { property: "product:price:currency", content: "NGN" },
+        ] : []),
       ],
     };
   },
@@ -63,6 +76,7 @@ function ProductDetail() {
   const { slug } = Route.useParams();
   const { data: product } = useSuspenseQuery(productQuery(slug));
   const { data: products } = useSuspenseQuery(productsQuery);
+  const { data: reviews = [] } = useQuery(productReviewsQuery(product?.id ?? ""));
   const { addItem, toggleWishlist, isWishlisted, pushRecentlyViewed } = useCart();
   const [qty, setQty] = useState(1);
   const [variant, setVariant] = useState<string | null>(null);
@@ -113,13 +127,25 @@ function ProductDetail() {
           name: product.name,
           description: product.short_description ?? undefined,
           sku: product.sku ?? undefined,
+          image: cover.startsWith("http") ? [cover] : undefined,
           brand: { "@type": "Brand", name: "Mummy Rose" },
           offers: {
             "@type": "Offer",
             price,
             priceCurrency: "NGN",
             availability: soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+            url: `https://www.mummyrose.com/products/${product.slug}`,
+            seller: { "@type": "Organization", name: "Mummy Rose" },
           },
+          ...(ratingSummary(reviews).count > 0 ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: ratingSummary(reviews).average.toFixed(1),
+              reviewCount: ratingSummary(reviews).count,
+              bestRating: "5",
+              worstRating: "1",
+            }
+          } : {}),
         }}
       />
 

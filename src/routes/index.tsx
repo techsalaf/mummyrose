@@ -154,13 +154,61 @@ function Home() {
       <JsonLd
         data={{
           "@context": "https://schema.org",
-          "@type": "Organization",
-          name: branding.name,
-          description: seo.description,
+          "@type": ["LocalBusiness", "FoodEstablishment"],
+          "@id": `${seo.site_url || "https://www.mummyrose.com"}/#organization`,
+          name: branding.name || "Mummy Rose",
+          url: seo.site_url || "https://www.mummyrose.com",
+          logo: branding.logo_url || undefined,
+          description: seo.description || "Natural Nigerian spices, stone-milled flours, herbal infusions and food products for retail, wholesale and export.",
           image: home.hero_image || heroFallback,
-          address: { "@type": "PostalAddress", addressLocality: "Lagos", addressCountry: "NG" },
+          priceRange: "₦₦",
+          servesCuisine: "Nigerian",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Lagos",
+            addressRegion: "Lagos",
+            addressCountry: "NG",
+          },
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: 6.5244,
+            longitude: 3.3792,
+          },
+          contactPoint: {
+            "@type": "ContactPoint",
+            contactType: "customer service",
+            email: "hello@mummyrose.com",
+            availableLanguage: ["English"],
+          },
+          sameAs: [
+            "https://instagram.com/mummyrose",
+            "https://facebook.com/mummyrose",
+          ],
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: "Natural Spices, Flours & Herbal Infusions",
+          },
         }}
       />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": `${seo.site_url || "https://www.mummyrose.com"}/#website`,
+          url: seo.site_url || "https://www.mummyrose.com",
+          name: branding.name || "Mummy Rose",
+          description: seo.description,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: `${seo.site_url || "https://www.mummyrose.com"}/products?q={search_term_string}`,
+            },
+            "query-input": "required name=search_term_string",
+          },
+        }}
+      />
+
 
       <HomeHero home={home} />
 
