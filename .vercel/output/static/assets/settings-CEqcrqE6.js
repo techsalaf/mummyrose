@@ -1,1 +1,0 @@
-function e(e){return e?.shipping??{}}function t(e){return e?.whatsapp??{}}function n(e){return e?.seo??{}}export{e as n,t as r,n as t};
