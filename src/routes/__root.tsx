@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/lib/cart";
+import { CurrencyProvider } from "@/lib/currency";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteChrome } from "@/components/site-chrome";
@@ -157,23 +158,24 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <SiteChrome />
-        {isAdmin ? (
-
-          <Outlet />
-        ) : (
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex-1">
-              <Outlet />
-            </main>
-            <SiteFooter />
-            <SupportAssistant />
-          </div>
-        )}
-        <Toaster position="top-center" />
-      </CartProvider>
+      <CurrencyProvider>
+        <CartProvider>
+          <SiteChrome />
+          {isAdmin ? (
+            <Outlet />
+          ) : (
+            <div className="flex min-h-screen flex-col">
+              <SiteHeader />
+              <main className="flex-1">
+                <Outlet />
+              </main>
+              <SiteFooter />
+              <SupportAssistant />
+            </div>
+          )}
+          <Toaster position="top-center" />
+        </CartProvider>
+      </CurrencyProvider>
     </QueryClientProvider>
   );
 }

@@ -11,7 +11,8 @@ import { RecentlyViewed } from "@/components/recently-viewed";
 import { JsonLd } from "@/components/json-ld";
 import { OrderPathsNote, WhatsAppOrderButton } from "@/components/whatsapp-order-button";
 import { productQuery, productsQuery, productReviewsQuery } from "@/lib/queries";
-import { effectivePrice, formatNaira } from "@/lib/format";
+import { effectivePrice } from "@/lib/format";
+import { useCurrency } from "@/lib/currency";
 import { productImage } from "@/lib/catalog-images";
 import { useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
@@ -78,6 +79,7 @@ function ProductDetail() {
   const { data: products } = useSuspenseQuery(productsQuery);
   const { data: reviews = [] } = useQuery(productReviewsQuery(product?.id ?? ""));
   const { addItem, toggleWishlist, isWishlisted, pushRecentlyViewed } = useCart();
+  const { formatPrice } = useCurrency();
   const [qty, setQty] = useState(1);
   const [variant, setVariant] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
@@ -208,11 +210,11 @@ function ProductDetail() {
 
           <div className="mt-4 flex items-baseline gap-3">
             <span className="font-display text-3xl font-bold text-foreground">
-              {formatNaira(price)}
+              {formatPrice(price)}
             </span>
             {hasDiscount && (
               <span className="text-base text-muted-foreground line-through">
-                {formatNaira(product.price)}
+                {formatPrice(product.price)}
               </span>
             )}
           </div>
@@ -294,7 +296,7 @@ function ProductDetail() {
               ) : soldOut ? (
                 "Sold Out"
               ) : (
-                `Add to Cart — ${formatNaira(price * qty)}`
+                `Add to Cart — ${formatPrice(price * qty)}`
               )}
             </Button>
 

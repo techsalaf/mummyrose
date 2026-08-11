@@ -4,13 +4,15 @@ import { Heart, Plus, Leaf, ShoppingBag, Eye, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { effectivePrice, formatNaira } from "@/lib/format";
+import { useCurrency } from "@/lib/currency";
+import { effectivePrice } from "@/lib/format";
 import { productImage } from "@/lib/catalog-images";
 import { cn } from "@/lib/utils";
 import type { ProductRow } from "@/lib/queries";
 
 export function ProductCard({ product, priority = false }: { product: ProductRow; priority?: boolean }) {
   const { addItem, toggleWishlist, isWishlisted } = useCart();
+  const { formatPrice } = useCurrency();
   const price = effectivePrice(product);
   const hasDiscount = price < Number(product.price);
   const image = productImage(product);
@@ -152,11 +154,11 @@ export function ProductCard({ product, priority = false }: { product: ProductRow
           <div>
             <div className="flex items-baseline gap-1.5">
               <span className="font-display text-xl font-bold text-foreground">
-                {formatNaira(price)}
+                {formatPrice(price)}
               </span>
               {hasDiscount ? (
                 <span className="text-xs text-muted-foreground line-through">
-                  {formatNaira(product.price)}
+                  {formatPrice(product.price)}
                 </span>
               ) : null}
             </div>

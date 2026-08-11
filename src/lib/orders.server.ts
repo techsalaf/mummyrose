@@ -181,7 +181,7 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
     await redeemCoupon(couponCode);
   }
 
-  return {
+  const createdOrder = {
     id: order.id,
     order_number: order.order_number,
     subtotal: Number(order.subtotal),
@@ -198,6 +198,17 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
       unit_price: l.unit_price,
     })),
   };
+
+  const fullAddress = `${input.address_line}, ${input.city}, ${input.state}, ${input.country}`;
+  import("./email.server")
+    .then(({ sendOrderNotificationEmails }) => {
+      sendOrderNotificationEmails(createdOrder, input.customer_email, input.customer_name, fullAddress).catch(
+        console.error,
+      );
+    })
+    .catch(() => {});
+
+  return createdOrder;
 }
 
 

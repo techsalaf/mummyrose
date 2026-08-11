@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchCommand } from "@/components/search-command";
+import { CurrencySwitcher } from "@/lib/currency";
 import { useCart } from "@/lib/cart";
 import { useSiteConfig } from "@/lib/site-config";
 
@@ -168,6 +169,7 @@ export function SiteHeader() {
 
         {/* Action icons */}
         <div className="flex items-center gap-1 sm:gap-2">
+          <CurrencySwitcher />
           <SearchCommand />
           
           <Button variant="ghost" size="icon" asChild aria-label="Wishlist" className="hover:text-primary">

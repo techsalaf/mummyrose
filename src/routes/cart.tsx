@@ -3,7 +3,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OrderPathsNote, WhatsAppOrderButton } from "@/components/whatsapp-order-button";
 import { useCart } from "@/lib/cart";
-import { formatNaira } from "@/lib/format";
+import { useCurrency } from "@/lib/currency";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const { items, subtotal, updateQuantity, removeItem } = useCart();
+  const { formatPrice } = useCurrency();
   const shipping = items.length === 0 ? 0 : subtotal >= 50000 ? 0 : 2500;
 
   return (
@@ -56,7 +57,7 @@ function CartPage() {
                       </Link>
                       {item.variant && <p className="text-xs text-muted-foreground">{item.variant}</p>}
                     </div>
-                    <p className="font-display">{formatNaira(item.unit_price * item.quantity)}</p>
+                    <p className="font-display">{formatPrice(item.unit_price * item.quantity)}</p>
                   </div>
                   <div className="mt-auto flex items-center gap-3 pt-3">
                     <div className="flex items-center rounded-md border border-input">
@@ -93,15 +94,15 @@ function CartPage() {
             <dl className="mt-5 space-y-3 text-sm">
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Subtotal</dt>
-                <dd>{formatNaira(subtotal)}</dd>
+                <dd>{formatPrice(subtotal)}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Shipping</dt>
-                <dd>{shipping === 0 ? "Free" : formatNaira(shipping)}</dd>
+                <dd>{shipping === 0 ? "Free" : formatPrice(shipping)}</dd>
               </div>
               <div className="flex justify-between border-t border-border pt-3 font-display text-lg">
                 <dt>Total</dt>
-                <dd>{formatNaira(subtotal + shipping)}</dd>
+                <dd>{formatPrice(subtotal + shipping)}</dd>
               </div>
             </dl>
             <Button asChild variant="clay" size="lg" className="mt-6 w-full">

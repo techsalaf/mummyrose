@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
-import { ChefHat, Clock, Timer, UtensilsCrossed } from "lucide-react";
+import { ChefHat, Clock, Timer, UtensilsCrossed, ShoppingBag, Check } from "lucide-react";
+import { toast } from "sonner";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JsonLd } from "@/components/json-ld";
@@ -10,9 +11,10 @@ import { RelatedProducts } from "@/components/content/related-products";
 import { RelatedContent } from "@/components/content/related-content";
 import { useCanonicalOverride } from "@/components/canonical";
 import { Button } from "@/components/ui/button";
-import { postQuery, recipesQuery } from "@/lib/queries";
-import { categoryImage } from "@/lib/catalog-images";
-import { formatDate } from "@/lib/format";
+import { postQuery, recipesQuery, relatedProductsQuery } from "@/lib/queries";
+import { categoryImage, productImage } from "@/lib/catalog-images";
+import { formatDate, effectivePrice } from "@/lib/format";
+import { useCart } from "@/lib/cart";
 import { absoluteUrl, formatMinutes, isoDuration, relatedContent, totalMinutes } from "@/lib/content";
 import { useSiteConfig } from "@/lib/site-config";
 
@@ -90,8 +92,25 @@ function RecipeDetail() {
   const { slug } = Route.useParams();
   const { data: post } = useSuspenseQuery(postQuery(slug));
   const { data: allRecipes = [] } = useQuery(recipesQuery);
+  const { data: recipeProducts = [] } = useQuery(relatedProductsQuery(post?.related_product_ids));
+  const { addItem } = useCart();
   const { seo } = useSiteConfig();
   useCanonicalOverride(post?.canonical_url);
+
+  const handleAddRecipeProducts = () => {
+    if (recipeProducts.length === 0) return;
+    for (const prod of recipeProducts) {
+      addItem({
+        product_id: prod.id,
+        slug: prod.slug,
+        name: prod.name,
+        image: productImage(prod),
+        unit_price: effectivePrice(prod),
+        variant: prod.weight_options?.[0] ?? null,
+      });
+    }
+    toast.success(`Added ${recipeProducts.length} Mummy Rose ingredients to your cart!`);
+  };
 
   if (!post) return null;
 
@@ -205,10 +224,21 @@ function RecipeDetail() {
         <div id="recipe" className="mt-16 scroll-mt-28 rounded-sm bg-linen p-6 md:p-10">
           <p className="eyebrow text-accent">The recipe</p>
           <h2 className="mt-2 font-display text-2xl md:text-3xl">{post.title}</h2>
-          <div className="mt-8 grid gap-10 md:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+          <div className="mt-8 grid gap-10 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
             {ingredients.length > 0 && (
               <div>
-                <h3 className="font-display text-lg">Ingredients</h3>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <h3 className="font-display text-lg">Ingredients</h3>
+                  {recipeProducts.length > 0 && (
+                    <Button
+                      size="xs"
+                      onClick={handleAddRecipeProducts}
+                      className="gap-1 font-semibold text-[11px] h-7 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90"
+                    >
+                      <ShoppingBag className="size-3" /> Add All to Cart
+                    </Button>
+                  )}
+                </div>
                 <ul className="mt-4 space-y-2.5 text-sm">
                   {ingredients.map((item, index) => (
                     <li key={index} className="flex gap-3 border-b border-border/60 pb-2.5">
@@ -217,6 +247,23 @@ function RecipeDetail() {
                     </li>
                   ))}
                 </ul>
+                {recipeProducts.length > 0 && (
+                  <div className="mt-6 rounded-lg border border-primary/20 bg-primary/5 p-3.5">
+                    <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">
+                      Mummy Rose Pantry Match
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      {recipeProducts.length} essential product{recipeProducts.length !== 1 ? "s" : ""} used in this recipe available in our store.
+                    </p>
+                    <Button
+                      size="sm"
+                      onClick={handleAddRecipeProducts}
+                      className="w-full gap-2 font-semibold shadow-xs"
+                    >
+                      <ShoppingBag className="size-4" /> Add All Recipe Products to Cart
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
             {instructions.length > 0 && (
