@@ -231,7 +231,7 @@ function RecipeDetail() {
                   <h3 className="font-display text-lg">Ingredients</h3>
                   {recipeProducts.length > 0 && (
                     <Button
-                      size="xs"
+                      size="sm"
                       onClick={handleAddRecipeProducts}
                       className="gap-1 font-semibold text-[11px] h-7 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90"
                     >
