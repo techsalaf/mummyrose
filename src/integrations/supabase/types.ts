@@ -514,6 +514,7 @@ export type Database = {
           shipping_fee: number
           state: string | null
           status: Database["public"]["Enums"]["order_status"]
+          stock_restored: boolean
           subtotal: number
           total: number
           updated_at: string
@@ -543,6 +544,7 @@ export type Database = {
           shipping_fee?: number
           state?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_restored?: boolean
           subtotal?: number
           total?: number
           updated_at?: string
@@ -572,6 +574,7 @@ export type Database = {
           shipping_fee?: number
           state?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_restored?: boolean
           subtotal?: number
           total?: number
           updated_at?: string

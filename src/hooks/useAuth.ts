@@ -17,7 +17,8 @@ export function useAuth() {
         return;
       }
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
-      if (active) setIsStaff((data ?? []).some((r) => r.role === "admin" || r.role === "staff"));
+      if (active)
+        setIsStaff((data ?? []).some((r) => r.role === "admin" || r.role === "staff" || r.role === "manager"));
     };
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {

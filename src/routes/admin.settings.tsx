@@ -14,7 +14,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { adminSettingsQuery } from "@/lib/admin-queries";
 import { upsertRow } from "@/lib/admin-mutations";
-import { DEFAULT_SHIPPING } from "@/lib/shipping";
+import { DEFAULT_SHIPPING, type ShippingZone } from "@/lib/shipping";
+import { DeliveryZonesEditor } from "@/components/admin/delivery-zones-editor";
+import { PaystackConfigCard } from "@/components/admin/paystack-config";
 import {
   DEFAULT_BRANDING,
   DEFAULT_THEME,
@@ -56,7 +58,7 @@ function AdminSettings() {
   const [home, setHome] = useState<Group>({});
   const [footer, setFooter] = useState<Group>({});
   const [pagesSeo, setPagesSeo] = useState<Record<string, Partial<PageSeo>>>({});
-  const [zonesText, setZonesText] = useState("");
+  const [zones, setZones] = useState<ShippingZone[]>([]);
 
 
   useEffect(() => {
@@ -71,7 +73,7 @@ function AdminSettings() {
     setHome({ ...DEFAULT_HOME, ...(data.home ?? {}) });
     setFooter({ ...DEFAULT_FOOTER, ...(data.footer ?? {}) });
     setPagesSeo((data.pages_seo ?? {}) as Record<string, Partial<PageSeo>>);
-    setZonesText(JSON.stringify((data.shipping?.zones ?? []) as unknown[], null, 2));
+    setZones((data.shipping?.zones ?? []) as ShippingZone[]);
 
   }, [data]);
 
@@ -348,14 +350,7 @@ function AdminSettings() {
           <Panel
             title="Delivery &amp; shipping"
             description="Zone fees are applied automatically at checkout based on the delivery state."
-            onSave={() => {
-              try {
-                const zones = zonesText.trim() ? JSON.parse(zonesText) : [];
-                save.mutate({ key: "shipping", value: { ...shipping, zones } });
-              } catch {
-                toast.error("Delivery zones must be valid JSON.");
-              }
-            }}
+            onSave={() => save.mutate({ key: "shipping", value: { ...shipping, zones } })}
             pending={save.isPending}
           >
             <Text
@@ -376,18 +371,7 @@ function AdminSettings() {
               onChange={(v) => setShipping({ ...shipping, international_fee: Number(v) })}
               type="number"
             />
-            <div className="sm:col-span-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Delivery zones (JSON)</Label>
-              <Textarea
-                className="mt-1.5 font-mono text-xs"
-                rows={12}
-                value={zonesText}
-                onChange={(e) => setZonesText(e.target.value)}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                Format: {`[{ "name": "Lagos", "fee": 2000, "states": ["Lagos"] }]`}
-              </p>
-            </div>
+            <DeliveryZonesEditor value={zones} onChange={setZones} />
           </Panel>
         </TabsContent>
 
@@ -398,11 +382,7 @@ function AdminSettings() {
             onSave={() => save.mutate({ key: "payments", value: payments })}
             pending={save.isPending}
           >
-            <Toggle
-              label="Paystack"
-              value={payments.paystack_enabled}
-              onChange={(v) => setPayments({ ...payments, paystack_enabled: v })}
-            />
+            <PaystackConfigCard />
             <Toggle
               label="Flutterwave"
               value={payments.flutterwave_enabled}

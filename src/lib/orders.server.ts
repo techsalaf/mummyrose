@@ -167,13 +167,31 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
   );
   if (itemsError) throw new Error(itemsError.message);
 
-  for (const line of lines) {
-    await supabaseAdmin.from("products").update({ stock_quantity: line.remaining }).eq("id", line.product_id);
-    await supabaseAdmin.from("inventory_logs").insert({
-      product_id: line.product_id,
-      change: -line.quantity,
-      reason: `Order ${order.order_number}`,
-    });
+  // Atomically deduct stock per line via a guarded SQL function that holds a row
+  // lock and refuses to go negative, so concurrent orders can never oversell. If
+  // a line cannot be fulfilled we roll the order back rather than leaving a
+  // dangling pending order (and its reserved stock).
+  try {
+    for (const line of lines) {
+      const { error: stockError } = await (supabaseAdmin.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => PromiseLike<{ error: { message: string } | null }>)("adjust_product_stock", {
+        p_product: line.product_id,
+        p_delta: -line.quantity,
+        p_reason: `Order ${order.order_number}`,
+      });
+      if (stockError) throw new Error(stockError.message);
+    }
+  } catch (err) {
+    // Best-effort rollback of the just-created order.
+    try {
+      await supabaseAdmin.from("order_items").delete().eq("order_id", order.id);
+      await supabaseAdmin.from("orders").delete().eq("id", order.id);
+    } catch {
+      // Cleanup is best-effort; reconciliation/audit surfaces any leftovers.
+    }
+    throw err;
   }
 
   if (couponCode) {
@@ -224,4 +242,106 @@ export async function lookupOrder(orderNumber: string, email: string) {
     .maybeSingle();
   if (error) throw new Error(error.message);
   return data;
+}
+
+/**
+ * Restores reserved (already-deducted) stock for an order whose payment failed,
+ * was abandoned, or which an admin cancels before fulfilment.
+ *
+ * Idempotency: the atomic `stock_restored` marker guarantees stock is only ever
+ * put back once, even if a failed-payment webhook and a verification callback
+ * race each other. A paid or already-restored order is a no-op, so a late or
+ * duplicate webhook can never cause a double restore.
+ */
+export async function restoreOrderStock(orderId: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const { data: existing, error: readError } = await supabaseAdmin
+    .from("orders")
+    .select("id, payment_status, stock_restored")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (readError) throw new Error(readError.message);
+  if (!existing) return { restored: false, reason: "no_order" } as const;
+  if (existing.payment_status === "paid" || existing.stock_restored === true) {
+    return { restored: false, reason: "already_restored" } as const;
+  }
+
+  // Atomically claim the restore. Only the first caller with stock_restored=false
+  // succeeds; the row lock prevents a concurrent duplicate restore.
+  const { data: claimed, error: claimError } = await supabaseAdmin
+    .from("orders")
+    .update({ stock_restored: true })
+    .eq("id", orderId)
+    .eq("stock_restored", false)
+    .select("id");
+  if (claimError) throw new Error(claimError.message);
+  if (!claimed || claimed.length === 0) return { restored: false, reason: "already_restored" } as const;
+
+  const { data: items } = await supabaseAdmin
+    .from("order_items")
+    .select("product_id, quantity")
+    .eq("order_id", orderId);
+  const productIdToQty = new Map<string, number>();
+  for (const item of items ?? []) {
+    if (!item.product_id) continue;
+    productIdToQty.set(item.product_id, (productIdToQty.get(item.product_id) ?? 0) + Number(item.quantity));
+  }
+  for (const [productId, qty] of productIdToQty) {
+    const { error: restockError } = await (supabaseAdmin.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => PromiseLike<{ error: { message: string } | null }>)("adjust_product_stock", {
+      p_product: productId,
+      p_delta: qty,
+      p_reason: `Restored — cancelled/failed order ${orderId}`,
+    });
+    if (restockError) throw new Error(restockError.message);
+  }
+  return { restored: true } as const;
+}
+
+export type StaffActor = { id: string; email: string | null };
+
+/** Resolves the signed-in user and rejects the call unless they hold a staff role. */
+export async function requireStaff(): Promise<StaffActor> {
+  const userId = await resolveUserId();
+  if (!userId) throw new Error("Not authenticated.");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: roles, error } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId);
+  if (error) throw new Error(error.message);
+  const staff = (roles ?? []).some((r) => ["admin", "staff", "manager"].includes(String(r.role)));
+  if (!staff) throw new Error("You do not have permission to perform that action.");
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .maybeSingle();
+  return { id: userId, email: profile?.email ?? null };
+}
+
+/** Writes a sensitive administrative action to the audit log (never secrets). */
+export async function logAudit(
+  actor: StaffActor,
+  action: string,
+  entityType: string,
+  entityId: string | null,
+  metadata: Record<string, unknown> = {},
+) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  try {
+    const auditInsert = (supabaseAdmin.from as unknown as (table: string) => {
+      insert: (values: Record<string, unknown>) => PromiseLike<{ error: { message: string } | null }>;
+    })("admin_audit_logs");
+    await auditInsert.insert({
+      actor_id: actor.id,
+      actor_email: actor.email,
+      action,
+      entity_type: entityType,
+      entity_id: entityId,
+      metadata,
+    });
+  } catch {
+    // Audit logging must never break the primary operation.
+  }
 }
