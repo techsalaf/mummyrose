@@ -243,10 +243,16 @@ export async function markPaid(reference: string, provider: string, payload: Rec
 
   const { data: order } = await supabaseAdmin
     .from("orders")
-    .select("id,order_number,total,status,payment_status")
+    .select("id,order_number,total,status,payment_status,coupon_code")
     .eq("id", orderId)
     .maybeSingle();
   if (!order) return { ok: false as const, reason: "no_order" };
+
+  // Idempotency: a repeated/duplicate webhook for an already-paid order must not
+  // re-confirm, re-bill the coupon, or create any side effects.
+  if (order.payment_status === "paid") {
+    return { ok: true as const, order: { order_number: order.order_number, total: order.total, status: order.status, payment_status: order.payment_status } };
+  }
 
   const data = (payload?.data ?? {}) as { amount?: number; currency?: string };
   if (data.amount != null) {
@@ -279,6 +285,15 @@ export async function markPaid(reference: string, provider: string, payload: Rec
     .select("order_number,total,status,payment_status")
     .eq("id", orderId)
     .maybeSingle();
+
+  // Coupons are only billed once the order is actually paid, never at order
+  // creation — so a failed/abandoned payment does not burn the code's usage limit.
+  if (order.coupon_code) {
+    await import("./coupons.server")
+      .then(({ redeemCoupon }) => redeemCoupon(order.coupon_code as string))
+      .catch(() => {});
+  }
+
   return { ok: true as const, order: confirmed };
 }
 
@@ -295,6 +310,54 @@ export async function markFailed(reference: string) {
   // Free the stock that was reserved at order creation — idempotent, so a
   // duplicate/late webhook can never double-restore.
   await import("./orders.server").then(({ restoreOrderStock }) => restoreOrderStock(tx.order_id as string)).catch(() => {});
+}
+
+/**
+ * Refunds a paid Paystack order via the Paystack API and flags it `refunded`.
+ * Admin-gated. Does not auto-restock (the goods may already be in transit).
+ * Idempotent: an already-refunded order is a no-op.
+ */
+export async function refundPaystackOrder(orderId: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: order } = await supabaseAdmin
+    .from("orders")
+    .select("id,order_number,payment_status,payment_provider,payment_reference,total")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order) throw new Error("Order not found.");
+  if (order.payment_status === "refunded") return { ok: true as const, reason: "already_refunded" as const };
+  if (order.payment_provider !== "paystack" || !order.payment_reference) {
+    throw new Error("This order is not a Paystack card payment and cannot be auto-refunded.");
+  }
+
+  const secret = await resolvePaystackSecret();
+  if (!secret) throw new Error("Paystack is not configured.");
+  const reference = order.payment_reference as string;
+
+  // Resolve the numeric Paystack transaction id from the reference.
+  const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
+    headers: { Authorization: `Bearer ${secret}` },
+  });
+  const verifyJson = (await verifyRes.json()) as { data?: { id?: number }; message?: string };
+  const transactionId = verifyJson.data?.id;
+  if (!transactionId) throw new Error(verifyJson.message || "Could not resolve the Paystack transaction.");
+
+  const refundRes = await fetch(`https://api.paystack.co/transaction/${transactionId}/refund`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ transaction: transactionId }),
+  });
+  const refundJson = (await refundRes.json()) as { status?: boolean; message?: string; data?: { status?: string } };
+  if (!refundRes.ok || !refundJson.status) {
+    throw new Error(refundJson.message || "Paystack could not process the refund.");
+  }
+
+  await supabaseAdmin
+    .from("orders")
+    .update({ payment_status: "refunded", payment_reference: reference })
+    .eq("id", orderId);
+  await supabaseAdmin.from("payment_transactions").update({ status: "refunded" }).eq("order_id", orderId);
+  return { ok: true as const, reason: "refunded" as const };
 }
 
 export async function verifyPaystack(reference: string) {

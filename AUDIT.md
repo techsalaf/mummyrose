@@ -85,6 +85,17 @@ Vercel. Payment providers: Paystack + Flutterwave (server-initiated redirect).
    a people picker + role radio groups, plus "last admin" lockout protection.
 6. **Audit logging** — new `admin_audit_logs` table + `logAudit()` helper wired
    to payment-config changes and admin cancellations.
+7. **Coupon integrity** — coupons are now billed on *successful payment* (with
+   idempotency) instead of at order creation, so failed/abandoned checkouts no
+   longer burn usage limits.
+8. **Stale unpaid sweep + refunds** — `sweepStaleOrders` releases reserved stock
+   for 24h+ unpaid card orders; `refundOrder` refunds paid Paystack orders via
+   the gateway, both admin-triggered from **Payments & reconciliation**.
+9. **Fine-grained RBAC** — new `permissions` + `role_permissions` tables (seeded
+   per role), a `has_permission()` DB check, `requirePermission()` (admin
+   bypass + pre-migration fallback) enforced on refund/payment-config/order
+   functions, and a **role-builder UI** (grouped, readable permission
+   checkboxes) on the Team & Roles page.
 
 ## Prioritized Roadmap
 
@@ -92,10 +103,12 @@ Vercel. Payment providers: Paystack + Flutterwave (server-initiated redirect).
 |---|---|
 | P0 | ✅ Inventory restore + atomic stock; ✅ server-side staff gate; ✅ amount reconcile |
 | P1 | ✅ Human-centered Team & Roles UI (search, picker, last-admin guard) |
-| P1 | Fine-grained **permissions** (per-action rights + role builder) [phase 2] |
-| P1 | Admin payment reconciliation + refund workflow for Paystack |
-| P1 | Order cancellation/fulfilment UI wired to restock; auto-expire unpaid orders |
-| P1 | Coupon billed on payment (not creation) with restore-on-failure |
+| P1 | ✅ Coupon billed on successful payment (idempotent), not at creation |
+| P1 | ✅ Admin order updates via `adminUpdateOrder` (restock on cancel/fail; admin+audit to mark paid/refunded) |
+| P1 | ✅ Payments & reconciliation page (ledger, filters, re-verify) |
+| P1 | ✅ Stale unpaid card orders sweep (release stock) + Paystack refund workflow |
+| P1 | ✅ Fine-grained **permissions**: catalog, role→permission mapping, `has_permission`, role-builder UI, enforcement on server functions |
+| P1 | Auto-expire stale unpaid orders (scheduled sweep) + refund workflow UI |
 | P1 | Address-book prefill in checkout already present — wire delivery to saved address |
 | P2 | Dashboard/reporting (sales, AOV, top products, low-stock) |
 | P2 | Customer notifications (email already partly wired via Resend) + order timeline |

@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   Tag,
   Ticket,
+  CreditCard,
   Users,
   GalleryHorizontal,
   ShieldCheck,
@@ -49,6 +50,7 @@ export const adminNavGroups: { group: string; items: Item[] }[] = [
     group: "Commerce",
     items: [
       { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
+      { to: "/admin/payments", label: "Payments & reconciliation", icon: CreditCard },
       { to: "/admin/products", label: "Products", icon: Package },
       { to: "/admin/variants", label: "Variants", icon: Tag },
       { to: "/admin/categories", label: "Categories", icon: Folder },

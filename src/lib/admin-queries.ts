@@ -37,6 +37,19 @@ export const adminOrdersQuery = queryOptions({
   },
 });
 
+export const adminPaymentsQuery = queryOptions({
+  queryKey: ["admin", "payments"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("payment_transactions")
+      .select("*, orders(order_number,customer_name,customer_email,total)")
+      .order("created_at", { ascending: false })
+      .limit(300);
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
 export const adminPostsQuery = queryOptions({
   queryKey: ["admin", "posts"],
   queryFn: async () => {

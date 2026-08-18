@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Pencil, Plus, Search, Trash2, UserCheck } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Loader2, Pencil, Plus, Search, ShieldCheck, Trash2, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { AdminHeader } from "@/components/admin/resource-manager";
@@ -37,6 +38,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { adminCustomersQuery, adminRolesQuery } from "@/lib/admin-queries";
 import { deleteRow, saveRow, upsertRow } from "@/lib/admin-mutations";
+import { PERMISSION_GROUPS } from "@/lib/permissions";
+import { getRolePermissions, updateRolePermissions } from "@/lib/permissions.functions";
 
 export const Route = createFileRoute("/admin/roles")({
   component: AdminRoles,
@@ -144,6 +147,46 @@ function AdminRoles() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
+  const fetchRolePerms = useServerFn(getRolePermissions);
+  const saveRolePerms = useServerFn(updateRolePermissions);
+
+  const rolePerms = useQuery({
+    queryKey: ["role-permissions"],
+    queryFn: async () => {
+      const out: Record<string, string[]> = {};
+      for (const key of ROLE_KEYS) {
+        out[key] = await fetchRolePerms({ data: { role: key as "admin" | "manager" | "staff" | "customer" } });
+      }
+      return out;
+    },
+  });
+
+  const [permRole, setPermRole] = useState<string | null>(null);
+  const [permSet, setPermSet] = useState<string[]>([]);
+
+  const openPermissions = (role: string) => {
+    setPermRole(role);
+    setPermSet(rolePerms.data?.[role] ?? []);
+  };
+
+  const savePerms = useMutation({
+    mutationFn: async () => {
+      if (!permRole) throw new Error("Choose a role first.");
+      return saveRolePerms({
+        data: { role: permRole as "admin" | "manager" | "staff" | "customer", permission_ids: permSet },
+      });
+    },
+    onSuccess: async () => {
+      toast.success("Role permissions saved");
+      setPermRole(null);
+      await queryClient.invalidateQueries({ queryKey: ["role-permissions"] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const togglePerm = (id: string) =>
+    setPermSet((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
 if (isLoading) return <Loader2 className="size-4 animate-spin text-muted-foreground" />;
 
   return (
@@ -234,6 +277,36 @@ if (isLoading) return <Loader2 className="size-4 animate-spin text-muted-foregro
             )}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="rounded-md border bg-card p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-lg font-semibold">Roles & permissions</h2>
+            <p className="text-sm text-muted-foreground">Tune exactly what each role can do in the console.</p>
+          </div>
+          <ShieldCheck className="size-5 text-muted-foreground" />
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {ROLE_KEYS.map((key) => {
+            const meta = ROLE_INFO[key];
+            const count = rolePerms.data?.[key]?.length;
+            return (
+              <div key={key} className="flex items-center justify-between rounded-md border px-3 py-2.5">
+                <div>
+                  <p className="text-sm font-medium">{meta.label}</p>
+                  <p className="text-xs text-muted-foreground">{meta.desc}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {key === "admin" ? "All permissions" : count == null ? "Loading…" : `${count} permissions`}
+                  </p>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => openPermissions(key)} disabled={key === "admin"}>
+                  Edit
+                </Button>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <Dialog open={grantOpen} onOpenChange={setGrantOpen}>
@@ -360,6 +433,46 @@ if (isLoading) return <Loader2 className="size-4 animate-spin text-muted-foregro
               disabled={!editing || saveRole.isPending}
             >
               {saveRole.isPending ? <Loader2 className="size-4 animate-spin" /> : null} Save role
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(permRole)} onOpenChange={(next) => !next && setPermRole(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Permissions — {permRole ? ROLE_INFO[permRole]?.label ?? permRole : ""}</DialogTitle>
+            <DialogDescription>Tick the permissions this role can use in the console.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {PERMISSION_GROUPS.map((group) => (
+              <div key={group.group}>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{group.group}</p>
+                <div className="space-y-2">
+                  {group.permissions.map((perm) => (
+                    <label key={perm.id} className="flex items-start gap-2 rounded-md border px-3 py-2">
+                      <input
+                        type="checkbox"
+                        checked={permSet.includes(perm.id)}
+                        onChange={() => togglePerm(perm.id)}
+                        className="mt-0.5"
+                      />
+                      <span>
+                        <span className="block text-sm font-medium">{perm.label}</span>
+                        <span className="block text-xs text-muted-foreground">{perm.description}</span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPermRole(null)}>
+              Cancel
+            </Button>
+            <Button onClick={() => savePerms.mutate()} disabled={savePerms.isPending}>
+              {savePerms.isPending ? <Loader2 className="size-4 animate-spin" /> : null} Save permissions
             </Button>
           </DialogFooter>
         </DialogContent>

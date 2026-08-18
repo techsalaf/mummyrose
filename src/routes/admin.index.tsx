@@ -11,7 +11,9 @@ import {
   adminAnalyticsQuery,
   adminInquiriesQuery,
   adminOrdersQuery,
+  adminPaymentsQuery,
   adminProductsQuery,
+  adminReviewsQuery,
   useAdminRealtime,
 } from "@/lib/admin-queries";
 
@@ -28,6 +30,7 @@ type OrderRow = {
   payment_status: string;
   order_type?: string | null;
   created_at: string;
+  order_items?: { product_id: string | null; product_name: string; quantity: number }[];
 };
 
 function AdminDashboard() {
@@ -35,6 +38,8 @@ function AdminDashboard() {
   const products = useQuery(adminProductsQuery);
   const analytics = useQuery(adminAnalyticsQuery);
   const inquiries = useQuery(adminInquiriesQuery);
+  const payments = useQuery(adminPaymentsQuery);
+  const reviews = useQuery(adminReviewsQuery);
   useAdminRealtime(
     ["orders", "products", "inquiries", "analytics_events"],
     [["admin", "orders"], ["admin", "products"], ["admin", "inquiries"], ["admin", "analytics"]],
@@ -64,6 +69,22 @@ function AdminDashboard() {
   const openInquiries = ((inquiries.data ?? []) as unknown as { status: string }[]).filter(
     (i) => i.status === "new",
   ).length;
+
+  const failedPayments = (payments.data ?? []).filter((p) => (p as { status: string }).status === "failed").length;
+  const reviewsToModerate = (reviews.data ?? []).filter((r) => (r as { is_approved: boolean }).is_approved === false)
+    .length;
+
+  // Top products by units sold (counts every paid order line).
+  const units = new Map<string, { name: string; qty: number }>();
+  for (const order of paidOrders) {
+    for (const item of order.order_items ?? []) {
+      const key = item.product_name || item.product_id || "Unknown";
+      const cur = units.get(key) ?? { name: key, qty: 0 };
+      cur.qty += Number(item.quantity ?? 0);
+      units.set(key, cur);
+    }
+  }
+  const topProducts = [...units.values()].sort((a, b) => b.qty - a.qty).slice(0, 5);
 
   const last14 = buildDailySeries(orderRows);
 
@@ -125,6 +146,8 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <Row label="Pending orders" value={pending} to="/admin/orders" />
+            <Row label="Failed payments" value={failedPayments} to="/admin/payments" />
+            <Row label="Reviews to moderate" value={reviewsToModerate} to="/admin/reviews" />
             <Row label="Low / out of stock" value={lowStock.length} to="/admin/inventory" />
             <Row label="New inquiries" value={openInquiries} to="/admin/inquiries" />
             <Row label="Inactive products" value={productRows.filter((p) => !p.is_active).length} to="/admin/products" />
@@ -132,7 +155,7 @@ function AdminDashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Latest orders</CardTitle>
@@ -155,6 +178,21 @@ function AdminDashboard() {
               </div>
             ))}
             {orderRows.length === 0 ? <p className="text-sm text-muted-foreground">No orders yet.</p> : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Top products (units sold)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {topProducts.map((product) => (
+              <div key={product.name} className="flex items-center justify-between gap-3 border-b pb-2 last:border-0">
+                <p className="truncate text-sm">{product.name}</p>
+                <Badge variant="secondary">{product.qty} sold</Badge>
+              </div>
+            ))}
+            {topProducts.length === 0 ? <p className="text-sm text-muted-foreground">No sales yet.</p> : null}
           </CardContent>
         </Card>
 
@@ -225,7 +263,13 @@ function Stat({
   );
 }
 
-type AdminPath = "/admin/orders" | "/admin/inventory" | "/admin/inquiries" | "/admin/products";
+type AdminPath =
+  | "/admin/orders"
+  | "/admin/inventory"
+  | "/admin/inquiries"
+  | "/admin/products"
+  | "/admin/payments"
+  | "/admin/reviews";
 
 function Row({ label, value, to }: { label: string; value: number; to: AdminPath }) {
   return (

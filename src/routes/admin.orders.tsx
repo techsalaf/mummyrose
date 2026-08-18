@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
 
 import { AdminHeader } from "@/components/admin/resource-manager";
+import { adminUpdateOrder } from "@/lib/orders.functions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,6 +86,19 @@ function AdminOrders() {
   const update = useMutation({
     mutationFn: async ({ id, values }: { id: string; values: Record<string, unknown> }) =>
       await saveRow("orders", values, id),
+    onSuccess: async () => {
+      toast.success("Order updated");
+      await queryClient.invalidateQueries({ queryKey: adminOrdersQuery.queryKey });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const changeOrderRaw = useServerFn(adminUpdateOrder);
+  // Status/payment changes go through the server so integrity rules are enforced
+  // (stock restored on cancel/fail, admin + audit required to mark paid/refunded).
+  const changeOrder = useMutation({
+    mutationFn: (vars: { id: string; status?: string; payment_status?: string }) =>
+      changeOrderRaw({ data: vars }),
     onSuccess: async () => {
       toast.success("Order updated");
       await queryClient.invalidateQueries({ queryKey: adminOrdersQuery.queryKey });
@@ -249,7 +264,7 @@ function AdminOrders() {
                   <p className="mb-1.5 text-xs uppercase tracking-wide text-muted-foreground">Fulfilment status</p>
                   <Select
                     value={current.status}
-                    onValueChange={(status) => update.mutate({ id: current.id, values: { status } })}
+                    onValueChange={(status) => changeOrder.mutate({ id: current.id, status })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -267,7 +282,7 @@ function AdminOrders() {
                   <p className="mb-1.5 text-xs uppercase tracking-wide text-muted-foreground">Payment status</p>
                   <Select
                     value={current.payment_status}
-                    onValueChange={(payment_status) => update.mutate({ id: current.id, values: { payment_status } })}
+                    onValueChange={(payment_status) => changeOrder.mutate({ id: current.id, payment_status })}
                   >
                     <SelectTrigger>
                       <SelectValue />

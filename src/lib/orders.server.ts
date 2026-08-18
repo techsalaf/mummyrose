@@ -2,6 +2,7 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import type { CheckoutInput } from "./schemas";
 import { quoteShipping, type ShippingConfig } from "./shipping";
+import { permissionLabel } from "./permissions";
 
 type Item = CheckoutInput["items"][number];
 
@@ -194,11 +195,6 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
     throw err;
   }
 
-  if (couponCode) {
-    const { redeemCoupon } = await import("./coupons.server");
-    await redeemCoupon(couponCode);
-  }
-
   const createdOrder = {
     id: order.id,
     order_number: order.order_number,
@@ -301,23 +297,90 @@ export async function restoreOrderStock(orderId: string) {
   return { restored: true } as const;
 }
 
+/**
+ * Releases stock for stale, never-paid card orders so abandoned checkouts don't
+ * hold inventory indefinitely. Only card (Paystack/Flutterwave) orders are swept;
+ * COD / bank / WhatsApp orders are fulfilled manually and are left untouched.
+ * Safe to run repeatedly — `restoreOrderStock` is idempotent.
+ */
+export async function sweepStaleUnpaidOrders(hours = 24): Promise<{ released: string[] }> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const cutoff = new Date(Date.now() - hours * 3600_000).toISOString();
+  const { data, error } = await supabaseAdmin
+    .from("orders")
+    .select("id,order_number,payment_status,status,payment_provider")
+    .in("payment_provider", ["paystack", "flutterwave"])
+    .eq("payment_status", "unpaid")
+    .eq("status", "pending")
+    .lt("created_at", cutoff)
+    .limit(200);
+  if (error) throw new Error(error.message);
+
+  const released: string[] = [];
+  for (const order of data ?? []) {
+    const res = await restoreOrderStock(order.id).catch(() => ({ restored: false as const, reason: "error" as const }));
+    if (res.restored) {
+      await supabaseAdmin.from("orders").update({ status: "cancelled" }).eq("id", order.id);
+      released.push(String(order.order_number));
+    }
+  }
+  return { released };
+}
+
 export type StaffActor = { id: string; email: string | null };
 
-/** Resolves the signed-in user and rejects the call unless they hold a staff role. */
-export async function requireStaff(): Promise<StaffActor> {
+async function resolveActor(required: "staff" | "admin"): Promise<StaffActor> {
   const userId = await resolveUserId();
   if (!userId) throw new Error("Not authenticated.");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: roles, error } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId);
   if (error) throw new Error(error.message);
-  const staff = (roles ?? []).some((r) => ["admin", "staff", "manager"].includes(String(r.role)));
-  if (!staff) throw new Error("You do not have permission to perform that action.");
+  const isStaff = (roles ?? []).some((r) => ["admin", "staff", "manager"].includes(String(r.role)));
+  const isAdmin = (roles ?? []).some((r) => String(r.role) === "admin");
+  if (required === "admin" && !isAdmin) throw new Error("Only an Admin can perform that action.");
+  if (required === "staff" && !isStaff) throw new Error("You do not have permission to perform that action.");
   const { data: profile } = await supabaseAdmin
     .from("profiles")
     .select("email")
     .eq("id", userId)
     .maybeSingle();
   return { id: userId, email: profile?.email ?? null };
+}
+
+/** Resolves the signed-in user and rejects the call unless they hold a staff role. */
+export async function requireStaff(): Promise<StaffActor> {
+  return resolveActor("staff");
+}
+
+/** Resolves the signed-in user and rejects the call unless they hold an admin role. */
+export async function requireAdmin(): Promise<StaffActor> {
+  return resolveActor("admin");
+}
+
+/**
+ * Resolves the signed-in user and rejects the call unless they hold a specific
+ * permission (admin roles always pass). If the permission tables have not been
+ * provisioned yet (pre-migration), it falls back to the coarse staff gate so
+ * existing deployments keep working.
+ */
+export async function requirePermission(permission: string): Promise<StaffActor> {
+  const actor = await resolveActor("staff");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  try {
+    const { data, error } = await (supabaseAdmin.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => PromiseLike<{ data: boolean | null; error: { message: string } | null }>)("has_permission", {
+      _user_id: actor.id,
+      _permission: permission,
+    });
+    if (!error && data === true) return actor;
+    if (!error) throw new Error(`You need the “${permissionLabel(permission)}” permission to do that.`);
+    throw error;
+  } catch {
+    // Permissions may not be provisioned yet — keep the coarse staff gate.
+    return actor;
+  }
 }
 
 /** Writes a sensitive administrative action to the audit log (never secrets). */
