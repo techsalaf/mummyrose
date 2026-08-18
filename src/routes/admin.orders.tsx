@@ -18,6 +18,7 @@ import { adminOrdersQuery, useAdminRealtime } from "@/lib/admin-queries";
 import { saveRow } from "@/lib/admin-mutations";
 import { formatDateTime, formatNaira } from "@/lib/format";
 import { buildWhatsAppMessage, whatsAppLink } from "@/lib/whatsapp";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/orders")({
   component: AdminOrders,
@@ -58,6 +59,19 @@ type Order = {
 
 const STATUSES = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
 const PAYMENT_STATUSES = ["unpaid", "paid", "refunded", "failed"];
+
+function auditActionLabel(action: string): string {
+  const labels: Record<string, string> = {
+    order_status_change: "Status changed",
+    order_cancelled_restock: "Cancelled — stock released",
+    order_refunded: "Refunded",
+    stale_orders_sweep: "Released by stale-order sweep",
+    payment_config_update: "Payment settings updated",
+    smtp_config_update: "Email settings updated",
+    role_permissions_update: "Role permissions updated",
+  };
+  return labels[action] ?? action.replace(/_/g, " ");
+}
 
 function AdminOrders() {
   const queryClient = useQueryClient();
@@ -107,6 +121,48 @@ function AdminOrders() {
   });
 
   const current = active ? (orders.find((o) => o.id === active.id) ?? active) : null;
+
+  const audit = useQuery({
+    queryKey: ["admin", "audit", current?.id],
+    queryFn: async () => {
+      const { data: auditData, error } = await (supabase.from as unknown as (t: string) => {
+        select: (cols: string) => {
+          eq: (c: string, v: unknown) => {
+            eq: (c2: string, v2: unknown) => {
+              order: (col: string, opts?: { ascending?: boolean }) => {
+                limit: (n: number) => PromiseLike<{
+                  data: { action: string; actor_email: string | null; created_at: string }[] | null;
+                  error: { message: string } | null;
+                }>;
+              };
+            };
+          };
+        };
+      })("admin_audit_logs")
+        .select("action,actor_email,created_at")
+        .eq("entity_type", "orders")
+        .eq("entity_id", current?.id ?? "")
+        .order("created_at", { ascending: false })
+        .limit(30);
+      if (error) throw new Error(error.message);
+      return auditData ?? [];
+    },
+    enabled: Boolean(current),
+  });
+
+  const orderPayments = useQuery({
+    queryKey: ["admin", "order-payments", current?.id],
+    queryFn: async () => {
+      const { data: txData, error } = await supabase
+        .from("payment_transactions")
+        .select("provider,status,reference,amount,created_at")
+        .eq("order_id", current?.id ?? "")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return txData ?? [];
+    },
+    enabled: Boolean(current),
+  });
 
   return (
     <div className="space-y-6">
@@ -257,6 +313,38 @@ function AdminOrders() {
                     {current.payment_reference ? ` · ${current.payment_reference}` : ""}
                   </p>
                 </div>
+              </div>
+
+              <div className="rounded-md border p-3">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Timeline</p>
+                <ol className="mt-3 space-y-3 text-sm">
+                  <li className="flex items-start justify-between gap-3">
+                    <span>Order placed</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{formatDateTime(current.created_at)}</span>
+                  </li>
+                  {(orderPayments.data ?? []).map((tx, i) => (
+                    <li key={i} className="flex items-start justify-between gap-3">
+                      <span>
+                        Payment via {tx.provider}{" "}
+                        <Badge variant={tx.status === "success" ? "default" : tx.status === "failed" ? "destructive" : "secondary"}>
+                          {tx.status}
+                        </Badge>
+                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground">{formatDateTime(tx.created_at)}</span>
+                    </li>
+                  ))}
+                  {(audit.data ?? []).map((event, i) => (
+                    <li key={i} className="flex items-start justify-between gap-3">
+                      <span>
+                        {auditActionLabel(event.action)}
+                        {event.actor_email ? (
+                          <span className="block text-xs text-muted-foreground">{event.actor_email}</span>
+                        ) : null}
+                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground">{formatDateTime(event.created_at)}</span>
+                    </li>
+                  ))}
+                </ol>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">

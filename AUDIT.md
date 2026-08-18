@@ -96,6 +96,14 @@ Vercel. Payment providers: Paystack + Flutterwave (server-initiated redirect).
    bypass + pre-migration fallback) enforced on refund/payment-config/order
    functions, and a **role-builder UI** (grouped, readable permission
    checkboxes) on the Team & Roles page.
+10. **Admin-configured SMTP mail** — new Settings → Email panel (host/port/TLS/
+    username/password/from), password encrypted at rest (shared AES-256-GCM
+    secrets module), live "Send test email", and `sendMail()` used by order
+    receipts + admin alerts with Resend as fallback. SMTP settings are excluded
+    from public reads via RLS.
+11. **Order timeline** — the admin order dialog now shows a timeline of
+    order placement, gateway payment attempts, and every audited admin action
+    (with actor + timestamp).
 
 ## Prioritized Roadmap
 
@@ -109,9 +117,10 @@ Vercel. Payment providers: Paystack + Flutterwave (server-initiated redirect).
 | P1 | ✅ Stale unpaid card orders sweep (release stock) + Paystack refund workflow |
 | P1 | ✅ Fine-grained **permissions**: catalog, role→permission mapping, `has_permission`, role-builder UI, enforcement on server functions |
 | P1 | Auto-expire stale unpaid orders (scheduled sweep) + refund workflow UI |
-| P1 | Address-book prefill in checkout already present — wire delivery to saved address |
+| P1 | ✅ Address-book default selection + checkout prefill (verified present) |
+| P1 | ✅ Admin-configured **SMTP** mail with panel + test send |
 | P2 | Dashboard/reporting (sales, AOV, top products, low-stock) |
-| P2 | Customer notifications (email already partly wired via Resend) + order timeline |
+| P2 | Customer notifications (email via SMTP/Resend) + ✅ admin order timeline |
 | P3 | Search autocomplete, product reviews moderation polish, media validation |
 | P3 | `.env` hardened + remove publishable-key hardcoded fallbacks to Config |
 

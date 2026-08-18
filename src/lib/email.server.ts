@@ -6,8 +6,6 @@ import { formatNaira } from "./format";
  * Operates gracefully with fallback logging if RESEND_API_KEY is not configured.
  */
 export async function sendOrderNotificationEmails(order: CreatedOrder, customerEmail: string, customerName: string, address: string) {
-  const apiKey = (typeof process !== "undefined" ? process.env?.RESEND_API_KEY : undefined) || "";
-
   const customerHtml = `
 <!DOCTYPE html>
 <html>
@@ -112,30 +110,36 @@ export async function sendOrderNotificationEmails(order: CreatedOrder, customerE
 </html>
   `;
 
-  if (!apiKey) {
-    console.log(`[Email Notice] RESEND_API_KEY not configured. Order email receipt for #${order.order_number} to ${customerEmail} logged successfully.`);
-    return;
+  const { sendMail } = await import("./smtp.server");
+  const receipt = await sendMail({
+    to: customerEmail,
+    subject: `Order Confirmation #${order.order_number} — Mummy Rose`,
+    html: customerHtml,
+  });
+  if (!receipt.ok) {
+    console.log(
+      `[Email Notice] No mail provider configured. Order email receipt for #${order.order_number} to ${customerEmail} logged successfully.`,
+    );
   }
 
+  // Best-effort admin notification (uses the store's contact email from settings).
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Mummy Rose <orders@mummyrose.com>",
-        to: [customerEmail],
-        subject: `Order Confirmation #${order.order_number} — Mummy Rose`,
-        html: customerHtml,
-      }),
-    });
-    if (!res.ok) {
-      const errText = await res.text();
-      console.warn(`[Resend Error] ${res.status} — ${errText}`);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: storeSetting } = await supabaseAdmin
+      .from("site_settings")
+      .select("value")
+      .eq("key", "store")
+      .maybeSingle();
+    const storeEmail = String((storeSetting?.value as { email?: string } | null)?.email ?? "").trim();
+    if (storeEmail) {
+      await sendMail({
+        to: storeEmail,
+        subject: `New order ${order.order_number} — ${formatNaira(order.total)}`,
+        html: `<p>New order <strong>#${order.order_number}</strong> for ${formatNaira(order.total)} from ${customerName}.<br/>Payment: ${order.payment_provider}. Manage it in the <a href="https://www.mummyrose.com/admin/orders">admin console</a>.</p>`,
+        text: `New order #${order.order_number} for ${formatNaira(order.total)} from ${customerName}. Payment: ${order.payment_provider}.`,
+      });
     }
-  } catch (err) {
-    console.error("[Resend Network Exception]", err);
+  } catch {
+    // Admin notification is best-effort; never block order creation on it.
   }
 }

@@ -17,6 +17,7 @@ import { upsertRow } from "@/lib/admin-mutations";
 import { DEFAULT_SHIPPING, type ShippingZone } from "@/lib/shipping";
 import { DeliveryZonesEditor } from "@/components/admin/delivery-zones-editor";
 import { PaystackConfigCard } from "@/components/admin/paystack-config";
+import { SmtpConfigCard } from "@/components/admin/smtp-config";
 import {
   DEFAULT_BRANDING,
   DEFAULT_THEME,
@@ -107,6 +108,7 @@ function AdminSettings() {
           <TabsTrigger value="store">Store</TabsTrigger>
           <TabsTrigger value="shipping">Delivery</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="seo">SEO &amp; meta</TabsTrigger>
         </TabsList>
@@ -410,6 +412,10 @@ function AdminSettings() {
               onChange={(v) => setPayments({ ...payments, account_number: v })}
             />
           </Panel>
+        </TabsContent>
+
+        <TabsContent value="email">
+          <SmtpConfigCard />
         </TabsContent>
 
         <TabsContent value="whatsapp">
