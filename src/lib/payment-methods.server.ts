@@ -27,10 +27,19 @@ async function readPaymentsSetting(): Promise<Record<string, unknown>> {
 export async function readPaymentMethodFlags(): Promise<PaymentMethodFlags> {
   const value = await readPaymentsSetting();
   const on = (key: string) => value[key] !== false;
+
+  // A gateway is only offered at checkout when the admin has actually configured
+  // its credential. This prevents a dead-end "Paystack is not configured" error
+  // for a store that hasn't added its key yet.
+  const paystackCfg = (value.paystack ?? {}) as { enabled?: boolean; secret_cipher?: string | null };
+  const paystackConfigured =
+    Boolean(paystackCfg.secret_cipher) || Boolean(typeof process !== "undefined" && process.env?.PAYSTACK_SECRET_KEY);
+  const flutterwaveConfigured = Boolean(typeof process !== "undefined" && process.env?.FLUTTERWAVE_SECRET_KEY);
+
   return {
-    paystack_enabled: on("paystack_enabled"),
-    flutterwave_enabled: on("flutterwave_enabled"),
-    bank_transfer_enabled: on("bank_transfer_enabled"),
+    paystack_enabled: on("paystack_enabled") && paystackCfg.enabled !== false && paystackConfigured,
+    flutterwave_enabled: on("flutterwave_enabled") && flutterwaveConfigured,
+    bank_transfer_enabled: on("bank_transfer_enabled") && Boolean(String(value.account_number ?? "").trim()),
     pay_on_delivery_enabled: on("pay_on_delivery_enabled"),
   };
 }

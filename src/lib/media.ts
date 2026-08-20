@@ -2,6 +2,17 @@ import { supabase } from "@/integrations/supabase/client";
 
 const BUCKET = "media";
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+const MAX_FILE_BYTES = 8 * 1024 * 1024;
+const MAX_IMAGE_DIMENSION = 6000;
+
+/** Safe image types we will accept. SVG is intentionally excluded (stored-XSS risk). */
+const ALLOWED_TYPES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif",
+};
 
 function safeName(name: string) {
   return name
@@ -11,10 +22,47 @@ function safeName(name: string) {
     .slice(-80);
 }
 
-/** Uploads a file to the media bucket and returns a long-lived signed URL. */
+/** Validates a client-provided file before upload. Throws on anything unsafe. */
+function validateMediaFile(file: File): { ext: string } {
+  if (!file || !file.size) throw new Error("Choose a file to upload.");
+  if (file.size > MAX_FILE_BYTES) throw new Error("File is larger than 8MB.");
+  const type = (file.type ?? "").toLowerCase();
+  const ext = ALLOWED_TYPES[type];
+  // Never trust the browser's MIME alone — verify the extension matches too.
+  const lowerName = file.name.toLowerCase();
+  const matchesExt = Object.entries(ALLOWED_TYPES).some(([mime, e]) => type === mime || lowerName.endsWith(`.${e}`));
+  if (!ext || !matchesExt || !type) {
+    throw new Error("Unsupported file type. Use a JPG, PNG, WebP, GIF or AVIF image.");
+  }
+  return { ext };
+}
+
+/** Reads an image's pixel dimensions from a data URL without trusting the browser. */
+function readImageDimensions(blob: Blob): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const dims = { width: img.width, height: img.height };
+      URL.revokeObjectURL(url);
+      resolve(dims);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
+/** Uploads an image to the media bucket and returns a long-lived signed URL. */
 export async function uploadMedia(file: File, folder = "uploads"): Promise<string> {
-  if (file.size > 8 * 1024 * 1024) throw new Error("File is larger than 8MB.");
-  const path = `${folder}/${Date.now()}-${safeName(file.name)}`;
+  const { ext } = validateMediaFile(file);
+  const dims = await readImageDimensions(file);
+  if (dims && (dims.width > MAX_IMAGE_DIMENSION || dims.height > MAX_IMAGE_DIMENSION)) {
+    throw new Error(`Image is too large (${dims.width}×${dims.height}). Keep it under ${MAX_IMAGE_DIMENSION}px.`);
+  }
+  const path = `${folder}/${Date.now()}-${safeName(file.name.replace(/\.[^.]+$/, ""))}.${ext}`;
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
     cacheControl: "31536000",
     upsert: false,

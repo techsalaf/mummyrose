@@ -104,6 +104,13 @@ Vercel. Payment providers: Paystack + Flutterwave (server-initiated redirect).
 11. **Order timeline** — the admin order dialog now shows a timeline of
     order placement, gateway payment attempts, and every audited admin action
     (with actor + timestamp).
+12. **Media upload hardening** — safe content-type allow-list (JPG/PNG/WebP/GIF/
+    AVIF; **SVG excluded** for stored-XSS), extension/MIME cross-check, and a
+    max image-dimension guard before storage.
+13. **Checkout only offers configured gateways** — `readPaymentMethodFlags`
+    now surfaces Paystack/Flutterwave/bank-transfer only when a real credential
+    is present (secret key configured / env fallback), so a store that hasn't
+    added keys never hits a dead-end "gateway not configured" error.
 
 ## Prioritized Roadmap
 
