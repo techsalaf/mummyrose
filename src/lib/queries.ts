@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const PRODUCT_FIELDS =
-  "id,slug,name,short_description,description,image_url,gallery,price,discount_price,sku,stock_quantity,ingredients,nutrition,weight_options,tags,is_featured,category_id,seo_title,seo_description,categories(id,name,slug)";
+  "id,slug,name,short_description,description,image_url,gallery,price,discount_price,sku,stock_quantity,ingredients,nutrition,weight_options,tags,is_featured,category_id,seo_title,seo_description,categories(id,name,slug),product_variants(id,label,sku,price,discount_price,stock_quantity,is_active,sort_order)";
 
 export const categoriesQuery = queryOptions({
   queryKey: ["categories"],

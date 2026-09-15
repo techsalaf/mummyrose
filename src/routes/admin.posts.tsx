@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 
 import { ResourceManager } from "@/components/admin/resource-manager";
 import { Badge } from "@/components/ui/badge";
-import { adminPostsQuery } from "@/lib/admin-queries";
+import { adminPostsQuery, adminProductsQuery } from "@/lib/admin-queries";
 import { formatDate, slugify } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/posts")({
@@ -10,6 +11,11 @@ export const Route = createFileRoute("/admin/posts")({
 });
 
 function AdminPosts() {
+  const products = useQuery(adminProductsQuery);
+  const productOptions = ((products.data ?? []) as unknown as { id: string; name: string; sku?: string }[]).map((p) => ({
+    value: p.id,
+    label: p.sku ? `${p.name} (${p.sku})` : p.name,
+  }));
   return (
     <ResourceManager
       title="Journal &amp; recipes"
@@ -73,10 +79,12 @@ function AdminPosts() {
         { name: "serving_suggestions", label: "Serving suggestions", type: "textarea", full: true },
         {
           name: "related_product_ids",
-          label: "Related product IDs",
-          type: "tags",
+          label: "Shop this recipe (spices)",
+          type: "multiselect",
+          options: productOptions,
+          placeholder: "Pick a spice product...",
           full: true,
-          help: "Paste product IDs to show a Shop this recipe block.",
+          help: "Select the spices used in this recipe. Customers can add them to cart directly from the recipe page.",
         },
         { name: "seo_title", label: "SEO title", type: "text" },
         { name: "seo_keywords", label: "SEO keywords", type: "text" },

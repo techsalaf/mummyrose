@@ -517,6 +517,9 @@ export type Database = {
           stock_restored: boolean
           subtotal: number
           total: number
+          courier_name: string | null
+          tracking_number: string | null
+          dispatched_at: string | null
           updated_at: string
           user_id: string | null
           wholesale_account_id: string | null
@@ -547,6 +550,9 @@ export type Database = {
           stock_restored?: boolean
           subtotal?: number
           total?: number
+          courier_name?: string | null
+          tracking_number?: string | null
+          dispatched_at?: string | null
           updated_at?: string
           user_id?: string | null
           wholesale_account_id?: string | null
@@ -577,6 +583,9 @@ export type Database = {
           stock_restored?: boolean
           subtotal?: number
           total?: number
+          courier_name?: string | null
+          tracking_number?: string | null
+          dispatched_at?: string | null
           updated_at?: string
           user_id?: string | null
           wholesale_account_id?: string | null

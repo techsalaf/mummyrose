@@ -20,6 +20,7 @@ import { buildWhatsAppMessage, whatsAppLink } from "@/lib/whatsapp";
 import { track } from "@/lib/analytics";
 import { useAuth } from "@/hooks/useAuth";
 import { SavedAddressPicker, type AddressRow } from "@/components/address-book";
+import { useSiteConfig } from "@/lib/site-config";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -39,6 +40,7 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const submit = useServerFn(placeOrder);
   const { user } = useAuth();
+  const siteConfig = useSiteConfig();
   const { data: settings } = useQuery(settingsQuery);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [provider, setProvider] = useState<PaymentProvider>("paystack");
@@ -157,7 +159,12 @@ function CheckoutPage() {
     payment_provider: chosen,
     origin: typeof window === "undefined" ? null : window.location.origin,
     coupon_code: coupon?.code ?? null,
-    items: items.map((i) => ({ product_id: i.product_id, variant: i.variant, quantity: i.quantity })),
+    items: items.map((i) => ({
+      product_id: i.product_id,
+      variant_id: i.variant_id ?? null,
+      variant: i.variant,
+      quantity: i.quantity,
+    })),
   });
 
   const runSubmit = (form: HTMLFormElement, chosen: PaymentProvider) => {
@@ -293,11 +300,31 @@ function CheckoutPage() {
               </label>
             ))}
             {provider === "bank_transfer" && (
-              <div className="rounded-md border border-border bg-muted/40 p-3 text-xs">
-                <p className="font-medium">Bank transfer</p>
-                <p className="mt-1 text-muted-foreground">
-                  We'll show the account details on the confirmation page and in your email — use your order
-                  number as the transfer reference.
+              <div className="rounded-md border border-accent/40 bg-accent/5 p-4 text-xs space-y-2.5">
+                <p className="font-semibold text-accent uppercase tracking-wider text-[11px]">
+                  Official Bank Transfer Details
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-sm bg-card p-3 rounded-md border border-border">
+                  <div>
+                    <span className="text-[11px] text-muted-foreground block">Bank:</span>
+                    <strong className="text-foreground">{siteConfig.bank_account?.bank_name || "Providus Bank"}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-muted-foreground block">Account Number:</span>
+                    <strong className="text-foreground text-sm tracking-wider font-mono">
+                      {siteConfig.bank_account?.account_number || "Contact Store"}
+                    </strong>
+                  </div>
+                  <div className="col-span-2 pt-1 border-t border-border/60">
+                    <span className="text-[11px] text-muted-foreground block">Account Name:</span>
+                    <strong className="text-foreground">
+                      {siteConfig.bank_account?.account_name || "Mummy Rose Foods Ltd"}
+                    </strong>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  {siteConfig.bank_account?.instructions ||
+                    "Please use your Order Number as your payment reference so we can verify and dispatch immediately."}
                 </p>
               </div>
             )}

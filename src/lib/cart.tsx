@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 
 export type CartItem = {
   product_id: string;
+  variant_id?: string | null;
   slug: string;
   name: string;
   image: string;
@@ -21,8 +22,8 @@ type CartContextValue = {
   wishlist: string[];
   recentlyViewed: string[];
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  updateQuantity: (product_id: string, variant: string | null, quantity: number) => void;
-  removeItem: (product_id: string, variant: string | null) => void;
+  updateQuantity: (product_id: string, variant: string | null, quantity: number, variant_id?: string | null) => void;
+  removeItem: (product_id: string, variant: string | null, variant_id?: string | null) => void;
   clear: () => void;
   toggleWishlist: (slug: string) => void;
   isWishlisted: (slug: string) => boolean;
@@ -66,7 +67,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback((item: Omit<CartItem, "quantity">, quantity = 1) => {
     setItems((prev) => {
-      const idx = prev.findIndex((i) => i.product_id === item.product_id && i.variant === item.variant);
+      const idx = prev.findIndex(
+        (i) =>
+          i.product_id === item.product_id &&
+          (item.variant_id ? i.variant_id === item.variant_id : i.variant === item.variant),
+      );
       if (idx === -1) return [...prev, { ...item, quantity }];
       const next = [...prev];
       next[idx] = { ...next[idx], quantity: next[idx].quantity + quantity };
@@ -74,16 +79,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const updateQuantity = useCallback((product_id: string, variant: string | null, quantity: number) => {
-    setItems((prev) =>
-      quantity <= 0
-        ? prev.filter((i) => !(i.product_id === product_id && i.variant === variant))
-        : prev.map((i) => (i.product_id === product_id && i.variant === variant ? { ...i, quantity } : i)),
-    );
-  }, []);
+  const updateQuantity = useCallback(
+    (product_id: string, variant: string | null, quantity: number, variant_id?: string | null) => {
+      setItems((prev) =>
+        quantity <= 0
+          ? prev.filter(
+              (i) =>
+                !(
+                  i.product_id === product_id &&
+                  (variant_id ? i.variant_id === variant_id : i.variant === variant)
+                ),
+            )
+          : prev.map((i) =>
+              i.product_id === product_id &&
+              (variant_id ? i.variant_id === variant_id : i.variant === variant)
+                ? { ...i, quantity }
+                : i,
+            ),
+      );
+    },
+    [],
+  );
 
-  const removeItem = useCallback((product_id: string, variant: string | null) => {
-    setItems((prev) => prev.filter((i) => !(i.product_id === product_id && i.variant === variant)));
+  const removeItem = useCallback((product_id: string, variant: string | null, variant_id?: string | null) => {
+    setItems((prev) =>
+      prev.filter(
+        (i) =>
+          !(
+            i.product_id === product_id &&
+            (variant_id ? i.variant_id === variant_id : i.variant === variant)
+          ),
+      ),
+    );
   }, []);
 
   const clear = useCallback(() => setItems([]), []);

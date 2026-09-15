@@ -24,6 +24,7 @@ import {
   DEFAULT_HOME,
   DEFAULT_FOOTER,
   DEFAULT_SEO_META,
+  DEFAULT_BANK_ACCOUNT,
   type HomePromise,
   type HomeSectionId,
   type PageSeo,
@@ -58,9 +59,9 @@ function AdminSettings() {
   const [theme, setTheme] = useState<Group>({});
   const [home, setHome] = useState<Group>({});
   const [footer, setFooter] = useState<Group>({});
+  const [bankAccount, setBankAccount] = useState<Group>({});
   const [pagesSeo, setPagesSeo] = useState<Record<string, Partial<PageSeo>>>({});
   const [zones, setZones] = useState<ShippingZone[]>([]);
-
 
   useEffect(() => {
     if (!data) return;
@@ -73,9 +74,9 @@ function AdminSettings() {
     setTheme({ ...DEFAULT_THEME, ...(data.theme ?? {}) });
     setHome({ ...DEFAULT_HOME, ...(data.home ?? {}) });
     setFooter({ ...DEFAULT_FOOTER, ...(data.footer ?? {}) });
+    setBankAccount({ ...DEFAULT_BANK_ACCOUNT, ...(data.bank_account ?? {}) });
     setPagesSeo((data.pages_seo ?? {}) as Record<string, Partial<PageSeo>>);
     setZones((data.shipping?.zones ?? []) as ShippingZone[]);
-
   }, [data]);
 
 
@@ -108,6 +109,7 @@ function AdminSettings() {
           <TabsTrigger value="store">Store</TabsTrigger>
           <TabsTrigger value="shipping">Delivery</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="bank">Bank account</TabsTrigger>
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="seo">SEO &amp; meta</TabsTrigger>
@@ -498,6 +500,42 @@ function AdminSettings() {
               onChange={setPagesSeo}
               siteName={String(branding.name ?? "Mummy Rose")}
             />
+          </Panel>
+        </TabsContent>
+
+        <TabsContent value="bank">
+          <Panel
+            title="Official Bank Account (Direct Transfer)"
+            description="Customers choosing Direct Bank Transfer will see these details at checkout and on their confirmation receipt."
+            onSave={() => save.mutate({ key: "bank_account", value: bankAccount })}
+            pending={save.isPending}
+          >
+            <Text
+              label="Bank name"
+              value={bankAccount.bank_name}
+              onChange={(v) => setBankAccount({ ...bankAccount, bank_name: v })}
+            />
+            <Text
+              label="Account number"
+              value={bankAccount.account_number}
+              onChange={(v) => setBankAccount({ ...bankAccount, account_number: v })}
+            />
+            <Text
+              label="Account name"
+              value={bankAccount.account_name}
+              onChange={(v) => setBankAccount({ ...bankAccount, account_name: v })}
+            />
+            <div className="sm:col-span-2">
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                Payment instructions / Narration guidelines
+              </Label>
+              <Textarea
+                rows={3}
+                value={String(bankAccount.instructions ?? "")}
+                onChange={(e) => setBankAccount({ ...bankAccount, instructions: e.target.value })}
+                className="mt-1.5"
+              />
+            </div>
           </Panel>
         </TabsContent>
 

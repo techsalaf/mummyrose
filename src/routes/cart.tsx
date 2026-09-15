@@ -38,7 +38,7 @@ function CartPage() {
         <div className="mt-10 grid gap-10 lg:grid-cols-[1.6fr_1fr]">
           <div className="flex flex-col divide-y divide-border">
             {items.map((item) => (
-              <div key={`${item.product_id}-${item.variant}`} className="flex gap-4 py-5">
+              <div key={`${item.product_id}-${item.variant_id ?? item.variant}`} className="flex gap-4 py-5">
                 <img
                   src={item.image}
                   alt={item.name}
@@ -64,7 +64,9 @@ function CartPage() {
                       <button
                         aria-label="Decrease quantity"
                         className="px-2.5 py-1.5"
-                        onClick={() => updateQuantity(item.product_id, item.variant, item.quantity - 1)}
+                        onClick={() =>
+                          updateQuantity(item.product_id, item.variant, item.quantity - 1, item.variant_id)
+                        }
                       >
                         <Minus className="size-3.5" />
                       </button>
@@ -72,14 +74,16 @@ function CartPage() {
                       <button
                         aria-label="Increase quantity"
                         className="px-2.5 py-1.5"
-                        onClick={() => updateQuantity(item.product_id, item.variant, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(item.product_id, item.variant, item.quantity + 1, item.variant_id)
+                        }
                       >
                         <Plus className="size-3.5" />
                       </button>
                     </div>
                     <button
                       className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive"
-                      onClick={() => removeItem(item.product_id, item.variant)}
+                      onClick={() => removeItem(item.product_id, item.variant, item.variant_id)}
                     >
                       <Trash2 className="size-3.5" /> Remove
                     </button>

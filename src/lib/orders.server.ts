@@ -63,24 +63,72 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
     .in("id", ids);
   if (productError) throw new Error(productError.message);
 
+  const variantIds = [
+    ...new Set(input.items.map((i) => i.variant_id).filter((v): v is string => Boolean(v))),
+  ];
+  let variantsById = new Map<
+    string,
+    {
+      id: string;
+      product_id: string;
+      label: string;
+      price: number;
+      discount_price: number | null;
+      stock_quantity: number;
+      is_active: boolean;
+    }
+  >();
+  if (variantIds.length > 0) {
+    const { data: variants, error: variantError } = await supabaseAdmin
+      .from("product_variants")
+      .select("id,product_id,label,price,discount_price,stock_quantity,is_active")
+      .in("id", variantIds);
+    if (variantError) throw new Error(variantError.message);
+    variantsById = new Map((variants ?? []).map((v) => [v.id, v]));
+  }
+
   const byId = new Map((products ?? []).map((p) => [p.id, p]));
   const lines = input.items.map((item: Item) => {
     const product = byId.get(item.product_id);
     if (!product || !product.is_active) throw new Error("One of the products is no longer available.");
-    if (product.stock_quantity < item.quantity) {
-      throw new Error(`Only ${product.stock_quantity} units of ${product.name} are in stock.`);
+
+    const variant = item.variant_id ? variantsById.get(item.variant_id) : null;
+    if (item.variant_id && (!variant || !variant.is_active)) {
+      throw new Error("Selected product packaging option is no longer available.");
     }
-    const price = Number(product.price);
-    const discount = product.discount_price == null ? null : Number(product.discount_price);
-    const unit = discount != null && discount > 0 && discount < price ? discount : price;
+
+    if (variant) {
+      if (variant.stock_quantity < item.quantity) {
+        throw new Error(`Only ${variant.stock_quantity} units of ${product.name} (${variant.label}) are in stock.`);
+      }
+    } else {
+      if (product.stock_quantity < item.quantity) {
+        throw new Error(`Only ${product.stock_quantity} units of ${product.name} are in stock.`);
+      }
+    }
+
+    let unit: number;
+    if (variant) {
+      const vPrice = Number(variant.price);
+      const vDiscount = variant.discount_price == null ? null : Number(variant.discount_price);
+      unit = vDiscount != null && vDiscount > 0 && vDiscount < vPrice ? vDiscount : vPrice;
+    } else {
+      const price = Number(product.price);
+      const discount = product.discount_price == null ? null : Number(product.discount_price);
+      unit = discount != null && discount > 0 && discount < price ? discount : price;
+    }
+
+    const variantLabel = variant ? variant.label : (item.variant ?? null);
+
     return {
       product_id: product.id,
+      variant_id: variant?.id ?? null,
       product_name: product.name,
-      variant: item.variant ?? null,
+      variant: variantLabel,
       unit_price: unit,
       quantity: item.quantity,
       line_total: Number((unit * item.quantity).toFixed(2)),
-      remaining: product.stock_quantity - item.quantity,
+      remaining: (variant ? variant.stock_quantity : product.stock_quantity) - item.quantity,
     };
   });
 
@@ -183,6 +231,16 @@ export async function createOrder(input: CheckoutInput, userId: string | null): 
         p_reason: `Order ${order.order_number}`,
       });
       if (stockError) throw new Error(stockError.message);
+
+      if (line.variant_id) {
+        const v = variantsById.get(line.variant_id);
+        if (v) {
+          await supabaseAdmin
+            .from("product_variants")
+            .update({ stock_quantity: Math.max(0, v.stock_quantity - line.quantity) })
+            .eq("id", line.variant_id);
+        }
+      }
     }
   } catch (err) {
     // Best-effort rollback of the just-created order.
@@ -231,7 +289,7 @@ export async function lookupOrder(orderNumber: string, email: string) {
   const { data, error } = await supabaseAdmin
     .from("orders")
     .select(
-      "order_number,customer_name,customer_email,status,payment_status,payment_provider,subtotal,shipping_fee,total,created_at,address_line,city,state,country,order_items(product_name,variant,quantity,unit_price,line_total)",
+      "order_number,customer_name,customer_email,status,payment_status,payment_provider,subtotal,shipping_fee,total,created_at,address_line,city,state,country,courier_name,tracking_number,dispatched_at,order_items(product_name,variant,quantity,unit_price,line_total)",
     )
     .eq("order_number", orderNumber)
     .ilike("customer_email", email)
@@ -276,12 +334,27 @@ export async function restoreOrderStock(orderId: string) {
 
   const { data: items } = await supabaseAdmin
     .from("order_items")
-    .select("product_id, quantity")
+    .select("product_id, variant, quantity")
     .eq("order_id", orderId);
   const productIdToQty = new Map<string, number>();
   for (const item of items ?? []) {
     if (!item.product_id) continue;
     productIdToQty.set(item.product_id, (productIdToQty.get(item.product_id) ?? 0) + Number(item.quantity));
+
+    if (item.variant) {
+      const { data: v } = await supabaseAdmin
+        .from("product_variants")
+        .select("id, stock_quantity")
+        .eq("product_id", item.product_id)
+        .eq("label", item.variant)
+        .maybeSingle();
+      if (v) {
+        await supabaseAdmin
+          .from("product_variants")
+          .update({ stock_quantity: v.stock_quantity + Number(item.quantity) })
+          .eq("id", v.id);
+      }
+    }
   }
   for (const [productId, qty] of productIdToQty) {
     const { error: restockError } = await (supabaseAdmin.rpc as unknown as (
@@ -290,7 +363,7 @@ export async function restoreOrderStock(orderId: string) {
     ) => PromiseLike<{ error: { message: string } | null }>)("adjust_product_stock", {
       p_product: productId,
       p_delta: qty,
-      p_reason: `Restored — cancelled/failed order ${orderId}`,
+      p_reason: `Restored: cancelled/failed order ${orderId}`,
     });
     if (restockError) throw new Error(restockError.message);
   }

@@ -135,11 +135,16 @@ export function ResourceManager({
     setEditing(row);
     const next: FormValues = {};
     for (const field of fields) {
-      next[field.name] = row
-        ? field.type === "switch"
-          ? Boolean(row[field.name])
-          : toInput(row[field.name], field.type)
-        : (defaults[field.name] ?? (field.type === "switch" ? false : ""));
+      if (field.type === "switch") {
+        next[field.name] = row ? Boolean(row[field.name]) : Boolean(defaults[field.name]);
+      } else if (field.type === "multiselect") {
+        const rawVal = row ? row[field.name] : defaults[field.name];
+        next[field.name] = Array.isArray(rawVal) ? rawVal : [];
+      } else {
+        next[field.name] = row
+          ? toInput(row[field.name], field.type)
+          : (defaults[field.name] ?? "");
+      }
     }
     setValues(next);
     setOpen(true);
@@ -201,7 +206,7 @@ export function ResourceManager({
                 <TableRow key={row.id}>
                   {columns.map((column) => (
                     <TableCell key={column.key} className={column.className}>
-                      {column.render ? column.render(row) : String(row[column.key] ?? "—")}
+                      {column.render ? column.render(row) : String(row[column.key] ?? "-")}
                     </TableCell>
                   ))}
                   <TableCell className="text-right">

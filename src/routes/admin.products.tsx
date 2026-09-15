@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Upload } from "lucide-react";
+import { Boxes, Upload } from "lucide-react";
 
 import { ResourceManager } from "@/components/admin/resource-manager";
 import { ProductImportDialog } from "@/components/admin/product-import-dialog";
+import { ProductVariantsDialog, type VariantProductInfo } from "@/components/admin/product-variants-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { adminCategoriesQuery, adminProductsQuery } from "@/lib/admin-queries";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/admin/products")({
 
 function AdminProducts() {
   const [importOpen, setImportOpen] = useState(false);
+  const [variantProduct, setVariantProduct] = useState<VariantProductInfo | null>(null);
   const categories = useQuery(adminCategoriesQuery);
   const options = ((categories.data ?? []) as unknown as { id: string; name: string }[]).map((c) => ({
     value: c.id,
@@ -52,7 +54,7 @@ function AdminProducts() {
 
       <ResourceManager
         title="Products"
-        description="Full catalogue control — pricing, offers, stock, media, nutrition and SEO."
+        description="Full catalogue control: pricing, packaging variants, stock, media, nutrition and SEO."
         table="products"
         singular="Product"
         query={adminProductsQuery}
@@ -127,6 +129,29 @@ function AdminProducts() {
             },
           },
           {
+            key: "variants",
+            label: "Pack sizes",
+            render: (row) => (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 text-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setVariantProduct({
+                    id: row.id,
+                    name: String(row.name),
+                    sku: row.sku ? String(row.sku) : null,
+                    price: Number(row.price ?? 0),
+                  });
+                }}
+              >
+                <Boxes className="size-3.5 text-primary" />
+                Sizes / Variants
+              </Button>
+            ),
+          },
+          {
             key: "is_active",
             label: "Status",
             render: (row) => (
@@ -134,6 +159,12 @@ function AdminProducts() {
             ),
           },
         ]}
+      />
+
+      <ProductVariantsDialog
+        product={variantProduct}
+        open={Boolean(variantProduct)}
+        onClose={() => setVariantProduct(null)}
       />
     </>
   );

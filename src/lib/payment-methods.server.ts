@@ -24,8 +24,19 @@ async function readPaymentsSetting(): Promise<Record<string, unknown>> {
   return (data?.value ?? {}) as Record<string, unknown>;
 }
 
+async function readBankAccountSetting(): Promise<Record<string, unknown>> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("site_settings")
+    .select("value")
+    .eq("key", "bank_account")
+    .maybeSingle();
+  return (data?.value ?? {}) as Record<string, unknown>;
+}
+
 export async function readPaymentMethodFlags(): Promise<PaymentMethodFlags> {
   const value = await readPaymentsSetting();
+  const bankAccount = await readBankAccountSetting();
   const on = (key: string) => value[key] !== false;
 
   // A gateway is only offered at checkout when the admin has actually configured
@@ -35,11 +46,12 @@ export async function readPaymentMethodFlags(): Promise<PaymentMethodFlags> {
   const paystackConfigured =
     Boolean(paystackCfg.secret_cipher) || Boolean(typeof process !== "undefined" && process.env?.PAYSTACK_SECRET_KEY);
   const flutterwaveConfigured = Boolean(typeof process !== "undefined" && process.env?.FLUTTERWAVE_SECRET_KEY);
+  const bankAccountNumber = String(bankAccount.account_number ?? value.account_number ?? "").trim();
 
   return {
     paystack_enabled: on("paystack_enabled") && paystackCfg.enabled !== false && paystackConfigured,
     flutterwave_enabled: on("flutterwave_enabled") && flutterwaveConfigured,
-    bank_transfer_enabled: on("bank_transfer_enabled") && Boolean(String(value.account_number ?? "").trim()),
+    bank_transfer_enabled: on("bank_transfer_enabled") && Boolean(bankAccountNumber),
     pay_on_delivery_enabled: on("pay_on_delivery_enabled"),
   };
 }
@@ -53,12 +65,13 @@ export async function readBankDetailsForOrder(orderNumber: string): Promise<Bank
     .maybeSingle();
   if (!order) return null;
 
+  const bankAccount = await readBankAccountSetting();
   const value = await readPaymentsSetting();
-  const number = String(value.account_number ?? "");
+  const number = String(bankAccount.account_number ?? value.account_number ?? "").trim();
   if (!number) return null;
   return {
-    bank_name: String(value.bank_name ?? ""),
-    account_name: String(value.account_name ?? ""),
+    bank_name: String(bankAccount.bank_name ?? value.bank_name ?? "Providus Bank"),
+    account_name: String(bankAccount.account_name ?? value.account_name ?? "Mummy Rose Foods Ltd"),
     account_number: number,
   };
 }

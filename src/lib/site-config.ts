@@ -117,12 +117,20 @@ export type FooterConfig = {
   newsletter_body: string;
 };
 
+export type BankAccountConfig = {
+  bank_name: string;
+  account_name: string;
+  account_number: string;
+  instructions: string;
+};
+
 export type SiteConfig = {
   branding: BrandingConfig;
   theme: ThemeConfig;
   seo: SeoMetaConfig;
   home: HomeConfig;
   footer: FooterConfig;
+  bank_account: BankAccountConfig;
 };
 
 export const DEFAULT_BRANDING: BrandingConfig = {
@@ -186,7 +194,7 @@ export const DEFAULT_HOME: HomeConfig = {
   ],
 
   promises: [
-    { icon: "leaf", title: "100% natural", body: "No preservatives, fillers or artificial colouring — ever." },
+    { icon: "leaf", title: "100% natural", body: "No preservatives, fillers or artificial colouring - ever." },
     { icon: "package", title: "Small batch", body: "Milled and blended weekly so nothing sits on a shelf." },
     { icon: "truck", title: "Nationwide delivery", body: "Fast dispatch across Nigeria, export worldwide." },
     { icon: "shield", title: "Traceable sourcing", body: "Direct farm partnerships across Nigeria's food belt." },
@@ -234,12 +242,21 @@ export const DEFAULT_FOOTER: FooterConfig = {
   newsletter_body: "Recipes, restocks and quiet offers. No noise.",
 };
 
+export const DEFAULT_BANK_ACCOUNT: BankAccountConfig = {
+  bank_name: "Providus Bank",
+  account_name: "Mummy Rose Foods Ltd",
+  account_number: "",
+  instructions:
+    "Please use your Order Number as your payment narration. We confirm transfers swiftly.",
+};
+
 export const SITE_CONFIG_DEFAULTS: SiteConfig = {
   branding: DEFAULT_BRANDING,
   theme: DEFAULT_THEME,
   seo: DEFAULT_SEO_META,
   home: DEFAULT_HOME,
   footer: DEFAULT_FOOTER,
+  bank_account: DEFAULT_BANK_ACCOUNT,
 };
 
 function merge<T extends object>(defaults: T, saved: unknown): T {
@@ -259,6 +276,7 @@ export function buildSiteConfig(map: Record<string, Record<string, unknown>> | u
     seo: merge(DEFAULT_SEO_META, map?.seo),
     home: merge(DEFAULT_HOME, map?.home),
     footer: merge(DEFAULT_FOOTER, map?.footer),
+    bank_account: merge(DEFAULT_BANK_ACCOUNT, map?.bank_account),
   };
 }
 

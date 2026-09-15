@@ -91,13 +91,49 @@ function ProductDetail() {
 
   if (!product) return null;
 
-  const price = effectivePrice(product);
-  const hasDiscount = price < Number(product.price);
+  type VariantRow = {
+    id: string;
+    label: string;
+    sku: string | null;
+    price: number;
+    discount_price: number | null;
+    stock_quantity: number;
+    is_active: boolean;
+    sort_order?: number;
+  };
+
+  const rawVariants = useMemo(() => {
+    const list = ((product as unknown as { product_variants?: VariantRow[] })?.product_variants ?? [])
+      .filter((v) => v.is_active)
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    return list;
+  }, [product]);
+
+  const hasVariants = rawVariants.length > 0;
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+
+  const activeVariant = useMemo(() => {
+    if (!hasVariants) return null;
+    return rawVariants.find((v) => v.id === selectedVariantId) ?? rawVariants[0];
+  }, [hasVariants, rawVariants, selectedVariantId]);
+
+  const basePrice = effectivePrice(product);
+  const price = activeVariant
+    ? activeVariant.discount_price != null &&
+      Number(activeVariant.discount_price) > 0 &&
+      Number(activeVariant.discount_price) < Number(activeVariant.price)
+      ? Number(activeVariant.discount_price)
+      : Number(activeVariant.price)
+    : basePrice;
+
+  const originalPrice = activeVariant ? Number(activeVariant.price) : Number(product.price);
+  const hasDiscount = price < originalPrice;
   const cover = productImage(product);
   const images = [cover, ...(product.gallery ?? [])];
-  const soldOut = product.stock_quantity <= 0;
+  const stockQuantity = activeVariant ? activeVariant.stock_quantity : product.stock_quantity;
+  const soldOut = stockQuantity <= 0;
   const options = product.weight_options ?? [];
-  const chosen = variant ?? options[0] ?? null;
+  const chosen = activeVariant ? activeVariant.label : (variant ?? options[0] ?? null);
   const related = products
     .filter((p) => p.category_id === product.category_id && p.id !== product.id)
     .slice(0, 4);
@@ -107,6 +143,7 @@ function ProductDetail() {
     addItem(
       {
         product_id: product.id,
+        variant_id: activeVariant?.id ?? null,
         slug: product.slug,
         name: product.name,
         image: cover,
@@ -236,7 +273,38 @@ function ProductDetail() {
           </div>
 
           {/* Size Option Selector */}
-          {options.length > 0 && (
+          {hasVariants ? (
+            <div className="mt-6">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Select Package Size:
+              </label>
+              <div className="mt-2.5 flex flex-wrap gap-2.5">
+                {rawVariants.map((v) => {
+                  const isSelected = activeVariant?.id === v.id;
+                  const isOut = v.stock_quantity <= 0;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => setSelectedVariantId(v.id)}
+                      className={cn(
+                        "rounded-full border px-5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5",
+                        isSelected
+                          ? "border-primary bg-primary text-primary-foreground shadow-md"
+                          : "border-border bg-card hover:border-primary/50 text-foreground",
+                        isOut && !isSelected && "opacity-50 line-through",
+                      )}
+                    >
+                      <span>{v.label}</span>
+                      {isOut ? (
+                        <span className="text-[10px] uppercase font-normal">(Out of stock)</span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : options.length > 0 ? (
             <div className="mt-6">
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Select Package Size:
@@ -259,7 +327,7 @@ function ProductDetail() {
                 ))}
               </div>
             </div>
-          )}
+          ) : null}
 
           {/* Quantity and Actions */}
           <div className="mt-8 flex flex-wrap items-center gap-4">

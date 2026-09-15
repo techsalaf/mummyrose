@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +19,7 @@ export type FieldType =
   | "number"
   | "switch"
   | "select"
+  | "multiselect"
   | "image"
   | "tags"
   | "json"
@@ -57,6 +59,9 @@ export function serialise(fields: FieldDef[], values: FormValues): Record<string
       }
       case "switch":
         out[field.name] = Boolean(raw);
+        break;
+      case "multiselect":
+        out[field.name] = Array.isArray(raw) ? raw : [];
         break;
       case "tags":
         out[field.name] = String(raw ?? "")
@@ -163,6 +168,57 @@ export function FieldRenderer({
               ))}
             </SelectContent>
           </Select>
+        ) : field.type === "multiselect" ? (
+          (() => {
+            const selected = Array.isArray(value) ? (value as string[]) : [];
+            const remainingOptions = (field.options ?? []).filter((opt) => !selected.includes(opt.value));
+            return (
+              <div className="space-y-2">
+                <div className="flex min-h-[38px] flex-wrap items-center gap-1.5 rounded-md border bg-background p-1.5">
+                  {selected.length === 0 ? (
+                    <span className="text-xs text-muted-foreground px-1">None selected</span>
+                  ) : (
+                    selected.map((val) => {
+                      const opt = field.options?.find((o) => o.value === val);
+                      return (
+                        <Badge key={val} variant="secondary" className="gap-1 text-xs py-0.5">
+                          <span>{opt?.label ?? val}</span>
+                          <button
+                            type="button"
+                            className="rounded-full hover:bg-muted p-0.5"
+                            onClick={() => onChange(selected.filter((item) => item !== val))}
+                          >
+                            <X className="size-3 text-muted-foreground hover:text-foreground" />
+                          </button>
+                        </Badge>
+                      );
+                    })
+                  )}
+                </div>
+                {remainingOptions.length > 0 ? (
+                  <Select
+                    value=""
+                    onValueChange={(chosen) => {
+                      if (chosen && !selected.includes(chosen)) {
+                        onChange([...selected, chosen]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger id={id} className="h-9">
+                      <SelectValue placeholder={field.placeholder ?? "Add spice/product..."} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {remainingOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : null}
+              </div>
+            );
+          })()
         ) : field.type === "image" ? (
           <ImagePicker value={text} onChange={onChange} />
         ) : field.type === "textarea" || field.type === "json" ? (

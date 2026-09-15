@@ -44,13 +44,30 @@ function OrderConfirmed() {
         )}
       </p>
       {bank && (
-        <div className="mx-auto mt-6 max-w-md rounded-lg border border-border bg-muted/40 p-4 text-sm">
-          <p className="font-medium">Bank transfer details</p>
-          <p className="mt-1">
-            {bank.bank_name} · {bank.account_name} · {bank.account_number}
+        <div className="mx-auto mt-6 max-w-md text-left rounded-xl border border-accent/40 bg-accent/5 p-5 shadow-xs">
+          <p className="font-semibold text-accent uppercase tracking-wider text-xs">
+            Direct Bank Transfer Details
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Use <span className="text-foreground">{order}</span> as your transfer reference.
+          <div className="mt-3 space-y-2 rounded-lg bg-card p-4 border border-border text-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted-foreground">Bank Name</span>
+              <strong className="text-foreground">{bank.bank_name}</strong>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted-foreground">Account Number</span>
+              <strong className="font-mono text-base tracking-wider text-foreground">{bank.account_number}</strong>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted-foreground">Account Name</span>
+              <strong className="text-foreground">{bank.account_name}</strong>
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-border">
+              <span className="text-xs text-muted-foreground">Payment Narration</span>
+              <strong className="text-accent font-mono">{order}</strong>
+            </div>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+            Please transfer the order total to this account using your Order Number as the narration. We will verify and dispatch your spices immediately.
           </p>
         </div>
       )}

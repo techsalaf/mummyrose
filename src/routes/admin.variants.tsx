@@ -56,7 +56,7 @@ function AdminVariants() {
           label: "Product",
           render: (row) => {
             const product = row.products as { name?: string } | null;
-            return product?.name ?? "—";
+            return product?.name ?? "-";
           },
         },
         { key: "label", label: "Size" },

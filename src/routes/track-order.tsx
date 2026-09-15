@@ -83,6 +83,65 @@ function TrackOrderPage() {
             </div>
           </div>
 
+          <div className="mt-6 border-t border-border pt-6">
+            <div className="grid grid-cols-5 gap-2 text-center text-xs">
+              {[
+                { key: "pending", label: "Order Placed" },
+                { key: "confirmed", label: "Confirmed" },
+                { key: "processing", label: "Processing" },
+                { key: "shipped", label: "Shipped" },
+                { key: "delivered", label: "Delivered" },
+              ].map((step, idx) => {
+                const stepOrder = ["pending", "confirmed", "processing", "shipped", "delivered"];
+                const currentIdx = stepOrder.indexOf(order.status);
+                const isComplete = currentIdx >= idx;
+                const isCurrent = currentIdx === idx;
+                return (
+                  <div key={step.key} className="flex flex-col items-center">
+                    <div
+                      className={`size-6 rounded-full flex items-center justify-center font-bold text-[11px] mb-1.5 transition-colors ${
+                        isComplete
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground border border-border"
+                      } ${isCurrent ? "ring-2 ring-primary ring-offset-2" : ""}`}
+                    >
+                      {idx + 1}
+                    </div>
+                    <span
+                      className={`text-[11px] leading-tight ${
+                        isComplete ? "font-semibold text-foreground" : "text-muted-foreground"
+                      }`}
+                    >
+                      {step.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {(order as unknown as { courier_name?: string; tracking_number?: string })?.tracking_number && (
+            <div className="mt-6 rounded-md border border-accent/40 bg-accent/5 p-4 text-sm text-left">
+              <p className="font-semibold text-accent uppercase tracking-wider text-xs">
+                Dispatch &amp; Delivery Logistics
+              </p>
+              <div className="mt-2 grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-muted-foreground block">Courier Service:</span>
+                  <strong className="text-foreground text-sm">
+                    {(order as unknown as { courier_name?: string })?.courier_name || "Designated Dispatch Rider"}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block">Waybill / Tracking Number:</span>
+                  <strong className="text-foreground text-sm font-mono">
+                    {(order as unknown as { tracking_number?: string })?.tracking_number}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          )}
+
           <ul className="mt-6 divide-y divide-border text-sm">
             {(order.order_items ?? []).map((item, i) => (
               <li key={i} className="flex justify-between gap-3 py-2">

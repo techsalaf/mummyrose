@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, Printer } from "lucide-react";
 import { toast } from "sonner";
 
 import { AdminHeader } from "@/components/admin/resource-manager";
@@ -54,6 +54,9 @@ type Order = {
   order_type?: string | null;
   discount_percent?: number | null;
   created_at: string;
+  courier_name?: string | null;
+  tracking_number?: string | null;
+  dispatched_at?: string | null;
   order_items: Item[];
 };
 
@@ -83,6 +86,9 @@ function AdminOrders() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [active, setActive] = useState<Order | null>(null);
   const [notes, setNotes] = useState("");
+  const [courierName, setCourierName] = useState("");
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [packingSlipOpen, setPackingSlipOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const needle = term.trim().toLowerCase();
@@ -229,6 +235,8 @@ function AdminOrders() {
                   onClick={() => {
                     setActive(order);
                     setNotes(order.notes ?? "");
+                    setCourierName(order.courier_name ?? "");
+                    setTrackingNumber(order.tracking_number ?? "");
                   }}
                 >
                   <TableCell>
@@ -265,8 +273,16 @@ function AdminOrders() {
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           {current ? (
             <>
-              <DialogHeader>
-                <DialogTitle>{current.order_number}</DialogTitle>
+              <DialogHeader className="flex flex-row items-center justify-between gap-3 space-y-0 pb-2 border-b">
+                <DialogTitle className="text-xl font-display">{current.order_number}</DialogTitle>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 shrink-0"
+                  onClick={() => setPackingSlipOpen(true)}
+                >
+                  <Printer className="size-4" /> Print Packing Slip
+                </Button>
               </DialogHeader>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -386,6 +402,89 @@ function AdminOrders() {
                 </div>
               </div>
 
+              {/* Bank Transfer Verification Banner */}
+              {current.payment_status === "unpaid" && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+                  <div>
+                    <p className="font-semibold text-amber-950 dark:text-amber-200">
+                      Payment Pending ({current.payment_provider || "manual"})
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Confirm received funds into your bank account before dispatching spices.
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                    disabled={changeOrder.isPending}
+                    onClick={() => changeOrder.mutate({ id: current.id, payment_status: "paid" })}
+                  >
+                    Confirm &amp; Mark Paid
+                  </Button>
+                </div>
+              )}
+
+              {/* Fulfilment & Courier Logistics */}
+              <div className="rounded-md border p-3.5 space-y-3 bg-muted/20">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+                  Fulfilment &amp; Courier Logistics
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="text-xs text-muted-foreground block mb-1">Courier Service</label>
+                    <Input
+                      placeholder="e.g. GIG Logistics, DHL, Kwik, Rider"
+                      value={courierName}
+                      onChange={(e) => setCourierName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground block mb-1">Waybill / Tracking Number</label>
+                    <Input
+                      placeholder="e.g. GIG-12345678"
+                      value={trackingNumber}
+                      onChange={(e) => setTrackingNumber(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={update.isPending}
+                    onClick={() =>
+                      update.mutate({
+                        id: current.id,
+                        values: {
+                          courier_name: courierName || null,
+                          tracking_number: trackingNumber || null,
+                          status:
+                            current.status === "pending" || current.status === "processing"
+                              ? "shipped"
+                              : current.status,
+                          dispatched_at: current.dispatched_at || new Date().toISOString(),
+                        },
+                      })
+                    }
+                  >
+                    Save Dispatch Info
+                  </Button>
+                  {current.customer_phone && trackingNumber ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const msg = `Hello ${current.customer_name}, your Mummy Rose spice order #${current.order_number} has been dispatched!\n\nCourier: ${courierName || "Designated Courier"}\nWaybill / Tracking: ${trackingNumber}\nDelivery Address: ${current.address_line ?? ""}, ${current.city ?? ""}\n\nTrack online at: https://mummyrose.com/track-order\n\nThank you for choosing Mummy Rose!`;
+                        const link = whatsAppLink(current.customer_phone ?? "", msg);
+                        if (link) window.open(link, "_blank", "noopener,noreferrer");
+                      }}
+                    >
+                      Send Dispatch WhatsApp
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+
               <div>
                 <p className="mb-1.5 text-xs uppercase tracking-wide text-muted-foreground">Internal notes</p>
                 <Textarea value={notes} rows={3} onChange={(e) => setNotes(e.target.value)} />
@@ -433,6 +532,119 @@ function AdminOrders() {
                 </div>
               </div>
             </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Packing Slip Print Dialog */}
+      <Dialog open={packingSlipOpen} onOpenChange={setPackingSlipOpen}>
+        <DialogContent className="max-h-[92vh] max-w-xl overflow-y-auto p-6 text-foreground print:p-0">
+          {current ? (
+            <div className="space-y-6 print:space-y-4">
+              <div className="flex justify-between items-start border-b pb-4">
+                <div>
+                  <h2 className="text-2xl font-display font-bold">Mummy Rose</h2>
+                  <p className="text-xs text-muted-foreground">Natural Nigerian Spices &amp; Pantry</p>
+                  <p className="text-xs text-muted-foreground">hello@mummyrose.com · +234 800 000 0000</p>
+                </div>
+                <div className="text-right">
+                  <span className="inline-block rounded bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary uppercase">
+                    Packing Slip
+                  </span>
+                  <p className="mt-1 font-mono text-sm font-semibold">{current.order_number}</p>
+                  <p className="text-xs text-muted-foreground">{formatDateTime(current.created_at)}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div className="rounded border p-3">
+                  <p className="font-semibold text-muted-foreground uppercase text-[10px]">Customer Information</p>
+                  <p className="mt-1 text-sm font-medium">{current.customer_name}</p>
+                  <p className="text-muted-foreground">{current.customer_email}</p>
+                  <p className="text-muted-foreground">{current.customer_phone || "—"}</p>
+                </div>
+                <div className="rounded border p-3">
+                  <p className="font-semibold text-muted-foreground uppercase text-[10px]">Delivery Destination</p>
+                  <p className="mt-1 text-sm font-medium">{current.address_line || "—"}</p>
+                  <p className="text-muted-foreground">
+                    {current.city ? `${current.city}, ` : ""}{current.state || ""}{current.country ? ` (${current.country})` : ""}
+                  </p>
+                  {current.postal_code && <p className="text-muted-foreground">Postal Code: {current.postal_code}</p>}
+                </div>
+              </div>
+
+              {current.notes && (
+                <div className="rounded bg-muted/40 p-2.5 text-xs">
+                  <span className="font-semibold">Delivery Instructions: </span>
+                  <span className="text-muted-foreground">{current.notes}</span>
+                </div>
+              )}
+
+              <div>
+                <p className="font-semibold text-xs uppercase text-muted-foreground mb-2">Package Items Checklist</p>
+                <div className="rounded border overflow-hidden">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-muted/50 border-b">
+                      <tr>
+                        <th className="p-2.5 w-12 text-center">Check</th>
+                        <th className="p-2.5">Item &amp; Packaging Size</th>
+                        <th className="p-2.5 text-center">Qty</th>
+                        <th className="p-2.5 text-right">Price</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {(current.order_items ?? []).map((item) => (
+                        <tr key={item.id}>
+                          <td className="p-2.5 text-center">
+                            <div className="size-4 border rounded border-muted-foreground/50 mx-auto" />
+                          </td>
+                          <td className="p-2.5">
+                            <span className="font-medium text-foreground">{item.product_name}</span>
+                            {item.variant && <span className="ml-1 text-muted-foreground">({item.variant})</span>}
+                          </td>
+                          <td className="p-2.5 text-center font-bold">{item.quantity}</td>
+                          <td className="p-2.5 text-right">{formatNaira(item.line_total)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="border-t pt-3 space-y-1 text-xs">
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Subtotal</span>
+                  <span>{formatNaira(current.subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Delivery Fee</span>
+                  <span>{current.shipping_fee === 0 ? "Free" : formatNaira(current.shipping_fee)}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold text-foreground border-t pt-2">
+                  <span>Total Amount</span>
+                  <span>{formatNaira(current.total)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground pt-1">
+                  <span>Payment Status</span>
+                  <span className="capitalize">{current.payment_status} ({current.payment_provider || "manual"})</span>
+                </div>
+                {courierName && (
+                  <div className="flex justify-between text-xs text-muted-foreground pt-1">
+                    <span>Carrier / Tracking</span>
+                    <span>{courierName}{trackingNumber ? ` · ${trackingNumber}` : ""}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 print:hidden">
+                <Button variant="outline" size="sm" onClick={() => setPackingSlipOpen(false)}>
+                  Close
+                </Button>
+                <Button size="sm" className="gap-1.5" onClick={() => window.print()}>
+                  <Printer className="size-4" /> Print Now
+                </Button>
+              </div>
+            </div>
           ) : null}
         </DialogContent>
       </Dialog>
