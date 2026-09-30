@@ -496,6 +496,7 @@ export type Database = {
           city: string | null
           country: string
           coupon_code: string | null
+          courier_name: string | null
           created_at: string
           currency: string
           customer_email: string
@@ -503,6 +504,7 @@ export type Database = {
           customer_phone: string | null
           discount_amount: number
           discount_percent: number
+          dispatched_at: string | null
           id: string
           notes: string | null
           order_number: string
@@ -514,8 +516,10 @@ export type Database = {
           shipping_fee: number
           state: string | null
           status: Database["public"]["Enums"]["order_status"]
+          stock_restored: boolean
           subtotal: number
           total: number
+          tracking_number: string | null
           updated_at: string
           user_id: string | null
           wholesale_account_id: string | null
@@ -525,6 +529,7 @@ export type Database = {
           city?: string | null
           country?: string
           coupon_code?: string | null
+          courier_name?: string | null
           created_at?: string
           currency?: string
           customer_email: string
@@ -532,6 +537,7 @@ export type Database = {
           customer_phone?: string | null
           discount_amount?: number
           discount_percent?: number
+          dispatched_at?: string | null
           id?: string
           notes?: string | null
           order_number: string
@@ -543,8 +549,10 @@ export type Database = {
           shipping_fee?: number
           state?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_restored?: boolean
           subtotal?: number
           total?: number
+          tracking_number?: string | null
           updated_at?: string
           user_id?: string | null
           wholesale_account_id?: string | null
@@ -554,6 +562,7 @@ export type Database = {
           city?: string | null
           country?: string
           coupon_code?: string | null
+          courier_name?: string | null
           created_at?: string
           currency?: string
           customer_email?: string
@@ -561,6 +570,7 @@ export type Database = {
           customer_phone?: string | null
           discount_amount?: number
           discount_percent?: number
+          dispatched_at?: string | null
           id?: string
           notes?: string | null
           order_number?: string
@@ -572,8 +582,10 @@ export type Database = {
           shipping_fee?: number
           state?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_restored?: boolean
           subtotal?: number
           total?: number
+          tracking_number?: string | null
           updated_at?: string
           user_id?: string | null
           wholesale_account_id?: string | null
