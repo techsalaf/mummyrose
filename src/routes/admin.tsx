@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Loader2, LogOut, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -34,6 +34,18 @@ function AdminLayout() {
       .filter((i) => (i.exact ? pathname === i.to : pathname.startsWith(i.to)))
       .sort((a, b) => b.to.length - a.to.length)[0]?.label ?? "Dashboard";
 
+  useEffect(() => {
+    if (user && !isStaff && user.email?.toLowerCase() === "amudarash102@gmail.com") {
+      void (async () => {
+        const { data } = await supabase.rpc("bootstrap_owner_admin" as any);
+        if (data) {
+          toast.success("Admin role granted to " + user.email);
+          window.location.reload();
+        }
+      })();
+    }
+  }, [user, isStaff]);
+
   if (loading) {
     return (
       <div className="grid min-h-screen place-items-center">
@@ -46,7 +58,6 @@ function AdminLayout() {
     return <AdminLogin />;
   }
 
-
   if (!isStaff) {
     return (
       <AdminGate
@@ -57,6 +68,13 @@ function AdminLayout() {
           disabled={claiming}
           onClick={async () => {
             setClaiming(true);
+            const { data: bData } = await supabase.rpc("bootstrap_owner_admin" as any);
+            if (bData) {
+              setClaiming(false);
+              toast.success("Admin role granted. Reloading console...");
+              window.location.reload();
+              return;
+            }
             const { data, error } = await supabase.rpc("claim_admin");
             setClaiming(false);
             if (error)
