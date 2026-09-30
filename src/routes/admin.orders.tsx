@@ -42,6 +42,7 @@ type Order = {
   address_line: string | null;
   city: string | null;
   state: string | null;
+  postal_code?: string | null;
   country: string;
   notes: string | null;
   subtotal: number;
