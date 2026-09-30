@@ -18,7 +18,8 @@ import { DEFAULT_SHIPPING, type ShippingZone } from "@/lib/shipping";
 import { DeliveryZonesEditor } from "@/components/admin/delivery-zones-editor";
 import { PaystackConfigCard } from "@/components/admin/paystack-config";
 import { SmtpConfigCard } from "@/components/admin/smtp-config";
-import { ChangePasswordCard, ProfileDetailsCard } from "@/components/profile-security-card";
+import { ChangePasswordCard } from "@/components/profile-security-card";
+import { ProfileEditor } from "@/components/profile-editor";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DEFAULT_BRANDING,
@@ -552,8 +553,8 @@ function AdminSettings() {
               </p>
             </div>
             {user ? (
-              <div className="grid gap-6 md:grid-cols-2">
-                <ProfileDetailsCard user={user} roleLabel="Store Administrator" />
+              <div className="space-y-6">
+                <ProfileEditor user={user} roleLabel="Store Administrator" />
                 <ChangePasswordCard user={user} />
               </div>
             ) : (

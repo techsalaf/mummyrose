@@ -134,6 +134,14 @@ export function AdminSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={pathname === "/admin/profile"} tooltip="My profile">
+              <Link to="/admin/profile">
+                <Users className="size-4" />
+                <span>My profile</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="View storefront">
               <Link to="/">
                 <Home className="size-4" />
