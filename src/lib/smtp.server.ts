@@ -1,4 +1,3 @@
-import nodemailer from "nodemailer";
 import { decryptSecret, encryptSecret } from "./secrets.server";
 
 export type SmtpConfig = {
@@ -129,6 +128,7 @@ export async function sendMail(input: {
           ? `"${config.from_name.replace(/"/g, "")}" <${config.from_email}>`
           : config.from_email
         : undefined;
+      const { default: nodemailer } = await import("nodemailer");
       const transport = nodemailer.createTransport({
         host: config.host,
         port: config.port,
