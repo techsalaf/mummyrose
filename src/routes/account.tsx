@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,14 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AddressBook } from "@/components/address-book";
+import { ChangePasswordCard, ProfileDetailsCard } from "@/components/profile-security-card";
 
 export const Route = createFileRoute("/account")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Your Account — Mummy Rose" },
+      { title: "Your Account - Mummy Rose" },
       { name: "description", content: "Sign in to your Mummy Rose account to track orders and manage details." },
-      { property: "og:title", content: "Your Account — Mummy Rose" },
+      { property: "og:title", content: "Your Account - Mummy Rose" },
       { property: "og:description", content: "Sign in to manage your Mummy Rose orders." },
       { name: "robots", content: "noindex" },
     ],
@@ -23,7 +25,7 @@ export const Route = createFileRoute("/account")({
 });
 
 function AccountPage() {
-  const { user, loading } = useAuth();
+  const { user, isStaff, loading } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
 
@@ -44,7 +46,7 @@ function AccountPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created — check your inbox to confirm.");
+        toast.success("Account created: check your inbox to confirm.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -63,13 +65,20 @@ function AccountPage() {
 
   if (user) {
     return (
-      <div className="container-page max-w-3xl py-16">
-        <p className="eyebrow text-accent">Account</p>
+      <div className="container-page max-w-4xl py-16">
+        <p className="eyebrow text-accent">Account &amp; Security</p>
         <h1 className="mt-3 font-display text-4xl">Hello{user.email ? `, ${user.email}` : ""}</h1>
         <p className="mt-4 text-muted-foreground">
-          Track a delivery with your order number, or keep shopping the pantry.
+          Manage your personal details, change your account password, and manage your delivery addresses.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          {isStaff ? (
+            <Button asChild variant="default" className="gap-2">
+              <Link to="/admin">
+                <ShieldCheck className="size-4" /> Admin Console
+              </Link>
+            </Button>
+          ) : null}
           <Button asChild variant="clay">
             <Link to="/track-order">Track an order</Link>
           </Button>
@@ -85,6 +94,11 @@ function AccountPage() {
           >
             Sign out
           </Button>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          <ProfileDetailsCard user={user} roleLabel={isStaff ? "Administrator / Staff" : "Customer"} />
+          <ChangePasswordCard user={user} />
         </div>
 
         <div className="mt-14">

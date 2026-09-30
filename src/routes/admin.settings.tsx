@@ -18,6 +18,8 @@ import { DEFAULT_SHIPPING, type ShippingZone } from "@/lib/shipping";
 import { DeliveryZonesEditor } from "@/components/admin/delivery-zones-editor";
 import { PaystackConfigCard } from "@/components/admin/paystack-config";
 import { SmtpConfigCard } from "@/components/admin/smtp-config";
+import { ChangePasswordCard, ProfileDetailsCard } from "@/components/profile-security-card";
+import { useAuth } from "@/hooks/useAuth";
 import {
   DEFAULT_BRANDING,
   DEFAULT_THEME,
@@ -48,6 +50,7 @@ export const Route = createFileRoute("/admin/settings")({
 type Group = Record<string, unknown>;
 
 function AdminSettings() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery(adminSettingsQuery);
   const [store, setStore] = useState<Group>({});
@@ -97,7 +100,7 @@ function AdminSettings() {
     <div className="space-y-6">
       <AdminHeader
         title="Settings"
-        description="Brand identity, colours, fonts, meta tags, home page content, footer, delivery, payments and WhatsApp — every change is live on the storefront the moment you save."
+        description="Brand identity, colours, fonts, meta tags, home page content, footer, delivery, payments, WhatsApp and admin security: every change is live on the storefront the moment you save."
       />
 
       <Tabs defaultValue="brand">
@@ -113,6 +116,7 @@ function AdminSettings() {
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="seo">SEO &amp; meta</TabsTrigger>
+          <TabsTrigger value="profile">Profile &amp; password</TabsTrigger>
         </TabsList>
 
         <TabsContent value="brand">
@@ -537,6 +541,27 @@ function AdminSettings() {
               />
             </div>
           </Panel>
+        </TabsContent>
+
+        <TabsContent value="profile">
+          <div className="space-y-6 pt-4">
+            <div>
+              <h2 className="font-display text-xl font-semibold">Administrator Profile &amp; Password</h2>
+              <p className="text-sm text-muted-foreground">
+                Manage your administrator contact details and change your account login password securely.
+              </p>
+            </div>
+            {user ? (
+              <div className="grid gap-6 md:grid-cols-2">
+                <ProfileDetailsCard user={user} roleLabel="Store Administrator" />
+                <ChangePasswordCard user={user} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-10 text-sm text-muted-foreground">
+                No active user session detected.
+              </div>
+            )}
+          </div>
         </TabsContent>
 
       </Tabs>

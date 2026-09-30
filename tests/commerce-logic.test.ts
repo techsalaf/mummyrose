@@ -133,3 +133,36 @@ describe("Checkout Schema with Variant Validation", () => {
     assert.equal(result.success, true);
   });
 });
+
+describe("Password and Profile Security Validation", () => {
+  function validatePasswordChange(current: string, next: string, confirm: string) {
+    if (!next) return { valid: false, error: "Password is required" };
+    if (next.length < 6) return { valid: false, error: "Minimum 6 characters required" };
+    if (next !== confirm) return { valid: false, error: "Passwords do not match" };
+    if (current && next === current) return { valid: false, error: "New password must be different" };
+    return { valid: true };
+  }
+
+  it("rejects passwords shorter than 6 characters", () => {
+    const res = validatePasswordChange("oldpass1", "12345", "12345");
+    assert.equal(res.valid, false);
+    assert.equal(res.error, "Minimum 6 characters required");
+  });
+
+  it("rejects mismatched confirm password", () => {
+    const res = validatePasswordChange("oldpass1", "Secret123!", "Secret1234!");
+    assert.equal(res.valid, false);
+    assert.equal(res.error, "Passwords do not match");
+  });
+
+  it("rejects new password identical to current password", () => {
+    const res = validatePasswordChange("SamePassword1", "SamePassword1", "SamePassword1");
+    assert.equal(res.valid, false);
+    assert.equal(res.error, "New password must be different");
+  });
+
+  it("accepts valid password update payload", () => {
+    const res = validatePasswordChange("OldSecure123", "NewSecure456!", "NewSecure456!");
+    assert.equal(res.valid, true);
+  });
+});

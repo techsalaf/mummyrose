@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Loader2, LogOut, ShieldCheck } from "lucide-react";
+import { KeyRound, Loader2, LogOut, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 
@@ -123,6 +123,11 @@ function AdminLayout() {
               <ThemeToggle />
               <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
                 <Link to="/">Storefront</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild className="hidden md:inline-flex gap-1.5 text-xs">
+                <Link to="/account">
+                  <KeyRound className="size-3.5" /> Password &amp; Profile
+                </Link>
               </Button>
               <Button
                 variant="ghost"
