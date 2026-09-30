@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AddressBook } from "@/components/address-book";
+import { ProfileEditor } from "@/components/profile-editor";
 
 export const Route = createFileRoute("/account")({
   ssr: false,
@@ -85,6 +86,10 @@ function AccountPage() {
           >
             Sign out
           </Button>
+        </div>
+
+        <div className="mt-10">
+          <ProfileEditor user={user} roleLabel="Customer" />
         </div>
 
         <div className="mt-14">
