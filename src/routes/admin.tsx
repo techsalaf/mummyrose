@@ -51,7 +51,7 @@ function AdminLayout() {
     return (
       <AdminGate
         title="No staff access on this account"
-        body="This account is signed in but has no admin or staff role. The store owner account already holds the admin role — sign in with it, or ask an admin to add this email under Team & roles."
+        body={`You are signed in as ${user.email ?? "unknown"}, but this account does not have an admin or staff role. Sign in with the store owner account, or claim the admin role below.`}
       >
         <Button
           disabled={claiming}
@@ -61,10 +61,10 @@ function AdminLayout() {
             setClaiming(false);
             if (error)
               return toast.error(
-                "Self-claiming admin is disabled for security. Ask an existing admin to grant this account access.",
+                "Self-claiming admin is disabled for security. Ask an existing admin or run the role grant query in Supabase.",
               );
             if (data) {
-              toast.success("Admin role granted — reloading");
+              toast.success("Admin role granted. Reloading console...");
               window.location.reload();
             } else {
               toast.error("An admin already exists. Ask them to grant you access.");
@@ -73,7 +73,16 @@ function AdminLayout() {
         >
           {claiming ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />} Claim admin role
         </Button>
-        <Button variant="outline" asChild>
+        <Button
+          variant="outline"
+          onClick={async () => {
+            await supabase.auth.signOut();
+            window.location.reload();
+          }}
+        >
+          <LogOut className="size-4" /> Sign out
+        </Button>
+        <Button variant="ghost" asChild>
           <Link to="/">Back to store</Link>
         </Button>
       </AdminGate>
